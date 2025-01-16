@@ -59,7 +59,7 @@ export default {
           900: "#480E00",
         },
         ebony: "#222428",
-        white_smoke: "#F5F5F5",
+        whiteSmoke: "#F5F5F5",
       },
     },
   },
