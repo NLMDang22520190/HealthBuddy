@@ -40,7 +40,7 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4 bg-whiteSmoke dark:bg-ebony">
+    <div className="min-h-screen w-full flex items-center justify-center p-4 bg-transparent">
       <motion.div
         className="w-full max-w-md"
         initial="hidden"
@@ -69,7 +69,7 @@ const ForgotPassword = () => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Nhập email..."
+                  placeholder="Enter email..."
                   required
                   icon={Mail}
                   className="mt-1"

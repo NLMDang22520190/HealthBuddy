@@ -37,7 +37,7 @@ const VerifyCode = () => {
     },
   };
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4 bg-gradient-to-br bg-white_smoke dark:bg-ebony">
+    <div className="min-h-screen w-full flex items-center justify-center p-4 bg-gradient-to-br bg-transparent">
       <motion.div
         className="w-full max-w-md"
         initial="hidden"
