@@ -60,6 +60,16 @@ export default {
         },
         ebony: "#222428",
         whiteSmoke: "#F5F5F5",
+        mint_cream: "#F5FFFA",
+        floral_white: "#FFFAF0",
+        snow: "#FFFAFA",
+        ghost_white: "#F8F8FF",
+        jet: "#2A2A2A",
+        raisin_black: "#242124",
+      },
+      screens: {
+        "sm-md": "700px", // Giữa sm và md
+        "md-lg": "900px", // Giữa md và lg
       },
     },
   },

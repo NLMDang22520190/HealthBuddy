@@ -3,6 +3,7 @@ import { BrowserRouter as Router } from "react-router-dom";
 
 import "./App.css";
 import Navbar from "./components/User/Navbar/Navbar";
+import LeftSideBar from "./components/User/LeftSideBar/LeftSideBar";
 import AllUserRoutes from "./routes/AllUserRoutes";
 
 function App() {
@@ -25,10 +26,13 @@ function App() {
 
   return (
     <div className={`${darkMode ? "dark" : ""}`}>
-      <Router>
-        <Navbar onToggleTheme={toggleDarkMode} isDarkTheme={darkMode} />
-        <AllUserRoutes />
-      </Router>
+      <div className="bg-snow dark:bg-ebony ">
+        <Router>
+          <Navbar onToggleTheme={toggleDarkMode} isDarkTheme={darkMode} />
+          <AllUserRoutes />
+        </Router>
+      </div>
+
       {/* <div className="transistion-300 bg-white_smoke dark:bg-ebony h-screen flex items-center justify-center">
         <h1 className="text-lg">hi {version}</h1>
         <button
