@@ -1,16 +1,25 @@
 import React from "react";
-import { LogOut, Sun, Moon } from "lucide-react";
+import { LogOut } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 
 import SearchBar from "./SearchBar";
 import logo from "../../../assets/logo.png";
 
 const Navbar = ({ onToggleTheme, isDarkTheme }) => {
+  const navigate = useNavigate();
   const user = null; // Thay giá trị null bằng logic kiểm tra user từ context hoặc redux
+
+  const navigateToHome = () => {
+    navigate("/");
+  };
 
   return (
     <div className="bg-whiteSmoke dark:bg-ebony flex items-center justify-between sticky top-0 z-50 ">
       <div className="mx-12 md:mx-auto bg-white flex items-center justify-between w-10/12 md:w-9/12 mt-2 rounded-2xl p-4">
-        <div className="flex text-center items-center gap-4">
+        <div
+          onClick={navigateToHome}
+          className="flex text-center items-center gap-4"
+        >
           <img className="size-12" src={logo} alt="logo" />
           <label className="bg-gradient-to-br from-primary-dark to-secondary-dark font-bold text-transparent bg-clip-text text-2xl">
             health buddy
@@ -64,7 +73,9 @@ const Navbar = ({ onToggleTheme, isDarkTheme }) => {
             // Hiển thị nút Login và Sign up nếu user là null
             <>
               <div className="rounded-xl max-w-32 bg-transparent items-center justify-center flex border-2 border-primary-dark shadow-lg hover:bg-primary-dark text-primary-dark hover:text-white duration-300 cursor-pointer active:scale-[0.98]">
-                <button className="px-5 py-2 uppercase">Login</button>
+                <Link to="/auth/login" className="px-5 py-2 uppercase">
+                  Login
+                </Link>
               </div>
               <div className="rounded-xl max-w-32 bg-transparent items-center justify-center bg-gradient-to-br from-primary-dark to-secondary-dark flex border-2 shadow-lg hover:bg-gradient-to-br hover:from-secondary-dark hover:to-primary-dark text-white transition duration-300 cursor-pointer active:scale-[0.98]">
                 <button className="px-5 py-2 uppercase">Sign up</button>
