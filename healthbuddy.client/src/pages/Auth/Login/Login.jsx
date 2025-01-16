@@ -1,20 +1,17 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, Lock, Mail } from "lucide-react";
-import { Form, Input, Checkbox } from "antd";
+import { Form } from "antd";
 import { Card, TextInput, Label, Button } from "flowbite-react";
 import { Link } from "react-router-dom";
+import { Mail, Lock } from "lucide-react";
 
 const Login = () => {
-  const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log("Login attempt:", { email, password, rememberMe });
+    console.log("Login attempt:", { email, password });
   };
 
   const containerVariants = {
@@ -55,7 +52,7 @@ const Login = () => {
             <h1 className="text-3xl font-semibold text-gray-900 dark:text-white">
               Welcome back
             </h1>
-            <p className="text-gray-500 dark:text-primary-dark">
+            <p className="text-gray-500 dark:text-secondary-dark">
               Please enter your details to sign in
             </p>
           </motion.div>
@@ -67,6 +64,7 @@ const Login = () => {
                   Email
                 </Label>
                 <TextInput
+                  icon={Mail}
                   id="email"
                   type="email"
                   value={email}
@@ -84,6 +82,7 @@ const Login = () => {
                 </Label>
                 <TextInput
                   id="password"
+                  icon={Lock}
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -102,7 +101,7 @@ const Login = () => {
             >
               <Link
                 to="/auth/forgot-password"
-                className="text-sm text-primary-dark hover:text-primary-light transition-colors"
+                className="text-sm text-secondary-dark hover:text-secondary-light transition-colors"
               >
                 Forgot password?
               </Link>
@@ -174,7 +173,7 @@ const Login = () => {
             Don't have an account?{" "}
             <Link
               to="/auth/signup"
-              className="text-primary-dark hover:text-primary-50"
+              className="text-secondary-dark hover:text-secondary-50"
             >
               Sign up
             </Link>

@@ -78,7 +78,9 @@ const Navbar = ({ onToggleTheme, isDarkTheme }) => {
                 </Link>
               </div>
               <div className="rounded-xl max-w-32 bg-transparent items-center justify-center bg-gradient-to-br from-primary-dark to-secondary-dark flex border-2 shadow-lg hover:bg-gradient-to-br hover:from-secondary-dark hover:to-primary-dark text-white transition duration-300 cursor-pointer active:scale-[0.98]">
-                <button className="px-5 py-2 uppercase">Sign up</button>
+                <Link to="auth/signup" className="px-5 py-2 uppercase">
+                  Sign up
+                </Link>
               </div>
             </>
           )}
