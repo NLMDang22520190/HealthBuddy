@@ -1,5 +1,9 @@
 import { useEffect, useState, version } from "react";
+import { BrowserRouter as Router } from "react-router-dom";
+
 import "./App.css";
+import Navbar from "./components/User/Navbar/Navbar";
+import AllUserRoutes from "./routes/AllUserRoutes";
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -21,7 +25,11 @@ function App() {
 
   return (
     <div className={`${darkMode ? "dark" : ""}`}>
-      <div className="transistion-300 bg-white_smoke dark:bg-ebony h-screen flex items-center justify-center">
+      <Router>
+        <Navbar onToggleTheme={toggleDarkMode} isDarkTheme={darkMode} />
+        <AllUserRoutes />
+      </Router>
+      {/* <div className="transistion-300 bg-white_smoke dark:bg-ebony h-screen flex items-center justify-center">
         <h1 className="text-lg">hi {version}</h1>
         <button
           onClick={() => {
@@ -31,7 +39,7 @@ function App() {
         >
           test
         </button>
-      </div>
+      </div> */}
     </div>
   );
 }
