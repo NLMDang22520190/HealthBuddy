@@ -1,12 +1,16 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 
-import Home from "../pages/User/Home/Home";
 import Login from "../pages/Auth/Login/Login";
 import SignUp from "../pages/Auth/SignUp/SignUp";
 import VerifyCode from "../pages/Auth/VerifyCode/VerifyCode";
 import ForgotPassword from "../pages/Auth/ForgotPassword/ForgotPassword";
 import ResetPassword from "../pages/Auth/ResetPassword/ResetPassword";
+
+import Home from "../pages/User/Home/Home";
+
+import NewFood from "../pages/User/Add/NewFood/NewFood";
+import NewExercise from "../pages/User/Add/NewExercise/NewExercise";
 
 const AllUserRoutes = () => {
   return (
@@ -17,6 +21,9 @@ const AllUserRoutes = () => {
       <Route path="auth/verify-code" element={<VerifyCode />} />
       <Route path="auth/forgot-password" element={<ForgotPassword />} />
       <Route path="auth/reset-password" element={<ResetPassword />} />
+
+      <Route path="add/new-food" element={<NewFood />} />
+      <Route path="add/new-exercise" element={<NewExercise />} />
     </Routes>
   );
 };

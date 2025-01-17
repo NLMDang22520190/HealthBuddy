@@ -5,9 +5,12 @@ import "./App.css";
 import Navbar from "./components/User/Navbar/Navbar";
 import LeftSideBar from "./components/User/LeftSideBar/LeftSideBar";
 import AllUserRoutes from "./routes/AllUserRoutes";
+import { ConfigProvider } from "antd";
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
+  const [modalColor, setModalColor] = useState("#1D1F21");
+  const [titleColor, setTitleColor] = useState("#000");
 
   useEffect(() => {
     let savedMode = localStorage.getItem("displayMode");
@@ -24,27 +27,37 @@ function App() {
     //localStorage.setItem("displayMode", darkMode ? "light" : "dark");
   };
 
-  return (
-    <div className={`${darkMode ? "dark" : ""}`}>
-      <div className="bg-snow dark:bg-ebony ">
-        <Router>
-          <Navbar onToggleTheme={toggleDarkMode} isDarkTheme={darkMode} />
-          <AllUserRoutes />
-        </Router>
-      </div>
+  useEffect(() => {
+    if (darkMode) {
+      setModalColor("#1D1F21");
+      setTitleColor("#fff");
+    } else {
+      setModalColor("#fff");
+      setTitleColor("#000");
+    }
+  }, [darkMode]);
 
-      {/* <div className="transistion-300 bg-white_smoke dark:bg-ebony h-screen flex items-center justify-center">
-        <h1 className="text-lg">hi {version}</h1>
-        <button
-          onClick={() => {
-            toggleDarkMode();
-          }}
-          className="size-28 bg-gradient-to-br from-primary-dark to-secondary-dark text-white"
-        >
-          test
-        </button>
-      </div> */}
-    </div>
+  return (
+    <ConfigProvider
+      theme={{
+        components: {
+          Modal: {
+            contentBg: modalColor,
+            headerBg: modalColor,
+            titleColor: titleColor,
+          },
+        },
+      }}
+    >
+      <div className={`${darkMode ? "dark" : ""}`}>
+        <div className="bg-snow dark:bg-ebony ">
+          <Router>
+            <Navbar onToggleTheme={toggleDarkMode} isDarkTheme={darkMode} />
+            <AllUserRoutes />
+          </Router>
+        </div>
+      </div>
+    </ConfigProvider>
   );
 }
 

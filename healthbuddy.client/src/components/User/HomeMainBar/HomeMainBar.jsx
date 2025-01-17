@@ -1,9 +1,10 @@
-import React from "react";
-import { Avatar } from "antd";
-import { Label } from "flowbite-react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { Modal } from "antd";
 
 import PostList from "../PostList/PostList";
+import UserAddNewPost from "../UserAddNewPost/UserAddNewPost";
+import AddNewNavigateModal from "../AddNewNavigateModal/AddNewNavigateModal";
 
 const posts = [
   {
@@ -145,7 +146,7 @@ const posts = [
     id: 10,
     title: "5 bài tập thể dục tại nhà đơn giản",
     content:
-      "Không cần đến phòng gym, bạn vẫn có thể tập luyện hiệu quả với 5 bài tập này.",
+      "Không cần đến phòng gym, bạn vẫn có thể tập luyện hiệu quả với 5 bài tập này.Không cần đến phòng gym, bạn vẫn có thể tập luyện hiệu quả với 5 bài tập này.Không cần đến phòng gym, bạn vẫn có thể tập luyện hiệu quả với 5 bài tập này.Không cần đến phòng gym, bạn vẫn có thể tập luyện hiệu quả với 5 bài tập này.",
     image: "https://placehold.co/50x50.png",
     user: {
       id: 10,
@@ -159,29 +160,25 @@ const posts = [
 ];
 
 const HomeMainBar = () => {
+  const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleAddClick = () => {
+    setIsOpen(true);
+    //navigate("/add/new-food");
+  };
+
   return (
     <div className="h-screen overflow-y-auto">
       {/* Content bên trong scroll */}
       <div className="min-h-screen divide-gray-400 divide-y">
-        <div className="p-3 md:p-6 flex gap-3">
-          <Avatar
-            className="min-w-12 h-12 md:size-14"
-            src="https://placehold.co/50x50.png"
-          ></Avatar>
-          <div className="flex flex-col gap-1 lg:gap-3">
-            <Label className="text-base ">Have something new to share?</Label>
-            <div className="flex gap-1 lg:gap-2">
-              <Label className="text-base ">Click</Label>
-              <Link to="/" className="text-secondary-dark font-bold">
-                HERE
-              </Link>
-              <Label className="text-base ">to post new stuff!</Label>
-            </div>
-          </div>
-        </div>
-
+        <UserAddNewPost onAddClick={handleAddClick} />
         <PostList posts={posts} />
       </div>
+      <AddNewNavigateModal
+        open={isOpen}
+        onCancel={() => setIsOpen(false)}
+      ></AddNewNavigateModal>
     </div>
   );
 };
