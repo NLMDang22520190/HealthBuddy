@@ -61,11 +61,15 @@ export default {
         ebony: "#222428",
         whiteSmoke: "#F5F5F5",
         mint_cream: "#F5FFFA",
+        seashell: "#FFF5EE",
         floral_white: "#FFFAF0",
         snow: "#FFFAFA",
         ghost_white: "#F8F8FF",
         jet: "#2A2A2A",
         raisin_black: "#242124",
+        oxford_blue: "#212437",
+        card_dark: "#1F2937",
+        gunmetal: "#1D1F21",
       },
       screens: {
         "sm-md": "700px", // Giữa sm và md
