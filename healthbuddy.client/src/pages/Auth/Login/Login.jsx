@@ -133,7 +133,30 @@ const Login = () => {
             className="grid grid-cols-2 gap-3"
             variants={itemVariants}
           >
-            <Button outline gradientDuoTone="pinkToOrange" className="group ">
+            <div className="group bg-gradient-to-tr from-[#ea4335] to-[#fbbc05] rounded-lg p-0.5 shadow-md flex items-center justify-center">
+              <button className=" flex-1 flex items-center justify-center font-bold text-xl bg-neutral-50 hover:bg-transparent p-2 rounded-lg">
+                <svg
+                  class="size-6 font-bold text-red-500 group-hover:text-white"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  stroke-width="2"
+                  stroke="currentColor"
+                  fill="none"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  {" "}
+                  <path stroke="none" d="M0 0h24v24H0z" />{" "}
+                  <path d="M17.788 5.108A9 9 0 1021 12h-8" />
+                </svg>
+              </button>
+            </div>
+            {/* <Button
+              outline
+              gradientDuoTone="pinkToOrange"
+              className="group bg-whiteSmoke"
+            >
               <svg
                 class="size-6 text-compleprimary-dark group-hover:text-white"
                 width="24"
@@ -149,8 +172,25 @@ const Login = () => {
                 <path stroke="none" d="M0 0h24v24H0z" />{" "}
                 <path d="M17.788 5.108A9 9 0 1021 12h-8" />
               </svg>
-            </Button>
-            <Button outline gradientDuoTone="cyanToBlue" className="group">
+            </Button> */}
+
+            <div className="group bg-gradient-to-tr from-[#3b5998]  to-secondary-dark rounded-lg p-0.5 shadow-md flex items-center justify-center">
+              <button className=" flex-1 flex items-center justify-center font-bold text-xl bg-neutral-50 hover:bg-transparent p-2 rounded-lg">
+                <svg
+                  class="size-6 text-blue-500 group-hover:text-white"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  {" "}
+                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                </svg>
+              </button>
+            </div>
+            {/* <Button outline gradientDuoTone="cyanToBlue" className="group">
               <svg
                 class="size-6 text-secondary-dark group-hover:text-white"
                 viewBox="0 0 24 24"
@@ -163,7 +203,7 @@ const Login = () => {
                 {" "}
                 <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
               </svg>
-            </Button>
+            </Button> */}
           </motion.div>
 
           <motion.p
