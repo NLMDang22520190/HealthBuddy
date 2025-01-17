@@ -163,7 +163,7 @@ const HomeMainBar = () => {
     <div className="h-screen overflow-y-auto">
       {/* Content bên trong scroll */}
       <div className="min-h-screen divide-gray-400 divide-y">
-        <div className="p-6 flex items-center gap-3">
+        <div className="p-6 flex items-center gap-1 lg:gap-3">
           <Avatar size={50} src="https://placehold.co/50x50.png"></Avatar>
           <Label className="text-base ">
             Have something new to share? Click
