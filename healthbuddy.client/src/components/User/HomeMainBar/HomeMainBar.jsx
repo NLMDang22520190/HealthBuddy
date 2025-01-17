@@ -163,15 +163,21 @@ const HomeMainBar = () => {
     <div className="h-screen overflow-y-auto">
       {/* Content bên trong scroll */}
       <div className="min-h-screen divide-gray-400 divide-y">
-        <div className="p-6 flex items-center gap-1 lg:gap-3">
-          <Avatar size={50} src="https://placehold.co/50x50.png"></Avatar>
-          <Label className="text-base ">
-            Have something new to share? Click
-          </Label>
-          <Link to="/" className="text-secondary-dark font-bold">
-            HERE
-          </Link>
-          <Label className="text-base ">to post new stuff!</Label>
+        <div className="p-3 md:p-6 flex gap-1 lg:gap-3">
+          <Avatar
+            className="min-w-12 h-12 md:size-14"
+            src="https://placehold.co/50x50.png"
+          ></Avatar>
+          <div className="flex flex-col gap-1 lg:gap-3">
+            <Label className="text-base ">Have something new to share?</Label>
+            <div className="flex gap-1 lg:gap-2">
+              <Label className="text-base ">Click</Label>
+              <Link to="/" className="text-secondary-dark font-bold">
+                HERE
+              </Link>
+              <Label className="text-base ">to post new stuff!</Label>
+            </div>
+          </div>
         </div>
 
         <PostList posts={posts} />

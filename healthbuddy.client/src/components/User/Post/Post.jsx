@@ -7,8 +7,11 @@ import { Label } from "flowbite-react";
 
 const Post = ({ post }) => {
   return (
-    <div className="px-6 py-2 flex gap-3">
-      <Avatar size={50} src={post.user.avatar}></Avatar>
+    <div className="px-3 md:px-6 py-2 flex gap-3">
+      <Avatar
+        className="min-w-12 h-12 md:size-14"
+        src={post.user.avatar}
+      ></Avatar>
       <div className="flex gap-3 flex-col">
         <div className="flex gap-2">
           <Label className="text-xs">{post.user.name}</Label>
