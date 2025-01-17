@@ -1,8 +1,8 @@
 import React from "react";
-import LeftSideBar from "../../../components/User/LeftSideBar/LeftSideBar";
-import HomeMainBar from "../../../components/User/HomeMainBar/HomeMainBar";
+import LeftSideBar from "../../../../components/User/LeftSideBar/LeftSideBar";
+import NewFoodMainBar from "../../../../components/User/Add/NewFoodMainBar/NewFoodMainBar";
 
-const Home = () => {
+const NewFood = () => {
   return (
     <div className="h-screen flex flex-col md:flex-row mt-2 relative">
       {/* LeftSideBar: Di chuyển xuống khi màn hình nhỏ, sticky ở dưới */}
@@ -11,11 +11,11 @@ const Home = () => {
       </div>
 
       {/* HomeMainBar */}
-      <div className="order-1 md:order-2  md:mx-auto  md:w-6/12 min-h-screen h-fit bg-white dark:bg-gunmetal rounded-2xl">
-        <HomeMainBar />
+      <div className="order-1 md:order-2  md:mx-auto  md:w-6/12 ~md h-fit min-h-screen bg-white dark:bg-gunmetal rounded-2xl">
+        <NewFoodMainBar />
       </div>
     </div>
   );
 };
 
-export default Home;
+export default NewFood;

@@ -133,7 +133,7 @@ const Login = () => {
             className="grid grid-cols-2 gap-3"
             variants={itemVariants}
           >
-            <div className="group bg-gradient-to-tr from-[#ea4335] to-[#fbbc05] rounded-lg p-0.5 shadow-md flex items-center justify-center">
+            <div className="group bg-gradient-to-tr from-[#d20404] to-[#ea8d84] rounded-lg p-0.5 shadow-md flex items-center justify-center">
               <button className=" flex-1 flex items-center justify-center font-bold text-xl bg-neutral-50 hover:bg-transparent p-2 rounded-lg">
                 <svg
                   class="size-6 font-bold text-red-500 group-hover:text-white"
