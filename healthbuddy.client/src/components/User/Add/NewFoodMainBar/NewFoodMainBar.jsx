@@ -1,6 +1,19 @@
 import React, { useState } from "react";
 import { Button, TextInput, Textarea, Select, Label } from "flowbite-react";
 import { motion } from "framer-motion";
+import {
+  Pen,
+  NotebookText,
+  Cross,
+  HeartPulse,
+  Flame,
+  Layers,
+  UsersRound,
+  Clock4,
+  Carrot,
+  Image,
+  Video,
+} from "lucide-react";
 
 const NewFoodMainBar = () => {
   const [formData, setFormData] = useState({
@@ -80,6 +93,7 @@ const NewFoodMainBar = () => {
           <motion.div variants={itemVariants}>
             <Label className="block mb-2 text-sm font-medium">Dish Name</Label>
             <TextInput
+              icon={Pen}
               name="name"
               placeholder="Enter dish name"
               value={formData.name}
@@ -102,54 +116,6 @@ const NewFoodMainBar = () => {
           </motion.div>
 
           <motion.div variants={itemVariants}>
-            <Label className="block mb-2 text-sm font-medium">Image</Label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              className="block w-full text-sm text-gray-500"
-            />
-          </motion.div>
-
-          <motion.div variants={itemVariants}>
-            <Label className="block mb-2 text-sm font-medium">Video URL</Label>
-            <TextInput
-              name="videoUrl"
-              placeholder="Enter video URL"
-              value={formData.videoUrl}
-              onChange={handleChange}
-            />
-          </motion.div>
-
-          <motion.div variants={itemVariants}>
-            <Label className="block mb-2 text-sm font-medium">Calories</Label>
-            <TextInput
-              type="number"
-              name="calories"
-              value={formData.calories}
-              onChange={handleChange}
-              required
-            />
-          </motion.div>
-
-          <motion.div variants={itemVariants}>
-            <Label className="block mb-2 text-sm font-medium">
-              Difficulty Level
-            </Label>
-            <Select
-              name="difficultyLevel"
-              value={formData.difficultyLevel}
-              onChange={(e) =>
-                setFormData({ ...formData, difficultyLevel: e.target.value })
-              }
-            >
-              <option value="easy">Easy</option>
-              <option value="medium">Medium</option>
-              <option value="hard">Hard</option>
-            </Select>
-          </motion.div>
-
-          <motion.div variants={itemVariants}>
             <Label className="block mb-2 text-sm font-medium">
               Health Benefits
             </Label>
@@ -161,31 +127,65 @@ const NewFoodMainBar = () => {
             />
           </motion.div>
 
-          <motion.div variants={itemVariants}>
-            <Label className="block mb-2 text-sm font-medium">
-              Cooking Time (minutes)
-            </Label>
-            <TextInput
-              type="number"
-              name="cookingTime"
-              value={formData.cookingTime}
-              onChange={handleChange}
-              required
-            />
-          </motion.div>
+          <div className="grid grid-cols-2 gap-4">
+            <motion.div variants={itemVariants}>
+              <Label className="block mb-2 text-sm font-medium">Calories</Label>
+              <TextInput
+                icon={Flame}
+                type="number"
+                name="calories"
+                value={formData.calories}
+                onChange={handleChange}
+                required
+              />
+            </motion.div>
 
-          <motion.div variants={itemVariants}>
-            <Label className="block mb-2 text-sm font-medium">
-              Portion Size
-            </Label>
-            <TextInput
-              type="number"
-              name="portion"
-              value={formData.portion}
-              onChange={handleChange}
-              required
-            />
-          </motion.div>
+            <motion.div variants={itemVariants}>
+              <Label className="block mb-2 text-sm font-medium">
+                Difficulty Level
+              </Label>
+              <Select
+                icon={Layers}
+                name="difficultyLevel"
+                value={formData.difficultyLevel}
+                onChange={(e) =>
+                  setFormData({ ...formData, difficultyLevel: e.target.value })
+                }
+              >
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+              </Select>
+            </motion.div>
+
+            <motion.div variants={itemVariants}>
+              <Label className="block mb-2 text-sm font-medium">
+                Cooking Time (minutes)
+              </Label>
+              <TextInput
+                icon={Clock4}
+                type="number"
+                name="cookingTime"
+                value={formData.cookingTime}
+                onChange={handleChange}
+                required
+              />
+            </motion.div>
+
+            <motion.div variants={itemVariants}>
+              <Label className="block mb-2 text-sm font-medium">
+                Portion Size
+              </Label>
+              <TextInput
+                icon={UsersRound}
+                type="number"
+                name="portion"
+                value={formData.portion}
+                onChange={handleChange}
+                required
+              />
+            </motion.div>
+          </div>
 
           <motion.div variants={itemVariants}>
             <Label className="block mb-2 text-sm font-medium">
@@ -194,6 +194,7 @@ const NewFoodMainBar = () => {
             {formData.ingredients.map((ingredient, index) => (
               <div key={index} className="flex gap-4 mt-2">
                 <TextInput
+                  icon={Carrot}
                   placeholder="Ingredient name"
                   value={ingredient.name}
                   onChange={(e) =>
@@ -218,6 +219,27 @@ const NewFoodMainBar = () => {
             >
               Add Ingredient
             </Button>
+          </motion.div>
+
+          <motion.div variants={itemVariants}>
+            <Label className="block mb-2 text-sm font-medium">Image</Label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="block w-full text-sm text-gray-500"
+            />
+          </motion.div>
+
+          <motion.div variants={itemVariants}>
+            <Label className="block mb-2 text-sm font-medium">Video URL</Label>
+            <TextInput
+              icon={Video}
+              name="videoUrl"
+              placeholder="Enter video URL"
+              value={formData.videoUrl}
+              onChange={handleChange}
+            />
           </motion.div>
 
           <motion.button

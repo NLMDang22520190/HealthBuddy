@@ -50,7 +50,7 @@ function App() {
       }}
     >
       <div className={`${darkMode ? "dark" : ""}`}>
-        <div className="bg-snow dark:bg-ebony ">
+        <div className="bg-bg_light dark:bg-bg_dark min-h-screen">
           <Router>
             <Navbar onToggleTheme={toggleDarkMode} isDarkTheme={darkMode} />
             <AllUserRoutes />

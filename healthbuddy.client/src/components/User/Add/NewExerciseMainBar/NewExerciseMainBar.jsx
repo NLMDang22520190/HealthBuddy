@@ -2,6 +2,15 @@ import React, { useState } from "react";
 import { Button } from "flowbite-react";
 import { TextInput, Textarea, Select, Label } from "flowbite-react";
 import { motion } from "framer-motion";
+import {
+  Pen,
+  Layers,
+  Flame,
+  ChartCandlestick,
+  Clock4,
+  Video,
+  Anvil,
+} from "lucide-react";
 
 const exerciseTypes = ["Cardio", "Strength", "Flexibility", "Balance", "HIIT"];
 
@@ -78,6 +87,7 @@ const AddNewExerciseMainBar = () => {
           <motion.div variants={itemVariants}>
             <Label className="block mb-2 font-medium">Exercise Name</Label>
             <TextInput
+              icon={Pen}
               placeholder="Enter exercise name"
               name="name"
               value={formData.name}
@@ -95,6 +105,68 @@ const AddNewExerciseMainBar = () => {
             />
           </motion.div>
 
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <motion.div variants={itemVariants}>
+              <Label className="block mb-2 font-medium">Number of Reps</Label>
+              <TextInput
+                icon={Anvil}
+                type="number"
+                name="numberOfReps"
+                value={formData.numberOfReps}
+                onChange={handleChange}
+              />
+            </motion.div>
+
+            <motion.div variants={itemVariants}>
+              <Label className="block mb-2 font-medium">Number of Sets</Label>
+              <TextInput
+                icon={ChartCandlestick}
+                type="number"
+                name="numberOfSets"
+                value={formData.numberOfSets}
+                onChange={handleChange}
+              />
+            </motion.div>
+
+            <motion.div variants={itemVariants}>
+              <Label className="block mb-2 font-medium">
+                Time Between Sets (seconds)
+              </Label>
+              <TextInput
+                icon={Clock4}
+                type="number"
+                name="timeBetweenSets"
+                value={formData.timeBetweenSets}
+                onChange={handleChange}
+              />
+            </motion.div>
+
+            <motion.div variants={itemVariants}>
+              <Label className="block mb-2 font-medium">Calories Burned</Label>
+              <TextInput
+                icon={Flame}
+                type="number"
+                name="caloriesBurned"
+                value={formData.caloriesBurned}
+                onChange={handleChange}
+              />
+            </motion.div>
+
+            <motion.div variants={itemVariants}>
+              <Label className="block mb-2 font-medium">Difficulty Level</Label>
+              <Select
+                icon={Layers}
+                name="difficultyLevel"
+                value={formData.difficultyLevel}
+                onChange={handleChange}
+              >
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+              </Select>
+            </motion.div>
+          </div>
+
           <motion.div variants={itemVariants}>
             <Label className="block mb-2 font-medium">Image</Label>
             <TextInput
@@ -108,64 +180,10 @@ const AddNewExerciseMainBar = () => {
           <motion.div variants={itemVariants}>
             <Label className="block mb-2 font-medium">Video URL</Label>
             <TextInput
+              icon={Video}
               placeholder="Enter video URL"
               name="videoUrl"
               value={formData.videoUrl}
-              onChange={handleChange}
-            />
-          </motion.div>
-
-          <motion.div variants={itemVariants}>
-            <Label className="block mb-2 font-medium">Difficulty Level</Label>
-            <Select
-              name="difficultyLevel"
-              value={formData.difficultyLevel}
-              onChange={handleChange}
-            >
-              <option value="beginner">Beginner</option>
-              <option value="intermediate">Intermediate</option>
-              <option value="advanced">Advanced</option>
-            </Select>
-          </motion.div>
-
-          <motion.div variants={itemVariants}>
-            <Label className="block mb-2 font-medium">Number of Reps</Label>
-            <TextInput
-              type="number"
-              name="numberOfReps"
-              value={formData.numberOfReps}
-              onChange={handleChange}
-            />
-          </motion.div>
-
-          <motion.div variants={itemVariants}>
-            <Label className="block mb-2 font-medium">Number of Sets</Label>
-            <TextInput
-              type="number"
-              name="numberOfSets"
-              value={formData.numberOfSets}
-              onChange={handleChange}
-            />
-          </motion.div>
-
-          <motion.div variants={itemVariants}>
-            <Label className="block mb-2 font-medium">
-              Time Between Sets (seconds)
-            </Label>
-            <TextInput
-              type="number"
-              name="timeBetweenSets"
-              value={formData.timeBetweenSets}
-              onChange={handleChange}
-            />
-          </motion.div>
-
-          <motion.div variants={itemVariants}>
-            <Label className="block mb-2 font-medium">Calories Burned</Label>
-            <TextInput
-              type="number"
-              name="caloriesBurned"
-              value={formData.caloriesBurned}
               onChange={handleChange}
             />
           </motion.div>
