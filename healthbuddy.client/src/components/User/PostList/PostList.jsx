@@ -15,7 +15,7 @@ const container = {
 const PostList = ({ posts }) => {
   return (
     <motion.div
-      className="divide-gray-500 divide-y"
+      className="divide-bg_divide_light dark:divide-bg_divide_dark divide-y"
       variants={container}
       initial="hidden"
       animate="show"

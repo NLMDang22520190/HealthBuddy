@@ -70,9 +70,11 @@ export default {
         oxford_blue: "#212437",
         card_dark: "#1F2937",
         gunmetal: "#1D1F21",
-        bg_dark: "#1D1F21",
-        bg_light: "#FFFAFA",
-        bg_content_dark: "#222428",
+        bg_dark: "#0A0A0A",
+        bg_light: "#FAFAFA",
+        bg_content_dark: "#181818",
+        bg_divide_dark: "#383939",
+        bg_divide_light: "#D9D9D9",
       },
       screens: {
         "sm-md": "700px", // Giữa sm và md
