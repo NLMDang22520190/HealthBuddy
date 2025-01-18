@@ -11,7 +11,7 @@ const Post = ({ post }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="px-3 md:px-6 py-2 flex gap-3"
+      className="px-3 md:px-6 py-4 flex gap-3"
     >
       <motion.div
         className="h-fit"
@@ -22,16 +22,18 @@ const Post = ({ post }) => {
       </motion.div>
 
       <div className="flex gap-3 flex-col">
-        <div className="flex gap-2">
-          <Label className="text-xs">{post.user.name}</Label>
-          <Label className="text-xs">
+        <div className="flex gap-2 items-center">
+          <Label className="text-sm font-bold">{post.user.name}</Label>
+          <Label className="text-sm font-extralight ">
             {formatDistanceToNow(new Date(post.postDate), {
               addSuffix: true,
               locale: vi,
             })}
           </Label>
         </div>
-        <Label className="text-xs">{post.title}</Label>
+        <Label className="text-base text-primary-dark dark:text-primary-dark">
+          {post.title}
+        </Label>
         <Label className="text-xs">{post.content}</Label>
 
         <motion.img
