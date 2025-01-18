@@ -76,7 +76,7 @@ const Navbar = ({ onToggleTheme, isDarkTheme }) => {
 
   return (
     <div className="bg-transparent flex items-center justify-between sticky top-0 z-50">
-      <div className=" md:mx-auto bg-white flex items-center justify-between w-full md:w-9/12 mt-2 rounded-2xl p-4">
+      <div className=" md:mx-auto bg-white dark:bg-bg_content_dark flex items-center justify-between w-full md:w-9/12 mt-2 rounded-2xl p-4">
         <div
           onClick={() => navigate("/")}
           className=" flex text-center items-center gap-4 cursor-pointer"

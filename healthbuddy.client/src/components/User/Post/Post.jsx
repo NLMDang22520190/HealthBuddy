@@ -31,7 +31,7 @@ const Post = ({ post }) => {
             })}
           </Label>
         </div>
-        <Label className="text-base text-primary-dark dark:text-primary-dark">
+        <Label className="text-base text-primary-light dark:text-primary-dark">
           {post.title}
         </Label>
         <Label className="text-xs">{post.content}</Label>
