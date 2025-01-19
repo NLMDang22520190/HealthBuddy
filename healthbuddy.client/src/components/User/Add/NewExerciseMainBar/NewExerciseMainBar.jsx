@@ -80,7 +80,7 @@ const AddNewExerciseMainBar = () => {
         initial="hidden"
         animate="visible"
         variants={containerVariants}
-        className="flex flex-col p-3 md:p-6"
+        className="flex flex-col p-3 md:p-6 mb-24"
       >
         <Label className="text-2xl font-bold mb-8">Add New Exercise</Label>
         <form onSubmit={handleSubmit} className="space-y-8">

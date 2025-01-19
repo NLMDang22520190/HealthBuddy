@@ -181,7 +181,7 @@ const HomeMainBar = () => {
   return (
     <div className="h-screen overflow-y-auto">
       {/* Content bên trong scroll */}
-      <div className="min-h-screen divide-gray-400 divide-y">
+      <div className="min-h-screen divide-gray-400 divide-y mb-24">
         <UserAddNewPost onAddClick={handleAddClick} />
         <PostList posts={posts} />
       </div>
