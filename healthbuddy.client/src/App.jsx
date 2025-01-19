@@ -1,5 +1,6 @@
 import { useEffect, useState, version } from "react";
 import { BrowserRouter as Router } from "react-router-dom";
+import "@ant-design/v5-patch-for-react-19";
 
 import "./App.css";
 import Navbar from "./components/User/Navbar/Navbar";
@@ -49,7 +50,7 @@ function App() {
         },
       }}
     >
-      <div className={`${darkMode ? "dark" : ""}`}>
+      <div className={` ${darkMode ? "dark" : ""}`}>
         <div className="bg-bg_light dark:bg-bg_dark min-h-screen">
           <Router>
             <Navbar onToggleTheme={toggleDarkMode} isDarkTheme={darkMode} />

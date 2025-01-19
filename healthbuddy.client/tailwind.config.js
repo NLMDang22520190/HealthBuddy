@@ -75,6 +75,10 @@ export default {
         bg_content_dark: "#181818",
         bg_divide_dark: "#383939",
         bg_divide_light: "#D9D9D9",
+        bg_card_flowbite_dark: "#1F2937",
+      },
+      height: {
+        "90%": "90%",
       },
       screens: {
         "sm-md": "700px", // Giữa sm và md

@@ -110,7 +110,7 @@ const comments = [
   },
 ];
 
-const CommentCard = ({ onCommentClick }) => {
+const CommentCard = () => {
   const [liked, setLiked] = useState(false);
 
   return (
@@ -118,7 +118,6 @@ const CommentCard = ({ onCommentClick }) => {
       <InteractButton
         liked={liked}
         onLikeClick={() => setLiked(!liked)}
-        onCommentClick={onCommentClick}
       ></InteractButton>
       <Accordion className="flex-1 dark:border-transparent border-transparent">
         <Accordion.Panel>

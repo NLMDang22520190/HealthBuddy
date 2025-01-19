@@ -16,6 +16,7 @@ import StatCard from "../StatCard/StatCard";
 import DescriptionCard from "../DescriptionCard/DescriptionCard";
 import CommentCard from "../CommentCard/CommentCard";
 import AddCommentModal from "../AddCommentModal/AddCommentModal";
+import CommentAccordition from "../CommentAccordition/CommentAccordition";
 
 const FoodMainBar = () => {
   const [showCommentModal, setShowCommentModal] = useState(false);
@@ -124,14 +125,10 @@ const FoodMainBar = () => {
           </Accordion.Panel>
         </Accordion>
 
-        <CommentCard
-          onCommentClick={() => setShowCommentModal(true)}
-        ></CommentCard>
+        <CommentCard></CommentCard>
       </motion.div>
-      <AddCommentModal
-        open={showCommentModal}
-        onCancel={() => setShowCommentModal(false)}
-      ></AddCommentModal>
+
+      <CommentAccordition></CommentAccordition>
     </div>
   );
 };
