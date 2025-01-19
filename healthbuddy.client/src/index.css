@@ -13,4 +13,19 @@
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
   }
+  .user-page-container {
+    @apply h-screen flex flex-col md:flex-row mt-2 relative;
+  }
+  .user-page-left-sidebar {
+    @apply order-2 md:order-1 w-full md:w-auto sticky bg-bg_light dark:bg-bg_dark justify-center flex bottom-0 z-10;
+  }
+  .user-page-mainbar-container {
+    @apply order-1 md:order-2  md:mx-auto  md:w-6/12 min-h-screen overflow-y-hidden h-fit bg-white dark:bg-bg_content_dark rounded-3xl shadow-xl;
+  }
+  .user-page-mainbar-content-container {
+    @apply h-screen overflow-y-auto no-scrollbar;
+  }
+  .user-page-mainbar-content-marginbottom {
+    @apply mb-40 md:mb-24;
+  }
 }

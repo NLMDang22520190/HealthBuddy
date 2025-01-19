@@ -44,12 +44,12 @@ const ChatBotMainBar = () => {
   };
 
   return (
-    <div className="h-screen overflow-y-auto no-scrollbar">
+    <div className="user-page-mainbar-content-container">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="flex flex-col p-3 md:p-6 mb-40 md:mb-24"
+        className="flex flex-col p-3 md:p-6 user-page-mainbar-content-marginbottom"
       >
         <Card className="flex-1 p-0 mb-4">
           <div className="overflow-y-auto h-[calc(100vh-200px)] space-y-4">
