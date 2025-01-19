@@ -21,6 +21,7 @@ const posts = [
     numberOfLikes: 120,
     numberOfComments: 45,
     postDate: "2023-12-01",
+    type: "food",
   },
   {
     id: 2,
@@ -36,6 +37,7 @@ const posts = [
     numberOfLikes: 95,
     numberOfComments: 30,
     postDate: "2023-11-30",
+    type: "exercise",
   },
   {
     id: 3,
@@ -51,6 +53,7 @@ const posts = [
     numberOfLikes: 85,
     numberOfComments: 20,
     postDate: "2023-11-29",
+    type: "food",
   },
   {
     id: 4,
@@ -66,6 +69,7 @@ const posts = [
     numberOfLikes: 110,
     numberOfComments: 25,
     postDate: "2023-11-28",
+    type: "exercise",
   },
   {
     id: 5,
@@ -81,6 +85,7 @@ const posts = [
     numberOfLikes: 78,
     numberOfComments: 18,
     postDate: "2023-11-27",
+    type: "food",
   },
   {
     id: 6,
@@ -96,6 +101,7 @@ const posts = [
     numberOfLikes: 65,
     numberOfComments: 22,
     postDate: "2023-11-26",
+    type: "exercise",
   },
   {
     id: 7,
@@ -111,6 +117,7 @@ const posts = [
     numberOfLikes: 140,
     numberOfComments: 50,
     postDate: "2023-11-25",
+    type: "food",
   },
   {
     id: 8,
@@ -126,6 +133,7 @@ const posts = [
     numberOfLikes: 88,
     numberOfComments: 35,
     postDate: "2023-11-24",
+    type: "exercise",
   },
   {
     id: 9,
@@ -141,6 +149,7 @@ const posts = [
     numberOfLikes: 102,
     numberOfComments: 40,
     postDate: "2023-11-23",
+    type: "food",
   },
   {
     id: 10,
@@ -156,6 +165,7 @@ const posts = [
     numberOfLikes: 125,
     numberOfComments: 60,
     postDate: "2023-11-22",
+    type: "exercise",
   },
 ];
 

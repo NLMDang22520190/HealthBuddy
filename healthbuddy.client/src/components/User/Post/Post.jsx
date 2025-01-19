@@ -5,7 +5,27 @@ import { vi } from "date-fns/locale";
 import { Avatar } from "antd";
 import { Label } from "flowbite-react";
 import { motion } from "framer-motion";
+import { Link, useNavigate } from "react-router-dom";
+
 const Post = ({ post }) => {
+  const navigate = useNavigate();
+
+  const handleUserNavigate = (user) => {
+    navigate(`/profile/${user.id}`);
+  };
+
+  const handlePostNavigate = (post) => {
+    let path = "";
+    if (post.type === "food") {
+      path = "/detail/food";
+    }
+    if (post.type === "exercise") {
+      path = "/detail/exercise";
+    }
+    path += `/${post.id}`;
+    return path;
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -18,12 +38,21 @@ const Post = ({ post }) => {
         whileHover={{ scale: 1.05 }}
         transition={{ duration: 0.2 }}
       >
-        <Avatar className="min-w-12 h-12 md:size-14" src={post.user.avatar} />
+        <Avatar
+          onClick={() => handleUserNavigate(post.user)}
+          className="cursor-pointer min-w-12 h-12 md:size-14"
+          src={post.user.avatar}
+        />
       </motion.div>
 
       <div className="flex gap-3 flex-col">
         <div className="flex gap-2 items-center">
-          <Label className="text-sm font-bold">{post.user.name}</Label>
+          <Label
+            onClick={() => handleUserNavigate(post.user)}
+            className="text-sm font-bold cursor-pointer"
+          >
+            {post.user.name}
+          </Label>
           <Label className="text-sm font-extralight ">
             {formatDistanceToNow(new Date(post.postDate), {
               addSuffix: true,
@@ -36,14 +65,19 @@ const Post = ({ post }) => {
         </Label>
         <Label className="text-xs">{post.content}</Label>
 
-        <motion.img
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
-          className="max-h-52 max-w-96 rounded-xl"
-          src={post.image}
-          alt="post"
-        />
+        <Link
+          to={handlePostNavigate(post)}
+          className="max-h-56 max-w-96 rounded-xl"
+        >
+          <motion.img
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            src={post.image}
+            className="rounded-xl min-h-56 object-cover"
+            alt="post"
+          />
+        </Link>
 
         <div className="flex gap-2">
           <motion.div
