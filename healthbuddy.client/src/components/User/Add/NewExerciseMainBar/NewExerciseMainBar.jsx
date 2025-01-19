@@ -75,12 +75,12 @@ const AddNewExerciseMainBar = () => {
   };
 
   return (
-    <div className="h-screen overflow-y-auto no-scrollbar">
+    <div className="user-page-mainbar-content-container">
       <motion.div
         initial="hidden"
         animate="visible"
         variants={containerVariants}
-        className="flex flex-col p-3 md:p-6 mb-40 md:mb-24"
+        className="flex flex-col p-3 md:p-6 user-page-mainbar-content-marginbottom"
       >
         <Label className="text-2xl font-bold mb-8">Add New Exercise</Label>
         <form onSubmit={handleSubmit} className="space-y-8">
