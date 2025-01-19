@@ -79,12 +79,12 @@ const NewFoodMainBar = () => {
   };
 
   return (
-    <div className="h-screen overflow-y-auto">
+    <div className="h-screen overflow-y-auto no-scrollbar">
       <motion.div
         initial="hidden"
         animate="visible"
         variants={containerVariants}
-        className="flex flex-col p-3 md:p-6 mb-24"
+        className="flex flex-col p-3 md:p-6 mb-40 md:mb-24"
       >
         <Label variants={itemVariants} className="text-2xl font-bold mb-8">
           Add New Dish

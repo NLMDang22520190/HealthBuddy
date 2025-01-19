@@ -8,6 +8,7 @@ import ForgotPassword from "../pages/Auth/ForgotPassword/ForgotPassword";
 import ResetPassword from "../pages/Auth/ResetPassword/ResetPassword";
 
 import Home from "../pages/User/Home/Home";
+import ChatBot from "../pages/User/ChatBot/ChatBot";
 
 import NewFood from "../pages/User/Add/NewFood/NewFood";
 import NewExercise from "../pages/User/Add/NewExercise/NewExercise";
@@ -19,6 +20,7 @@ const AllUserRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="chatBot" element={<ChatBot />} />
 
       {/* Auth */}
       <Route path="auth/login" element={<Login />} />

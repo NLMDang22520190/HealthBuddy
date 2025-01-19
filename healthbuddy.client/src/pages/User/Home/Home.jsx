@@ -11,7 +11,7 @@ const Home = () => {
       </div>
 
       {/* HomeMainBar */}
-      <div className="order-1 md:order-2  md:mx-auto  md:w-6/12 min-h-screen h-fit bg-white dark:bg-bg_content_dark rounded-3xl shadow-xl">
+      <div className="order-1 md:order-2  md:mx-auto  md:w-6/12 min-h-screen overflow-y-hidden h-fit bg-white dark:bg-bg_content_dark rounded-3xl shadow-xl">
         <HomeMainBar />
       </div>
     </div>

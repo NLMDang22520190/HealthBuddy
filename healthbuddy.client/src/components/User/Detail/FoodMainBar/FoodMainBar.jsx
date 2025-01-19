@@ -31,12 +31,12 @@ const FoodMainBar = () => {
   ];
 
   return (
-    <div className="h-screen overflow-y-auto">
+    <div className="h-screen overflow-y-auto no-scrollbar">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="flex flex-col p-3 md:p-6 mb-24"
+        className="flex flex-col p-3 md:p-6 mb-40 md:mb-24"
       >
         {/* Main image */}
         <motion.img
