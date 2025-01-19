@@ -1,17 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
-import { Heart, MessageCircle } from "lucide-react";
+import { Heart, MessageCircle, Send } from "lucide-react";
 import { vi } from "date-fns/locale";
-import { Avatar } from "antd";
+import { Avatar, message } from "antd";
 import { Label } from "flowbite-react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 
+import ShowImageModal from "../../ShowImageModal/ShowImageModal";
+import SharePopover from "../../SharePopover/SharePopover";
+
 const Post = ({ post }) => {
   const navigate = useNavigate();
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState("");
 
   const handleUserNavigate = (user) => {
-    navigate(`/profile/${user.id}`);
+    navigate(`/user/${user.id}`);
   };
 
   const handlePostNavigate = (post) => {
@@ -24,6 +29,23 @@ const Post = ({ post }) => {
     }
     path += `/${post.id}`;
     return path;
+  };
+
+  const handlePictureClick = (image) => {
+    setSelectedImage(image);
+    setShowImageModal(true);
+  };
+
+  const handleShare = (post) => {
+    const baseUrl = window.location.origin;
+    const path = handlePostNavigate(post);
+
+    const fullUrl = `${baseUrl}${path}`;
+    // Copy to clipboard (nếu cần)
+    navigator.clipboard.writeText(fullUrl).then(() => {
+      console.log("URL copied to clipboard!");
+      message.success("URL copied to clipboard!");
+    });
   };
 
   return (
@@ -60,26 +82,28 @@ const Post = ({ post }) => {
             })}
           </Label>
         </div>
-        <Label className="text-base text-primary-light dark:text-primary-dark">
-          {post.title}
-        </Label>
-        <Label className="text-xs">{post.content}</Label>
-
-        <Link
-          to={handlePostNavigate(post)}
-          className="max-h-56 max-w-96 rounded-xl"
+        <div
+          onClick={() => navigate(handlePostNavigate(post))}
+          className="cursor-pointer  flex gap-2 flex-col"
         >
+          <Label className="text-base cursor-pointer text-primary-light dark:text-primary-dark">
+            {post.title}
+          </Label>
+          <Label className="text-xs cursor-pointer">{post.content}</Label>
+        </div>
+        <div className="rounded-xl w-fit ">
           <motion.img
+            onClick={() => handlePictureClick(post.image)}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.4, delay: 0.2 }}
             src={post.image}
-            className="rounded-xl min-h-56 object-cover"
+            className="cursor-pointer rounded-xl min-h-56 max-h-56 max-w-80 md:max-w-72 lg:max-w-96 object-cover"
             alt="post"
           />
-        </Link>
+        </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           <motion.div
             className="flex items-center gap-1"
             whileHover={{ scale: 1.05 }}
@@ -96,12 +120,25 @@ const Post = ({ post }) => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <Label className="text-xs flex items-center gap-1">
-              <MessageCircle /> {post.numberOfComments}
-            </Label>
+            <button className="text-black dark:text-white">
+              <MessageCircle />
+            </button>
+            <Label className="text-xs">{post.numberOfComments}</Label>
+          </motion.div>
+          <motion.div
+            className="flex items-center gap-1"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <SharePopover onShareClick={() => handleShare(post)} />
           </motion.div>
         </div>
       </div>
+      <ShowImageModal
+        show={showImageModal}
+        image={selectedImage}
+        onCancel={() => setShowImageModal(false)}
+      ></ShowImageModal>
     </motion.div>
   );
 };

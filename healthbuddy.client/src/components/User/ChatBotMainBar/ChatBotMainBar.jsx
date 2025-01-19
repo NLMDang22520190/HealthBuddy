@@ -49,10 +49,10 @@ const ChatBotMainBar = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="flex flex-col p-3 md:p-6 user-page-mainbar-content-marginbottom"
+        className="flex flex-col p-3 md:p-6 user-page-mainbar-content-marginbottom "
       >
         <Card className="flex-1 p-0 mb-4">
-          <div className="overflow-y-auto h-[calc(100vh-200px)] space-y-4">
+          <div className="overflow-y-auto no-scrollbar h-[calc(100vh-250px)] space-y-4">
             {messages.map((message) => (
               <motion.div
                 key={message.id}
@@ -80,7 +80,7 @@ const ChatBotMainBar = () => {
                   <div
                     className={`p-3 rounded-lg ${
                       message.sender === "user"
-                        ? "bg-gradient-to-tr from-primary-dark  to-secondary-dark text-white"
+                        ? "bg-gradient-to-tr from-primary-dark to-10%  to-secondary-dark text-white"
                         : "bg-gray-200"
                     }`}
                   >
@@ -97,9 +97,10 @@ const ChatBotMainBar = () => {
         <form onSubmit={handleSendMessage} className="flex gap-2">
           <Textarea
             value={newMessage}
+            onKeyDown={(e) => e.key === "Enter" && handleSendMessage(e)}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type your message..."
-            className="flex-1"
+            className="flex-1 h-10"
           />
           <button
             className={`px-5 rounded-xl flex items-center justify-center border-2 shadow-lg text-white transition duration-300 cursor-pointer active:scale-[0.98] uppercase ${

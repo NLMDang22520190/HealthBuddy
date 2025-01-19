@@ -3,15 +3,29 @@ import { Heart, Flag } from "lucide-react";
 import { Label } from "flowbite-react";
 import { motion } from "framer-motion";
 import { MessageCircle } from "lucide-react";
-import { Button } from "antd";
+import { message } from "antd";
+import SharePopover from "../../../SharePopover/SharePopover";
 
-const InteractButton = ({ liked, onLikeClick, onCommentClick }) => {
+const InteractButton = ({ liked, onLikeClick }) => {
+  const onShareClick = () => {
+    const currentUrl = window.location.href; // Lấy URL hiện tại
+    navigator.clipboard
+      .writeText(currentUrl) // Sao chép URL vào clipboard
+      .then(() => {
+        message.success("URL copied to clipboard!");
+      })
+      .catch((error) => {
+        console.error("Failed to copy URL: ", error);
+      });
+  };
+
   return (
-    <div className="flex gap-2 p-4 ">
+    <div className="gap-2 grid grid-cols-3">
       <motion.div
-        className="flex items-center gap-1"
-        whileHover={{ scale: 1.05 }}
+        className="cursor-pointer flex p-3 items-center justify-center gap-1 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-lg"
+        whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.95 }}
+        onClick={onLikeClick}
       >
         <button
           onClick={onLikeClick}
@@ -21,21 +35,31 @@ const InteractButton = ({ liked, onLikeClick, onCommentClick }) => {
         >
           <Heart className={`size-7 ${liked ? "fill-current" : ""}`} />
         </button>
-        <Label className="text-xs">333</Label>
+        <Label className="text-sm cursor-pointer">333 Likes</Label>
       </motion.div>
 
       <motion.div
-        className="flex items-center gap-1"
+        className="flex p-3 items-center justify-center gap-1 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-lg"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
-        <button
-          onClick={onCommentClick}
-          className="text-primary-light dark:text-primary-dark"
-        >
+        <button className="text-primary-light dark:text-primary-dark">
           <MessageCircle className="size-7" />
         </button>
-        <Label className="text-xs">333</Label>
+        <Label className="text-sm">333 Comments</Label>
+      </motion.div>
+
+      <motion.div
+        className="flex p-3 items-center justify-center gap-1 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-lg"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        <SharePopover
+          iconSize="size-7"
+          iconColor="text-primary-light dark:text-primary-dark"
+          onShareClick={onShareClick}
+        />
+        <Label className="text-sm">Share</Label>
       </motion.div>
     </div>
   );
