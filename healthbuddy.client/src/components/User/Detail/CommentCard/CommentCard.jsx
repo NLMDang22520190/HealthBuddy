@@ -120,9 +120,9 @@ const CommentCard = ({ onCommentClick }) => {
         onLikeClick={() => setLiked(!liked)}
         onCommentClick={onCommentClick}
       ></InteractButton>
-      <Accordion className="flex-1 dark:border-bg_divide_dark border-transparent">
+      <Accordion className="flex-1 dark:border-transparent border-transparent">
         <Accordion.Panel>
-          <Accordion.Title className="dark:focus:ring-transparent focus:ring-transparent rounded-lg hover:rounded-lg hover:bg-transparent focus:bg-transparent  dark:hover:bg-primary-light dark:bg-primary-900">
+          <Accordion.Title className="dark:focus:ring-transparent focus:ring-transparent rounded-lg hover:rounded-lg hover:bg-transparent focus:bg-transparent  dark:hover:bg-transparent dark:bg-transparent">
             <Label className="text-xl font-semibold mb-2">Comments</Label>
           </Accordion.Title>
           <Accordion.Content className="bg-transparent dark:bg-transparent divide-y dark:divide-bg_divide_dark divide-bg_divide_light p-0">

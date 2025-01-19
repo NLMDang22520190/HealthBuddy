@@ -18,7 +18,7 @@ const AddCommentModal = ({ open, onCancel }) => {
         xxl: "40%",
       }}
       footer={[
-        <div className="flex gap-1 justify-end">
+        <div className="flex gap-2 justify-end">
           <button
             className="rounded-xl bg-primary-dark flex items-center justify-center border-2 shadow-lg hover:bg-gradient-to-br hover:from-secondary-dark hover:to-primary-dark text-white transition duration-300 cursor-pointer active:scale-[0.98] px-5 py-2 uppercase"
             onClick={onCancel}
