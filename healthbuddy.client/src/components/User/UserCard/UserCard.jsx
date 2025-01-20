@@ -29,14 +29,17 @@ const UserCard = ({ user }) => {
     >
       <Card
         onClick={() => handleUserClick(user)}
-        className="overflow-hidden hover:shadow-md hover:shadow-secondary-light dark:hover:shadow-md dark:hover:shadow-primary-dark transition-shadow"
+        className="overflow-hidden cursor-pointer hover:shadow-md hover:shadow-secondary-light dark:hover:shadow-md dark:hover:shadow-primary-dark transition-shadow"
       >
         <div className="flex gap-4 items-center">
-          <Avatar
-            src={user.avatar}
-            className="md:block lg:hidden xl:block size-12"
-            icon={<User className="h-6 w-6" />}
-          />
+          <div className="p-px rounded-full bg-gradient-to-tr from-primary-dark to-secondary-dark">
+            <Avatar
+              src={user.avatar}
+              className="md:block lg:hidden xl:block size-12"
+              icon={<User className="h-6 w-6" />}
+            />
+          </div>
+
           <div className="flex-1 flex flex-col items-start gap-2">
             <Label className="text-base font-bold flex gap-1 items-center">
               <CircleUserRound className="size-4"></CircleUserRound>

@@ -14,19 +14,21 @@ const UserComment = ({ comment }) => {
   };
 
   return (
-    <div key={comment.id} className="flex  gap-4 p-6 ">
+    <div key={comment.id} className="flex gap-4 p-6 ">
       <motion.div
         className="h-fit"
         whileHover={{ scale: 1.05 }}
         transition={{ duration: 0.2 }}
       >
-        <Avatar
-          onClick={() => handleUserNavigate(comment.user)}
-          className="cursor-pointer min-w-12 h-12 md:size-14"
-          src={comment.user.avatar}
-        />
+        <div className="p-px rounded-full bg-gradient-to-tr from-primary-dark to-secondary-dark">
+          <Avatar
+            onClick={() => handleUserNavigate(comment.user)}
+            className="cursor-pointer min-w-12 h-12 md:size-14"
+            src={comment.user.avatar}
+          />
+        </div>
       </motion.div>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2">
           <Label
             onClick={() => handleUserNavigate(comment.user)}
@@ -41,7 +43,7 @@ const UserComment = ({ comment }) => {
           </Label>
         </div>
 
-        <Label className="mt-2 text-xs font-normal">{comment.content}</Label>
+        <Label className="text-xs font-normal">{comment.content}</Label>
       </div>
     </div>
   );

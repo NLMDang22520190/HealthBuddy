@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Accordion, Label, Textarea } from "flowbite-react";
 import { Avatar } from "antd";
-import { ArrowUp, Ellipsis } from "lucide-react";
+import { ArrowUp, ArrowDown, Ellipsis } from "lucide-react";
 
 const CommentAccordition = () => {
   const [newMessage, setNewMessage] = useState("");
@@ -11,21 +11,26 @@ const CommentAccordition = () => {
       <Accordion className="flex-1 dark:border-transparent border-transparent">
         <Accordion.Panel>
           <Accordion.Title className="dark:focus:ring-transparent focus:ring-transparent rounded-lg hover:rounded-lg hover:bg-transparent focus:bg-transparent  dark:hover:bg-transparent dark:bg-transparent">
-            <Label className="text-xl font-semibold mb-2">
-              Write your comment here
+            <Label className="flex gap-2 items-center text-xl font-semibold mb-1">
+              Write your comment here <ArrowDown className="size-6" />
             </Label>
           </Accordion.Title>
           <Accordion.Content className="bg-transparent dark:bg-transparent divide-y dark:divide-bg_divide_dark divide-bg_divide_light p-0">
-            <div className="px-4 flex items-start gap-2 mt-2 mb-2 md-lg:mb-6">
-              <Avatar
-                src="https://placehold.co/50x50.png"
-                className="size-14"
-              ></Avatar>
-              <Textarea
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                placeholder="Write your comment here"
-              />
+            <div className="px-4 flex items-start gap-2 mt-2 mb-2 md-lg:mb-3">
+              <div className="p-px rounded-full bg-gradient-to-tr from-primary-dark to-secondary-dark">
+                <Avatar
+                  src="https://placehold.co/50x50.png"
+                  className="size-16"
+                ></Avatar>
+              </div>
+              <div className="flex-1 p-0.5 rounded-lg bg-gradient-to-tr from-primary-dark to-secondary-dark ">
+                <Textarea
+                  className="focus:ring-transparent dark:focus:ring-transparent rounded-lg  dark:bg-bg_content_dark bg-bg_light dark:border-transparent border-transparent"
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  placeholder="Write your comment here"
+                />
+              </div>
               <button
                 className={`p-4 rounded-xl flex items-center justify-center border-2 shadow-lg text-white transition duration-300 cursor-pointer active:scale-[0.98] uppercase ${
                   newMessage.trim()
@@ -35,9 +40,9 @@ const CommentAccordition = () => {
                 disabled={!newMessage.trim()} // Disable button when there's no input
               >
                 {newMessage.trim() ? (
-                  <ArrowUp className="size-5" />
+                  <ArrowUp className="size-6" />
                 ) : (
-                  <Ellipsis className="size-5" />
+                  <Ellipsis className="size-6" />
                 )}
               </button>
             </div>

@@ -14,13 +14,13 @@
     scrollbar-width: none; /* Firefox */
   }
   .user-page-container {
-    @apply h-screen flex flex-col md-lg:flex-row mt-2 relative;
+    @apply h-full-navbar flex flex-col md-lg:flex-row mt-2 relative;
   }
   .user-page-left-sidebar {
-    @apply order-2 md-lg:order-1 w-full md-lg:w-auto sticky bg-bg_light dark:bg-bg_dark justify-center flex bottom-0 z-10;
+    @apply order-2 md-lg:order-1 w-full md-lg:w-auto sticky bg-bg_light h-fit md-lg:h-full dark:bg-bg_dark justify-center flex bottom-0 z-10;
   }
   .user-page-mainbar-container {
-    @apply order-1 md-lg:order-2  md-lg:mx-auto  md-lg:w-6/12  overflow-y-hidden h-90% bg-white dark:bg-bg_content_dark rounded-3xl shadow-xl;
+    @apply order-1 md-lg:order-2  md-lg:mx-auto  md-lg:w-9/12 xl:w-7/12 2xl:w-5/12 overflow-y-hidden h-full bg-white dark:bg-bg_content_dark rounded-3xl shadow-2xl;
   }
   .user-page-mainbar-content-container {
     @apply h-screen overflow-y-auto no-scrollbar;

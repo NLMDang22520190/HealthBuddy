@@ -6,25 +6,12 @@ import { Link } from "react-router-dom";
 const UserAddNewPost = ({ onAddClick }) => {
   return (
     <div className="p-3 md:p-6 flex gap-3">
-      <Avatar
-        className="min-w-12 h-12 md:size-14"
-        src="https://placehold.co/50x50.png"
-      ></Avatar>
-      {/* <div className="flex flex-col gap-1 lg:gap-1 bg-[#484849] px-2 flex-1 rounded-xl">
-        <Label className="text-base text-white ">
-          Have something new to share?
-        </Label>
-        <div className="flex gap-1 lg:gap-2 items-center">
-          <Label className="text-base text-white">Click</Label>
-          <label
-            onClick={onAddClick}
-            className="text-secondary-dark font-bold text-lg"
-          >
-            HERE
-          </label>
-          <Label className="text-base text-white ">to post new stuff!</Label>
-        </div>
-      </div> */}
+      <div className="p-px rounded-full bg-gradient-to-tr from-primary-dark to-secondary-dark">
+        <Avatar
+          className="min-w-12 h-12 md:size-14"
+          src="https://placehold.co/50x50.png"
+        ></Avatar>
+      </div>
       <div
         onClick={onAddClick}
         className="items-center cursor-pointer flex-1 flex justify-between"
