@@ -100,7 +100,7 @@ const Post = ({ post }) => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.4, delay: 0.2 }}
             src={post.image}
-            className="cursor-pointer rounded-xl min-h-56 max-h-56 max-w-80 md:max-w-72 lg:max-w-96 object-cover"
+            className="cursor-pointer rounded-xl min-h-56 max-h-56 max-w-72 sm:max-w-80 md:max-w-72 lg:max-w-96 object-cover"
             alt="post"
           />
         </div>

@@ -99,6 +99,7 @@ const ChatBotMainBar = () => {
             <Textarea
               className="focus:ring-transparent dark:focus:ring-transparent rounded-lg  dark:bg-bg_content_dark bg-bg_light dark:border-transparent border-transparent"
               value={newMessage}
+              onKeyDown={(e) => e.key === "Enter" && handleSendMessage(e)}
               onChange={(e) => setNewMessage(e.target.value)}
               placeholder="Write your comment here"
             />
