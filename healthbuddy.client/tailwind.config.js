@@ -80,6 +80,7 @@ export default {
       height: {
         "90%": "90%",
         "full-navbar": "calc(100vh - 100px)",
+        "full-navbar-default": "calc(100vh - 200px)",
       },
       screens: {
         "sm-md": "700px", // Giữa sm và md
