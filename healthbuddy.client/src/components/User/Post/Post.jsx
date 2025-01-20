@@ -60,11 +60,13 @@ const Post = ({ post }) => {
         whileHover={{ scale: 1.05 }}
         transition={{ duration: 0.2 }}
       >
-        <Avatar
-          onClick={() => handleUserNavigate(post.user)}
-          className="cursor-pointer min-w-12 h-12 md:size-14"
-          src={post.user.avatar}
-        />
+        <div className="p-px rounded-full bg-gradient-to-tr from-primary-dark to-secondary-dark">
+          <Avatar
+            onClick={() => handleUserNavigate(post.user)}
+            className="cursor-pointer min-w-12 h-12 md:size-14"
+            src={post.user.avatar}
+          />
+        </div>
       </motion.div>
 
       <div className="flex gap-3 flex-col">

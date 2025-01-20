@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import SearchBar from "./SearchBar";
 import logo from "../../../assets/logo.png";
+import BreakPoint from "../../BreakPoint/BreakPoint";
 
 // Component: ToggleTheme
 const ToggleTheme = ({ isDarkTheme, onToggleTheme }) => (
@@ -76,27 +77,28 @@ const Navbar = ({ onToggleTheme, isDarkTheme }) => {
 
   return (
     <div className="bg-transparent flex items-center justify-between sticky top-0 z-50">
-      <div className=" md-lg:mx-auto bg-white dark:bg-bg_content_dark flex items-center justify-between w-full md-lg:w-9/12 mt-2 rounded-2xl p-4">
+      <div className=" md-lg:mx-auto bg-white dark:bg-bg_content_dark flex items-center justify-between w-full md-lg:w-10/12 xl:w-8/12 2xl:w-7/12 mt-2 rounded-2xl p-4">
         <div
           onClick={() => navigate("/")}
           className=" flex text-center items-center gap-4 cursor-pointer"
         >
           <img className="size-12" src={logo} alt="logo" />
-          <label className="cursor-pointer hidden sm:block bg-gradient-to-br from-primary-dark to-secondary-dark font-bold text-transparent bg-clip-text text-2xl">
+          {/* <label className="cursor-pointer hidden sm:block bg-gradient-to-br from-primary-dark to-secondary-dark font-bold text-transparent bg-clip-text text-2xl">
             health buddy
-          </label>
+          </label> */}
+          <BreakPoint />
         </div>
         <div className="flex gap-4 items-center">
           <SearchBar />
-          <div className="hidden lg:flex gap-2">
+          {/* <div className="hidden lg:flex gap-2">
             <ToggleTheme
               isDarkTheme={isDarkTheme}
               onToggleTheme={onToggleTheme}
             />
             <AuthButtons user={user} />
-          </div>
+          </div> */}
           <Menu>
-            <MenuButton className="lg:hidden bg-gradient-to-br from-primary-dark to-secondary-dark p-3 text-white rounded-full">
+            <MenuButton className=" bg-gradient-to-br from-primary-dark to-secondary-dark p-3 text-white rounded-full">
               <AlignJustify />
             </MenuButton>
             <MenuItems

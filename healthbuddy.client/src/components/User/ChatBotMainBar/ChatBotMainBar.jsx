@@ -95,13 +95,14 @@ const ChatBotMainBar = () => {
           </div>
         </Card>
         <form onSubmit={handleSendMessage} className="flex gap-2">
-          <Textarea
-            value={newMessage}
-            onKeyDown={(e) => e.key === "Enter" && handleSendMessage(e)}
-            onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Type your message..."
-            className="flex-1 h-10"
-          />
+          <div className="flex-1 p-0.5 rounded-lg bg-gradient-to-tr from-primary-dark to-secondary-dark ">
+            <Textarea
+              className="focus:ring-transparent dark:focus:ring-transparent rounded-lg  dark:bg-bg_content_dark bg-bg_light dark:border-transparent border-transparent"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              placeholder="Write your comment here"
+            />
+          </div>
           <button
             className={`px-5 rounded-xl flex items-center justify-center border-2 shadow-lg text-white transition duration-300 cursor-pointer active:scale-[0.98] uppercase ${
               newMessage.trim()
