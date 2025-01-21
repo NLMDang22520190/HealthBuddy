@@ -1,0 +1,13 @@
+# Please refer https://aka.ms/HTTPSinContainer on how to setup an https developer certificate for your ASP.NET Core service.
+
+version: '3.4'
+
+services:
+  healthbuddyserver:
+    image: healthbuddyserver
+    build:
+      context: .
+      dockerfile: HealthBuddy.Server/Dockerfile
+    ports:
+      - 5289:5289
+      - 7222:7222

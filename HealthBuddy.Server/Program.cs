@@ -2,7 +2,9 @@
 using HealthBuddy.Server.Models;
 using HealthBuddy.Server.Repositories;
 using HealthBuddy.Server.Repositories.Implement;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +15,19 @@ var builder = WebApplication.CreateBuilder(args);
 //Console.WriteLine("connection string: " + builder.Configuration.GetConnectionString("HealthBuddy"));
 builder.Services.AddDbContext<HealthBuddyDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("HealthBuddy")));
+
+
+
+// Cấu hình xác thực bằng JWT
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.Authority = "https://YOUR_AUTH0_DOMAIN/"; // Thay bằng domain Auth0 của bạn
+    options.Audience = "https://dev-vyacjvukxy0qkvz7.us.auth0.com/api/v2/";         // Thay bằng API Identifier đã tạo
+});
 
 builder.Services.AddScoped<IUserRepository, SQLUserRepository>();
 
