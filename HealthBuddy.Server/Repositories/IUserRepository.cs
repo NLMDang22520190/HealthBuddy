@@ -4,5 +4,6 @@ namespace HealthBuddy.Server.Repositories
 {
     public interface IUserRepository : IHealthBuddyRepository<User>
     {
+        Task<bool> CreateUserAsync(string email, string password);
     }
 }

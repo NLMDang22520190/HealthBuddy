@@ -1,4 +1,5 @@
-﻿using HealthBuddy.Server.Models;
+﻿using HealthBuddy.Server.Mapping;
+using HealthBuddy.Server.Models;
 using HealthBuddy.Server.Repositories;
 using HealthBuddy.Server.Repositories.Implement;
 using Microsoft.EntityFrameworkCore;
@@ -17,8 +18,11 @@ builder.Services.AddScoped<IUserRepository, SQLUserRepository>();
 
 
 builder.Services.AddScoped(typeof(IHealthBuddyRepository<>), typeof(HealthBuddyRepository<>));
+builder.Services.AddScoped<SuperTokensService>();
+builder.Services.AddHttpClient();  // Đăng ký IHttpClientFactory
 
-//builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
+
+builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 builder.Services.AddMemoryCache();
 
