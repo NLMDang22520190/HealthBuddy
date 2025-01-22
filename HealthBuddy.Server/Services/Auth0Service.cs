@@ -108,56 +108,6 @@ public class Auth0Service
     }
 
     // Add to your existing Auth0Service class
-    public async Task<bool> CheckIfEmailExistsAsync(string email)
-    {
-        // Obtain the Auth0 Management API token
-        var managementApiToken = await GetManagementApiTokenAsync();
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"https://{_settings.Domain}/api/v2/users-by-email?email={email}");
-        request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", managementApiToken);
-
-        var response = await _httpClient.SendAsync(request);
-
-        if (response.IsSuccessStatusCode)
-        {
-            var content = await response.Content.ReadAsStringAsync();
-            // If content is not empty array, it means the email exists
-            return content != "[]"; // Check if the response is not an empty array string
-        }
-
-        await HandleAuth0Error(response);
-        return false;
-    }
-
-    public async Task<bool> IsEmailVerifiedAsync(string email)
-    {
-        // Lấy token quản trị Auth0
-        var managementApiToken = await GetManagementApiTokenAsync();
-
-        // Tạo yêu cầu để lấy thông tin người dùng theo email
-        var request = new HttpRequestMessage(HttpMethod.Get, $"https://{_settings.Domain}/api/v2/users-by-email?email={email}");
-        request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", managementApiToken);
-
-        var response = await _httpClient.SendAsync(request);
-
-        if (response.IsSuccessStatusCode)
-        {
-            var content = await response.Content.ReadAsStringAsync();
-            // Nếu phản hồi không phải là mảng rỗng, có nghĩa là email tồn tại
-            if (content != "[]")
-            {
-                // Chúng ta sẽ phân tích JSON và kiểm tra thuộc tính "email_verified"
-                using var jsonDoc = JsonDocument.Parse(content);
-                var user = jsonDoc.RootElement[0]; // Chúng ta giả sử chỉ có một người dùng với email đó
-                return user.GetProperty("email_verified").GetBoolean();
-            }
-        }
-
-        // Nếu không thành công, xử lý lỗi
-        await HandleAuth0Error(response);
-        return false;
-    }
-
     public async Task SendVerificationEmailAsync(string email)
     {
         // Lấy token quản trị Auth0
@@ -210,7 +160,55 @@ public class Auth0Service
         await HandleAuth0Error(response);
     }
 
+    public async Task<bool> CheckIfEmailExistsAsync(string email)
+    {
+        // Obtain the Auth0 Management API token
+        var managementApiToken = await GetManagementApiTokenAsync();
 
+        var request = new HttpRequestMessage(HttpMethod.Get, $"https://{_settings.Domain}/api/v2/users-by-email?email={email}");
+        request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", managementApiToken);
+
+        var response = await _httpClient.SendAsync(request);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            // If content is not empty array, it means the email exists
+            return content != "[]"; // Check if the response is not an empty array string
+        }
+
+        await HandleAuth0Error(response);
+        return false;
+    }
+
+    public async Task<bool> IsEmailVerifiedAsync(string email)
+    {
+        // Lấy token quản trị Auth0
+        var managementApiToken = await GetManagementApiTokenAsync();
+
+        // Tạo yêu cầu để lấy thông tin người dùng theo email
+        var request = new HttpRequestMessage(HttpMethod.Get, $"https://{_settings.Domain}/api/v2/users-by-email?email={email}");
+        request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", managementApiToken);
+
+        var response = await _httpClient.SendAsync(request);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            // Nếu phản hồi không phải là mảng rỗng, có nghĩa là email tồn tại
+            if (content != "[]")
+            {
+                // Chúng ta sẽ phân tích JSON và kiểm tra thuộc tính "email_verified"
+                using var jsonDoc = JsonDocument.Parse(content);
+                var user = jsonDoc.RootElement[0]; // Chúng ta giả sử chỉ có một người dùng với email đó
+                return user.GetProperty("email_verified").GetBoolean();
+            }
+        }
+
+        // Nếu không thành công, xử lý lỗi
+        await HandleAuth0Error(response);
+        return false;
+    }
     // This method gets the Management API token using client credentials
     private async Task<string> GetManagementApiTokenAsync()
     {
