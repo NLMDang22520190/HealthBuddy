@@ -19,16 +19,16 @@ builder.Services.AddDbContext<HealthBuddyDbContext>(options =>
 
 
 
-// Cấu hình xác thực bằng JWT
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
-{
-    options.Authority = "https://YOUR_AUTH0_DOMAIN/"; // Thay bằng domain Auth0 của bạn
-    options.Audience = "https://dev-vyacjvukxy0qkvz7.us.auth0.com/api/v2/";         // Thay bằng API Identifier đã tạo
-});
+// // Cấu hình xác thực bằng JWT
+// builder.Services.AddAuthentication(options =>
+// {
+//     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+//     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+// }).AddJwtBearer(options =>
+// {
+//     options.Authority = "https://YOUR_AUTH0_DOMAIN/"; // Thay bằng domain Auth0 của bạn
+//     options.Audience = "https://dev-vyacjvukxy0qkvz7.us.auth0.com/api/v2/";         // Thay bằng API Identifier đã tạo
+// });
 
 builder.Services.AddScoped<IUserRepository, SQLUserRepository>();
 

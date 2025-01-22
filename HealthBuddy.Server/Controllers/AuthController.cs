@@ -27,7 +27,19 @@ namespace HealthBuddy.Server.Controllers
             try
             {
                 var response = await _auth0Service.LoginAsync(request.Email, request.Password);
-                return Ok(JsonSerializer.Deserialize<object>(response));
+                var user = await _userRepository.GetUserByEmailAsync(request.Email);
+                if (user == null)
+                {
+                    return BadRequest(new { error = "User not found with email " + request.Email });
+                }
+
+
+                return Ok(new
+                {
+                    token = response,
+                    userID = user.UserId,
+                    role = user.IsAdmin ? "admin" : "user"
+                });
             }
             catch (HttpRequestException ex)
             {
@@ -40,13 +52,18 @@ namespace HealthBuddy.Server.Controllers
         {
             try
             {
+                var emailExists = await _auth0Service.CheckIfEmailExistsAsync(request.Email);
+                if (emailExists)
+                {
+                    return BadRequest(new { error = "Email already exists" });
+                }
                 var response = await _auth0Service.SignupAsync(request.Email, request.Password);
 
-                // var result = await _userRepository.CreateUserAsync(request.Email, request.Password);
-                // if (!result)
-                // {
-                //     return StatusCode(StatusCodes.Status500InternalServerError, "Error creating user");
-                // }
+                var result = await _userRepository.CreateUserAsync(request.Email, request.Password);
+                if (!result)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Error creating user");
+                }
 
                 return Ok(JsonSerializer.Deserialize<object>(response));
             }
@@ -57,18 +74,20 @@ namespace HealthBuddy.Server.Controllers
 
         }
 
-        // [HttpGet]
-        // public async Task<ActionResult> GetAllUsers()
-        // {
-        //     try
-        //     {
-        //         var users = await _userRepository.GetAllAsync();
-        //         return Ok(users);
-        //     }
-        //     catch (Exception)
-        //     {
-        //         return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database");
-        //     }
-        // }
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword(string email)
+        {
+            try
+            {
+                await _auth0Service.ForgotPasswordAsync(email);
+                return Ok("Email sent");
+            }
+            catch (HttpRequestException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+
     }
 }
