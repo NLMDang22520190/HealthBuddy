@@ -16,6 +16,10 @@ public class Auth0Service
     private readonly Auth0Settings _settings;
     private readonly HttpClient _httpClient;
 
+    // Các biến lưu trữ token và thời gian hết hạn
+    private string _cachedManagementApiToken;
+    private DateTime _tokenExpirationTime;
+
     public Auth0Service(IOptions<Auth0Settings> options, IHttpClientFactory httpClientFactory)
     {
         _settings = options.Value;
@@ -210,8 +214,17 @@ public class Auth0Service
         return false;
     }
     // This method gets the Management API token using client credentials
+    // Hàm lấy token Management API
     private async Task<string> GetManagementApiTokenAsync()
     {
+        // Kiểm tra xem token đã hết hạn chưa
+        if (_cachedManagementApiToken != null && DateTime.UtcNow < _tokenExpirationTime)
+        {
+            // Nếu token chưa hết hạn, trả về token đã lưu trữ
+            return _cachedManagementApiToken;
+        }
+
+        // Nếu token đã hết hạn hoặc chưa có, tạo một token mới
         var body = new
         {
             grant_type = "client_credentials",
@@ -233,6 +246,11 @@ public class Auth0Service
         var responseContent = await response.Content.ReadAsStringAsync();
         using var jsonDoc = JsonDocument.Parse(responseContent);
         var accessToken = jsonDoc.RootElement.GetProperty("access_token").GetString();
+        var expiresIn = jsonDoc.RootElement.GetProperty("expires_in").GetInt32();
+
+        // Lưu token và thời gian hết hạn
+        _cachedManagementApiToken = accessToken;
+        _tokenExpirationTime = DateTime.UtcNow.AddSeconds(expiresIn);
 
         return accessToken;
     }
