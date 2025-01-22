@@ -2,6 +2,7 @@ using HealthBuddy.Server.Models;
 using HealthBuddy.Server.Models.Domain;
 using BCrypt.Net;
 using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 
 namespace HealthBuddy.Server.Repositories.Implement
 {
@@ -16,7 +17,7 @@ namespace HealthBuddy.Server.Repositories.Implement
             try
             {
                 var hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
-                var user = new User { Email = email, Password = hashedPassword };
+                var user = new User { Email = email, Password = hashedPassword, Username = email, IsDeactivated = false };
                 await CreateAsync(user);
                 return true;
             }
@@ -25,6 +26,12 @@ namespace HealthBuddy.Server.Repositories.Implement
                 Debug.WriteLine("Error creating user" + e.Message);
                 return false;
             }
+        }
+
+        public async Task<User> GetUserByEmailAsync(string email)
+        {
+            var user = await dbContext.Users.Where(u => u.Email == email).FirstOrDefaultAsync();
+            return user;
         }
     }
 }
