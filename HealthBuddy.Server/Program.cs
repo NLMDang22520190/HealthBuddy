@@ -2,6 +2,7 @@
 using HealthBuddy.Server.Models;
 using HealthBuddy.Server.Repositories;
 using HealthBuddy.Server.Repositories.Implement;
+using HealthBuddy.Server.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+builder.Services.Configure<Auth0Settings>(builder.Configuration.GetSection("Auth0"));
 
 // Đọc ConnectionString từ appsettings.json
 //Console.WriteLine("connection string: " + builder.Configuration.GetConnectionString("HealthBuddy"));
@@ -33,9 +34,8 @@ builder.Services.AddScoped<IUserRepository, SQLUserRepository>();
 
 
 builder.Services.AddScoped(typeof(IHealthBuddyRepository<>), typeof(HealthBuddyRepository<>));
-builder.Services.AddScoped<SuperTokensService>();
 builder.Services.AddHttpClient();  // Đăng ký IHttpClientFactory
-
+builder.Services.AddScoped<Auth0Service>();
 
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
