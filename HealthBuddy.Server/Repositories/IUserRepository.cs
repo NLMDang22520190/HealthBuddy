@@ -7,6 +7,10 @@ namespace HealthBuddy.Server.Repositories
         Task<bool> CreateUserAsync(string email, string password, string Provider);
 
         Task<bool> CheckEmailExistsAsync(string email);
+
+        Task<bool> CheckEmailExistWithProviderAsync(string email, string provider);
         Task<User> GetUserByEmailAsync(string email);
+
+        Task<User> GetUserByEmailAndProviderAsync(string email, string provider);
     }
 }

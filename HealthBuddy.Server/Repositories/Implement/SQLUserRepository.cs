@@ -17,6 +17,11 @@ namespace HealthBuddy.Server.Repositories.Implement
             return dbContext.Users.AnyAsync(u => u.Email.Normalize().Equals(email.Normalize()));
         }
 
+        public Task<bool> CheckEmailExistWithProviderAsync(string email, string provider)
+        {
+            return dbContext.Users.AnyAsync(u => u.Email.Normalize().Equals(email.Normalize()) && u.Provider.Equals(provider));
+        }
+
         public async Task<bool> CreateUserAsync(string email, string password, string Provider)
         {
             try
@@ -33,9 +38,14 @@ namespace HealthBuddy.Server.Repositories.Implement
             }
         }
 
+        public async Task<User> GetUserByEmailAndProviderAsync(string email, string provider)
+        {
+            return await dbContext.Users.Where(u => u.Email.Normalize().Equals(email.Normalize()) && u.Provider == provider).FirstOrDefaultAsync();
+        }
+
         public async Task<User> GetUserByEmailAsync(string email)
         {
-            var user = await dbContext.Users.Where(u => u.Email == email).FirstOrDefaultAsync();
+            var user = await dbContext.Users.Where(u => u.Email.Normalize().Equals(email.Normalize())).FirstOrDefaultAsync();
             return user;
         }
     }
