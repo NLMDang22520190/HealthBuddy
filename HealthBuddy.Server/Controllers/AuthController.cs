@@ -225,7 +225,7 @@ namespace HealthBuddy.Server.Controllers
                 var authResult = await _auth0Service.HandleSocialCallbackAsync(code, redirectUri);
 
                 // Tạo URL frontend và truyền token vào query string (hoặc sử dụng session/cookie)
-                var frontendUrl = $"https://localhost:3000/callback?access_token={authResult.AccessToken}&id_token={authResult.IdToken}";
+                var frontendUrl = $"https://healthbuddyyy.netlify.app/callback?access_token={authResult.AccessToken}&id_token={authResult.IdToken}";
 
                 // Redirect về frontend với các token
                 return Redirect(frontendUrl);
