@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text.Json;
 using HealthBuddy.Server.Models.Domain;
 using HealthBuddy.Server.Models.DTO.AUTH;
@@ -119,12 +120,64 @@ namespace HealthBuddy.Server.Controllers
             return Challenge(properties, "Auth0");
         }
 
-        // Callback sau khi login với Social
         [HttpGet("callback")]
-        public IActionResult Callback(string returnUrl = "/")
+        public async Task<IActionResult> Callback(string returnUrl = "/")
         {
-            return LocalRedirect(returnUrl);
+            // Lấy thông tin người dùng từ Auth0
+            var authenticateResult = await HttpContext.AuthenticateAsync("Auth0");
+
+            if (!authenticateResult.Succeeded)
+            {
+                return BadRequest(new { error = "Authentication failed." });
+            }
+
+            // Lấy thông tin người dùng từ claims
+            var user = authenticateResult.Principal;
+            var email = user?.FindFirstValue(ClaimTypes.Email);
+            var name = user?.FindFirstValue(ClaimTypes.Name);
+            var provider = user?.FindFirstValue("iss"); // Provider (Google, Facebook)
+            var userId = user?.FindFirstValue(ClaimTypes.NameIdentifier); // ID người dùng từ Auth0
+
+            if (string.IsNullOrEmpty(email))
+            {
+                return BadRequest(new { error = "Email is missing from authentication data." });
+            }
+
+            // Kiểm tra người dùng trong cơ sở dữ liệu
+            var existingUser = await _userRepository.GetUserByEmailAsync(email);
+            if (existingUser == null)
+            {
+                // Nếu chưa tồn tại, tạo người dùng mới
+                var result = await _userRepository.CreateUserAsync(email, "", provider); // Tạo người dùng với provider (nếu có)
+
+                if (!result)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Error creating user");
+                }
+
+                // Sau khi tạo người dùng, lấy lại thông tin người dùng từ cơ sở dữ liệu
+                existingUser = await _userRepository.GetUserByEmailAsync(email);
+            }
+
+            // Lấy access_token và id_token từ Auth0
+            var accessToken = authenticateResult.Properties.GetTokenValue("access_token");
+            var idToken = authenticateResult.Properties.GetTokenValue("id_token");
+
+            if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(idToken))
+            {
+                return BadRequest(new { error = "Tokens not found." });
+            }
+
+            // Trả về access_token, id_token, userId và role
+            return Ok(new
+            {
+                access_token = accessToken,
+                id_token = idToken,
+                userId = existingUser.UserId,
+                role = existingUser.IsAdmin ? "admin" : "user"
+            });
         }
+
 
         // Đăng xuất
         [HttpGet("logout")]
