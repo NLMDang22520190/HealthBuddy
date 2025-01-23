@@ -67,12 +67,13 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigins", builder =>
     {
-        builder.WithOrigins("https://localhost:3000") // Thay bằng domain frontend của bạn
+        builder.WithOrigins("https://localhost:3000", "https://healthbuddyyy.netlify.app") // Cho phép cả hai domain
                .AllowAnyHeader()
                .AllowAnyMethod()
                .AllowCredentials();
     });
 });
+
 
 
 builder.Services.AddScoped<IUserRepository, SQLUserRepository>();
