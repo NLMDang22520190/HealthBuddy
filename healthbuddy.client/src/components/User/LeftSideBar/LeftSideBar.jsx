@@ -11,8 +11,8 @@ import { Link } from "react-router-dom";
 
 const LeftSideBar = () => {
   return (
-    <div className="flex justify-center items-center transition-all duration-[450ms] ease-in-out w-fit md-lg:w-16 sticky top-1/3 h-fit  md-lg:h-96">
-      <div className="flex md-lg:inline-block md-lg:border md-lg:border-solid md-lg:border-gray-700 w-full ease-in-out duration-500 left-0 rounded-2xl  md-lg:shadow-lg md-lg:shadow-black/15 bg-bg_light dark:bg-bg_dark md:dark:bg-gradient-to-b md-lg:dark:from-jet md-lg:dark:to-raisin_black">
+    <div className="flex justify-center items-center transition-all duration-[450ms] ease-in-out w-fit sm:w-16 sticky top-1/3 h-fit sm:h-96">
+      <div className="flex sm:inline-block sm:border sm:border-solid sm:border-gray-700 w-full ease-in-out duration-500 left-0 rounded-2xl  sm:shadow-lg sm:shadow-black/15 bg-bg_light dark:bg-bg_dark sm:dark:bg-gradient-to-b sm:dark:from-jet sm:dark:to-raisin_black">
         <Link
           to="/"
           className="has-[:checked]:shadow-lg relative w-full h-16 p-4 ease-in-out duration-300 border-solid border-black/10 has-[:checked]:border group flex flex-row gap-3 items-center justify-center text-primary-light dark:text-primary-dark rounded-xl"
