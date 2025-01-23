@@ -4,6 +4,7 @@ import { Form } from "antd";
 import { Card, TextInput, Label, Button } from "flowbite-react";
 import { Link } from "react-router-dom";
 import { Mail, Lock } from "lucide-react";
+import axios from "axios";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -14,15 +15,41 @@ const Login = () => {
     console.log("Login attempt:", { email, password });
   };
 
-  const handleGoogleLogin = () => {
+  const handleGoogleLogin = async () => {
+    const productURL = "https://healthbuddy-gkgc.onrender.com";
+    const developmentURL = "https://localhost:7222";
     // window.location.href =
     //   "https://healthbuddy-gkgc.onrender.com/api/auth/login/social?provider=google";
 
-    const returnUrl = encodeURIComponent("/dashboard");
-    window.location.href = `https://healthbuddy-gkgc.onrender.com/api/auth/login/social?provider=google&returnUrl=${returnUrl}`;
+    // const redirectUrl = encodeURIComponent(
+    //   "https://healthbuddyyy.netlify.app/callback"
+    // );
+    // window.location.href = `https://healthbuddy-gkgc.onrender.com/api/auth/login/social?provider=google&returnUrl=${redirectUrl}`;
+
+    // const redirectUrl = encodeURIComponent("https://localhost:3000/callback");
+    // window.location.href = `https://localhost:7222/api/auth/login/social?provider=google&returnUrl=${redirectUrl}`;
+
+    // const returnUrl = encodeURIComponent("/dashboard");
+    // window.location.href = `https://healthbuddy-gkgc.onrender.com/api/auth/login/social?provider=google&returnUrl=${returnUrl}`;
 
     // const returnUrl = encodeURIComponent("/dashboard"); // Hoặc bất kỳ trang nào bạn muốn
     // window.location.href = `https://localhost:7222/api/Auth/login/social?provider=google&returnUrl=${returnUrl}`;
+
+    try {
+      const response = await axios.get(`${productURL}/api/auth/social-login`, {
+        params: { provider: "google" }, // Bạn có thể thay đổi thành Facebook hoặc các provider khác
+      });
+
+      if (response.data.url) {
+        // Điều hướng người dùng tới URL đăng nhập
+        window.location.href = response.data.url;
+      }
+    } catch (error) {
+      console.error(
+        "Error fetching social login URL:",
+        error.response?.data || error.message
+      );
+    }
   };
 
   const containerVariants = {

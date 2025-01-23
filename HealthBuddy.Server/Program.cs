@@ -63,6 +63,17 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigins", builder =>
+    {
+        builder.WithOrigins("https://localhost:3000") // Thay bằng domain frontend của bạn
+               .AllowAnyHeader()
+               .AllowAnyMethod()
+               .AllowCredentials();
+    });
+});
+
 
 builder.Services.AddScoped<IUserRepository, SQLUserRepository>();
 
@@ -91,6 +102,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("AllowSpecificOrigins");
 
 app.UseHttpsRedirection();
 

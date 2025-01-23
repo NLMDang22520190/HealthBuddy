@@ -295,4 +295,113 @@ public class Auth0Service
         }
     }
 
+    #region SocialLogin
+    public string GetSocialLoginUrl(string provider, string redirectUri)
+    {
+        if (string.IsNullOrWhiteSpace(provider))
+        {
+            throw new ArgumentException("Provider cannot be null or empty", nameof(provider));
+        }
+
+        return $"https://{_settings.Domain}/authorize" +
+               $"?response_type=code" +
+               $"&client_id={_settings.ClientId}" +
+               $"&redirect_uri={Uri.EscapeDataString(redirectUri)}" +
+               $"&connection={provider}" +
+               $"&scope=openid profile email" +
+               $"&state={Guid.NewGuid()}"; // Thêm state để bảo mật
+    }
+
+    // Hàm xử lý callback từ Auth0 sau khi người dùng login qua Social Provider
+    public async Task<AuthResult> HandleSocialCallbackAsync(string code, string redirectUri)
+    {
+        if (string.IsNullOrEmpty(code))
+        {
+            throw new ArgumentException("Authorization code cannot be null or empty", nameof(code));
+        }
+
+        var body = new
+        {
+            grant_type = "authorization_code",
+            client_id = _settings.ClientId,
+            client_secret = _settings.ClientSecret,
+            code = code,
+            redirect_uri = redirectUri
+        };
+
+        var response = await _httpClient.PostAsync(
+            $"https://{_settings.Domain}/oauth/token",
+            new StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json")
+        );
+
+        if (!response.IsSuccessStatusCode)
+        {
+            await HandleAuth0Error(response);
+        }
+
+        var responseContent = await response.Content.ReadAsStringAsync();
+        using var jsonDoc = JsonDocument.Parse(responseContent);
+
+        var accessToken = jsonDoc.RootElement.GetProperty("access_token").GetString();
+        var idToken = jsonDoc.RootElement.GetProperty("id_token").GetString();
+
+        // Lấy thông tin người dùng từ Auth0
+        var userInfo = await GetUserInfoAsync(accessToken);
+
+        return new AuthResult
+        {
+            AccessToken = accessToken,
+            IdToken = idToken,
+            Email = userInfo.Email,
+            Name = userInfo.Name,
+            Provider = userInfo.Provider
+        };
+    }
+
+    // Hàm lấy thông tin người dùng qua access token
+    private async Task<UserInfo> GetUserInfoAsync(string accessToken)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Get, $"https://{_settings.Domain}/userinfo");
+        request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+
+        var response = await _httpClient.SendAsync(request);
+        if (!response.IsSuccessStatusCode)
+        {
+            await HandleAuth0Error(response);
+        }
+
+        var responseContent = await response.Content.ReadAsStringAsync();
+        using var jsonDoc = JsonDocument.Parse(responseContent);
+
+        var email = jsonDoc.RootElement.GetProperty("email").GetString();
+        var name = jsonDoc.RootElement.GetProperty("name").GetString();
+        var provider = jsonDoc.RootElement.GetProperty("sub").GetString()?.Split('|')[0]; // Lấy provider (google, facebook)
+
+        return new UserInfo
+        {
+            Email = email,
+            Name = name,
+            Provider = provider
+        };
+    }
+
+    #endregion
+}
+
+// Class chứa kết quả đăng nhập
+public class AuthResult
+{
+    public string AccessToken { get; set; }
+    public string IdToken { get; set; }
+    public string Email { get; set; }
+    public string Name { get; set; }
+    public string Provider { get; set; }
+}
+
+// Class chứa thông tin người dùng
+public class UserInfo
+{
+    public string Email { get; set; }
+    public string Name { get; set; }
+    public string Provider { get; set; }
 }

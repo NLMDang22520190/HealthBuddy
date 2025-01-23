@@ -93,15 +93,19 @@ namespace HealthBuddy.Server.Controllers
         #region SocialLogin
 
         [HttpGet("login/social")]
-        public IActionResult LoginWithSocial([FromQuery] string provider, string returnUrl = "/")
+        public IActionResult LoginWithSocial([FromQuery] string provider, [FromQuery] string returnUrl)
         {
             if (string.IsNullOrEmpty(provider))
             {
                 return BadRequest(new { error = "Provider is required (e.g., google, facebook)." });
             }
 
-            var redirectUrl = Url.Action(nameof(Callback), "Auth", new { returnUrl = returnUrl });
-            var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+            if (string.IsNullOrEmpty(returnUrl))
+            {
+                return BadRequest(new { error = "Return URL is required." });
+            }
+
+            var properties = new AuthenticationProperties { RedirectUri = returnUrl };
 
             // Phân biệt provider để định tuyến Auth0 connection
             if (provider.Equals("google", StringComparison.OrdinalIgnoreCase))
@@ -126,24 +130,27 @@ namespace HealthBuddy.Server.Controllers
         [HttpGet("callback")]
         public async Task<IActionResult> Callback(string returnUrl = "/")
         {
-            // Lấy thông tin người dùng từ Auth0
             var authenticateResult = await HttpContext.AuthenticateAsync("Auth0");
 
             if (!authenticateResult.Succeeded)
             {
-                return BadRequest(new { error = "Authentication failed." });
+                return BadRequest(new { error = "Authentication failed.", details = authenticateResult.Failure?.Message });
             }
 
-            // Lấy thông tin người dùng từ claims
             var user = authenticateResult.Principal;
             var email = user?.FindFirstValue(ClaimTypes.Email);
-            var name = user?.FindFirstValue(ClaimTypes.Name);
-            var provider = user?.FindFirstValue("iss"); // Provider (Google, Facebook)
-            var userId = user?.FindFirstValue(ClaimTypes.NameIdentifier); // ID người dùng từ Auth0
+            var provider = user?.FindFirstValue("iss") ?? "";
+            if (provider.Contains("google"))
+                provider = "google";
+            else if (provider.Contains("facebook"))
+                provider = "facebook";
 
-            if (string.IsNullOrEmpty(email))
+            var accessToken = authenticateResult.Properties.GetTokenValue("access_token");
+            var idToken = authenticateResult.Properties.GetTokenValue("id_token");
+
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(idToken))
             {
-                return BadRequest(new { error = "Email is missing from authentication data." });
+                return BadRequest(new { error = "Invalid data from Auth0." });
             }
 
             // Kiểm tra người dùng trong cơ sở dữ liệu
@@ -161,16 +168,6 @@ namespace HealthBuddy.Server.Controllers
                 // Sau khi tạo người dùng, lấy lại thông tin người dùng từ cơ sở dữ liệu
                 existingUser = await _userRepository.GetUserByEmailAsync(email);
             }
-
-            // Lấy access_token và id_token từ Auth0
-            var accessToken = authenticateResult.Properties.GetTokenValue("access_token");
-            var idToken = authenticateResult.Properties.GetTokenValue("id_token");
-
-            if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(idToken))
-            {
-                return BadRequest(new { error = "Tokens not found." });
-            }
-
             // Trả về access_token, id_token, userId và role
             return Ok(new
             {
@@ -179,6 +176,44 @@ namespace HealthBuddy.Server.Controllers
                 userId = existingUser.UserId,
                 role = existingUser.IsAdmin ? "admin" : "user"
             });
+        }
+
+        [HttpGet("social-login")]
+        public IActionResult GetSocialLoginUrl(string provider, string returnUrl = "/")
+        {
+            if (string.IsNullOrEmpty(provider))
+            {
+                return BadRequest(new { error = "Provider is required (e.g., google, facebook)." });
+            }
+
+            var redirectUri = Url.Action("SocialCallback", "Auth", null, Request.Scheme);
+            var loginUrl = _auth0Service.GetSocialLoginUrl(provider, redirectUri);
+
+            return Ok(new { url = loginUrl });
+        }
+
+        [HttpGet("social-callback")]
+        public async Task<IActionResult> SocialCallback(string code, string state)
+        {
+            try
+            {
+                var redirectUri = Url.Action("SocialCallback", "Auth", null, Request.Scheme);
+                var authResult = await _auth0Service.HandleSocialCallbackAsync(code, redirectUri);
+
+                // Sau khi xử lý, bạn có thể lưu người dùng vào database hoặc trả kết quả về frontend
+                return Ok(new
+                {
+                    authResult.AccessToken,
+                    authResult.IdToken,
+                    authResult.Email,
+                    authResult.Name,
+                    authResult.Provider
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
 
