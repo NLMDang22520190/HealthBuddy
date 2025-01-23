@@ -20,7 +20,7 @@
     @apply order-2 sm:order-1 w-full sm:w-auto sticky bg-bg_light h-fit sm:h-full dark:bg-bg_dark justify-center flex bottom-0 z-10;
   }
   .user-page-mainbar-container {
-    @apply order-1 sm:order-2  sm:mx-auto sm-md:w-9/12 md-lg:w-7/12 xl:w-5/12 2xl:w-5/12 overflow-y-hidden h-full bg-white dark:bg-bg_content_dark rounded-3xl shadow-lg border border-bg_divide_light;
+    @apply order-1 sm:order-2  sm:mx-auto sm-md:w-9/12 md-lg:w-7/12 xl:w-5/12 2xl:w-5/12 overflow-y-hidden h-full bg-white dark:bg-bg_content_dark rounded-3xl shadow-lg border border-bg_divide_light dark:border-bg_divide_dark;
   }
   .user-page-mainbar-content-container {
     @apply h-screen overflow-y-auto no-scrollbar;
