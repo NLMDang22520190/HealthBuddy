@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Form } from "antd";
 import { Card, TextInput, Label, Button } from "flowbite-react";
@@ -12,6 +12,11 @@ const Login = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Login attempt:", { email, password });
+  };
+
+  const handleGoogleLogin = () => {
+    window.location.href =
+      "https://healthbuddy-gkgc.onrender.com/api/auth/login/social?provider=google";
   };
 
   const containerVariants = {
@@ -134,7 +139,10 @@ const Login = () => {
             variants={itemVariants}
           >
             <div className="group bg-gradient-to-tr from-[#d20404] to-[#ea8d84] rounded-lg p-0.5 shadow-md flex items-center justify-center">
-              <button className=" flex-1 flex items-center justify-center font-bold text-xl bg-neutral-50 hover:bg-transparent p-2 rounded-lg">
+              <button
+                onClick={() => handleGoogleLogin()}
+                className=" flex-1 flex items-center justify-center font-bold text-xl bg-neutral-50 hover:bg-transparent p-2 rounded-lg"
+              >
                 <svg
                   class="size-6 font-bold text-red-500 group-hover:text-white"
                   width="24"
