@@ -116,7 +116,7 @@ namespace HealthBuddy.Server.Controllers
                 return BadRequest(new { error = "Invalid provider. Supported providers: google, facebook." });
             }
 
-            return Challenge(properties, OpenIdConnectDefaults.AuthenticationScheme);
+            return Challenge(properties, "Auth0");
         }
 
         // Callback sau khi login với Social
