@@ -19,6 +19,8 @@ public partial class User
 
     public bool IsAdmin { get; set; }
 
+    public string Provider { get; set; }
+
     public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
 
     public virtual ICollection<Exercise> Exercises { get; set; } = new List<Exercise>();
