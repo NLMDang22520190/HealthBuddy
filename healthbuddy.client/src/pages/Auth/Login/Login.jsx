@@ -18,30 +18,11 @@ const Login = () => {
   const handleGoogleLogin = async () => {
     const productURL = "https://healthbuddy-gkgc.onrender.com";
     const developmentURL = "https://localhost:7222";
-    // window.location.href =
-    //   "https://healthbuddy-gkgc.onrender.com/api/auth/login/social?provider=google";
-
-    // const redirectUrl = encodeURIComponent(
-    //   "https://healthbuddyyy.netlify.app/callback"
-    // );
-    // window.location.href = `https://healthbuddy-gkgc.onrender.com/api/auth/login/social?provider=google&returnUrl=${redirectUrl}`;
-
-    // const redirectUrl = encodeURIComponent("https://localhost:3000/callback");
-    // window.location.href = `https://localhost:7222/api/auth/login/social?provider=google&returnUrl=${redirectUrl}`;
-
-    // const returnUrl = encodeURIComponent("/dashboard");
-    // window.location.href = `https://healthbuddy-gkgc.onrender.com/api/auth/login/social?provider=google&returnUrl=${returnUrl}`;
-
-    // const returnUrl = encodeURIComponent("/dashboard"); // Hoặc bất kỳ trang nào bạn muốn
-    // window.location.href = `https://localhost:7222/api/Auth/login/social?provider=google&returnUrl=${returnUrl}`;
 
     try {
-      const response = await axios.get(
-        `${developmentURL}/api/auth/social-login`,
-        {
-          params: { provider: "google-oauth2" }, // Bạn có thể thay đổi thành Facebook hoặc các provider khác
-        }
-      );
+      const response = await axios.get(`${productURL}/api/auth/social-login`, {
+        params: { provider: "google-oauth2" }, // Bạn có thể thay đổi thành Facebook hoặc các provider khác
+      });
 
       if (response.data.url) {
         // Điều hướng người dùng tới URL đăng nhập
