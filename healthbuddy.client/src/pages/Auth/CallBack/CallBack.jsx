@@ -5,43 +5,31 @@ import axios from "axios";
 const Callback = () => {
   const navigate = useNavigate();
 
-  const handleSocialCallback = async () => {
+  const handleSocialCallback = () => {
     const productURL = "https://healthbuddy-gkgc.onrender.com";
     const developmentURL = "https://localhost:7222";
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get("code");
-    const state = urlParams.get("state");
-
-    if (!code) {
-      console.error("Missing authorization code");
-      return;
-    }
-
-    try {
-      const response = await axios.get(
-        `${productURL}/api/auth/social-login/callback`,
-        {
-          params: { code, state },
-        }
-      );
-
-      // Lưu token và thông tin người dùng sau khi callback thành công
-      const { accessToken, idToken, email, name, provider } = response.data;
-
-      localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("idToken", idToken);
-      localStorage.setItem("userEmail", email);
-
-      // Điều hướng đến trang dashboard hoặc trang chính
-      window.location.href = "/dashboard";
-    } catch (error) {
-      console.error(
-        "Error during social login callback:",
-        error.response?.data || error.message
-      );
-    }
   };
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const accessToken = params.get("access_token");
+    const idToken = params.get("id_token");
+
+    console.log("Access token:", accessToken);
+    console.log("ID token:", idToken);
+
+    if (accessToken && idToken) {
+      // Lưu các token vào localStorage (hoặc sessionStorage)
+      localStorage.setItem("access_token", accessToken);
+      localStorage.setItem("id_token", idToken);
+
+      // Điều hướng về trang chính hoặc dashboard
+      navigate("/");
+    } else {
+      // Nếu không có token, xử lý lỗi (hoặc redirect về trang login)
+      navigate("/auth/login");
+    }
+  }, [navigate]);
 
   useEffect(() => {
     handleSocialCallback();

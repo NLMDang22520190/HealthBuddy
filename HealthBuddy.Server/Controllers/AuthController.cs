@@ -192,6 +192,30 @@ namespace HealthBuddy.Server.Controllers
             return Ok(new { url = loginUrl });
         }
 
+        // [HttpGet("social-callback")]
+        // public async Task<IActionResult> SocialCallback(string code, string state)
+        // {
+        //     try
+        //     {
+        //         var redirectUri = Url.Action("SocialCallback", "Auth", null, Request.Scheme);
+        //         var authResult = await _auth0Service.HandleSocialCallbackAsync(code, redirectUri);
+
+        //         // Sau khi xử lý, bạn có thể lưu người dùng vào database hoặc trả kết quả về frontend
+        //         return Ok(new
+        //         {
+        //             authResult.AccessToken,
+        //             authResult.IdToken,
+        //             authResult.Email,
+        //             authResult.Name,
+        //             authResult.Provider
+        //         });
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return BadRequest(new { error = ex.Message });
+        //     }
+        //}
+
         [HttpGet("social-callback")]
         public async Task<IActionResult> SocialCallback(string code, string state)
         {
@@ -200,21 +224,18 @@ namespace HealthBuddy.Server.Controllers
                 var redirectUri = Url.Action("SocialCallback", "Auth", null, Request.Scheme);
                 var authResult = await _auth0Service.HandleSocialCallbackAsync(code, redirectUri);
 
-                // Sau khi xử lý, bạn có thể lưu người dùng vào database hoặc trả kết quả về frontend
-                return Ok(new
-                {
-                    authResult.AccessToken,
-                    authResult.IdToken,
-                    authResult.Email,
-                    authResult.Name,
-                    authResult.Provider
-                });
+                // Tạo URL frontend và truyền token vào query string (hoặc sử dụng session/cookie)
+                var frontendUrl = $"https://localhost:3000/callback?access_token={authResult.AccessToken}&id_token={authResult.IdToken}";
+
+                // Redirect về frontend với các token
+                return Redirect(frontendUrl);
             }
             catch (Exception ex)
             {
                 return BadRequest(new { error = ex.Message });
             }
         }
+
 
 
         // Đăng xuất
