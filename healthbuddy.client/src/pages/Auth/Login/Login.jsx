@@ -15,10 +15,13 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href =
-      "https://healthbuddy-gkgc.onrender.com/api/auth/login/social?provider=google&returnUrl=https://healthbuddyyy.netlify.app/callback";
+    // window.location.href =
+    //   "https://healthbuddy-gkgc.onrender.com/api/auth/login/social?provider=google";
 
-    //    const returnUrl = encodeURIComponent("/dashboard"); // Hoặc bất kỳ trang nào bạn muốn
+    const returnUrl = encodeURIComponent("/dashboard");
+    window.location.href = `https://healthbuddy-gkgc.onrender.com/api/auth/login/social?provider=google&returnUrl=${returnUrl}`;
+
+    // const returnUrl = encodeURIComponent("/dashboard"); // Hoặc bất kỳ trang nào bạn muốn
     // window.location.href = `https://localhost:7222/api/Auth/login/social?provider=google&returnUrl=${returnUrl}`;
   };
 
