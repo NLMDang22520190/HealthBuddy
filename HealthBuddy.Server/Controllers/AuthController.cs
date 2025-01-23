@@ -3,6 +3,9 @@ using HealthBuddy.Server.Models.Domain;
 using HealthBuddy.Server.Models.DTO.AUTH;
 using HealthBuddy.Server.Repositories;
 using HealthBuddy.Server.Services;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,7 +24,7 @@ namespace HealthBuddy.Server.Controllers
             _auth0Service = auth0Service;
         }
 
-        [HttpPost("login")]
+        [HttpPost("login/email-password")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO request)
         {
             try
@@ -32,8 +35,6 @@ namespace HealthBuddy.Server.Controllers
                 {
                     return BadRequest(new { error = "User not found with email " + request.Email });
                 }
-
-
                 return Ok(new
                 {
                     token = response,
@@ -52,14 +53,14 @@ namespace HealthBuddy.Server.Controllers
         {
             try
             {
-                var emailExists = await _auth0Service.CheckIfEmailExistsAsync(request.Email);
+                var emailExists = await _userRepository.CheckEmailExistsAsync(request.Email);
                 if (emailExists)
                 {
                     return BadRequest(new { error = "Email already exists" });
                 }
                 var response = await _auth0Service.SignupAsync(request.Email, request.Password);
 
-                var result = await _userRepository.CreateUserAsync(request.Email, request.Password);
+                var result = await _userRepository.CreateUserAsync(request.Email, request.Password, "EmailAndPassword");
                 if (!result)
                 {
                     return StatusCode(StatusCodes.Status500InternalServerError, "Error creating user");
@@ -88,6 +89,53 @@ namespace HealthBuddy.Server.Controllers
             }
         }
 
+        #region SocialLogin
+
+        [HttpGet("login/social")]
+        public IActionResult LoginWithSocial([FromQuery] string provider, string returnUrl = "/")
+        {
+            if (string.IsNullOrEmpty(provider))
+            {
+                return BadRequest(new { error = "Provider is required (e.g., google, facebook)." });
+            }
+
+            var redirectUrl = Url.Action(nameof(Callback), "Auth", new { returnUrl });
+            var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+
+            // Phân biệt provider để định tuyến Auth0 connection
+            if (provider.Equals("google", StringComparison.OrdinalIgnoreCase))
+            {
+                properties.Items["connection"] = "google-oauth2"; // Tên connection trên Auth0
+            }
+            else if (provider.Equals("facebook", StringComparison.OrdinalIgnoreCase))
+            {
+                properties.Items["connection"] = "facebook";
+            }
+            else
+            {
+                return BadRequest(new { error = "Invalid provider. Supported providers: google, facebook." });
+            }
+
+            return Challenge(properties, OpenIdConnectDefaults.AuthenticationScheme);
+        }
+
+        // Callback sau khi login với Social
+        [HttpGet("callback")]
+        public IActionResult Callback(string returnUrl = "/")
+        {
+            return LocalRedirect(returnUrl);
+        }
+
+        // Đăng xuất
+        [HttpGet("logout")]
+        public IActionResult Logout()
+        {
+            return SignOut(new AuthenticationProperties { RedirectUri = "/" },
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                OpenIdConnectDefaults.AuthenticationScheme);
+        }
+
+        #endregion
 
     }
 }

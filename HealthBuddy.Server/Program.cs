@@ -3,7 +3,9 @@ using HealthBuddy.Server.Models;
 using HealthBuddy.Server.Repositories;
 using HealthBuddy.Server.Repositories.Implement;
 using HealthBuddy.Server.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -17,18 +19,50 @@ builder.Services.Configure<Auth0Settings>(builder.Configuration.GetSection("Auth
 builder.Services.AddDbContext<HealthBuddyDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("HealthBuddy")));
 
+var auth0Settings = builder.Configuration.GetSection("Auth0").Get<Auth0Settings>();
 
 
-// // Cấu hình xác thực bằng JWT
-// builder.Services.AddAuthentication(options =>
-// {
-//     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-//     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-// }).AddJwtBearer(options =>
-// {
-//     options.Authority = "https://YOUR_AUTH0_DOMAIN/"; // Thay bằng domain Auth0 của bạn
-//     options.Audience = "https://dev-vyacjvukxy0qkvz7.us.auth0.com/api/v2/";         // Thay bằng API Identifier đã tạo
-// });
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+})
+.AddCookie()
+.AddOpenIdConnect("Auth0", options =>
+{
+    // Auth0 domain và thông tin ứng dụng
+    options.Authority = $"https://{auth0Settings.Domain}";
+    options.ClientId = auth0Settings.ClientId;
+    options.ClientSecret = auth0Settings.ClientSecret;
+
+    // Flow xác thực: Authorization Code Flow
+    options.ResponseType = "code";
+
+    // URL callback sau khi login
+    options.CallbackPath = new PathString("/callback");
+
+    // Lưu token
+    options.SaveTokens = true;
+
+    // Scope để lấy thông tin người dùng
+    options.Scope.Add("openid");
+    options.Scope.Add("profile");
+    options.Scope.Add("email");
+
+    // Xử lý sự kiện đăng xuất
+    options.Events = new OpenIdConnectEvents
+    {
+        OnRedirectToIdentityProviderForSignOut = (context) =>
+        {
+            var logoutUri = $"https://{auth0Settings.Domain}/v2/logout?client_id={auth0Settings.ClientId}";
+            context.Response.Redirect(logoutUri);
+            context.HandleResponse();
+            return Task.CompletedTask;
+        }
+    };
+});
+
 
 builder.Services.AddScoped<IUserRepository, SQLUserRepository>();
 
@@ -60,6 +94,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

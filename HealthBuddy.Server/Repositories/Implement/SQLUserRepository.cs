@@ -12,12 +12,17 @@ namespace HealthBuddy.Server.Repositories.Implement
         {
         }
 
-        public async Task<bool> CreateUserAsync(string email, string password)
+        public Task<bool> CheckEmailExistsAsync(string email)
+        {
+            return dbContext.Users.AnyAsync(u => u.Email.Normalize().Equals(email.Normalize()));
+        }
+
+        public async Task<bool> CreateUserAsync(string email, string password, string Provider)
         {
             try
             {
                 var hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
-                var user = new User { Email = email, Password = hashedPassword, Username = email, IsDeactivated = false };
+                var user = new User { Email = email, Password = hashedPassword, Username = email, IsDeactivated = false, Provider = Provider };
                 await CreateAsync(user);
                 return true;
             }
