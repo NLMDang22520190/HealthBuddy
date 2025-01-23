@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Form } from "antd";
+import { Form, message } from "antd";
 import { Card, TextInput, Label, Button } from "flowbite-react";
 import { Link } from "react-router-dom";
 import { Mail, Lock } from "lucide-react";
@@ -9,6 +9,7 @@ import axios from "axios";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isGoogleLoginLoading, setIsGoogleLoginLoading] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -19,6 +20,7 @@ const Login = () => {
     const productURL = "https://healthbuddy-gkgc.onrender.com";
     const developmentURL = "https://localhost:7222";
 
+    setIsGoogleLoginLoading(true);
     try {
       const response = await axios.get(`${productURL}/api/auth/social-login`, {
         params: { provider: "google-oauth2" }, // Bạn có thể thay đổi thành Facebook hoặc các provider khác
@@ -29,10 +31,12 @@ const Login = () => {
         window.location.href = response.data.url;
       }
     } catch (error) {
-      console.error(
+      message.error(
         "Error fetching social login URL:",
         error.response?.data || error.message
       );
+    } finally {
+      setIsGoogleLoginLoading(false);
     }
   };
 
@@ -157,6 +161,7 @@ const Login = () => {
           >
             <div className="group bg-gradient-to-tr from-[#d20404] to-[#ea8d84] rounded-lg p-0.5 shadow-md flex items-center justify-center">
               <button
+                disabled={isGoogleLoginLoading}
                 onClick={() => handleGoogleLogin()}
                 className=" flex-1 flex items-center justify-center font-bold text-xl bg-neutral-50 hover:bg-transparent p-2 rounded-lg"
               >
