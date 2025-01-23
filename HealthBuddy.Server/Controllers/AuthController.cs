@@ -99,7 +99,7 @@ namespace HealthBuddy.Server.Controllers
                 return BadRequest(new { error = "Provider is required (e.g., google, facebook)." });
             }
 
-            var redirectUrl = Url.Action(nameof(Callback), "Auth", new { returnUrl });
+            var redirectUrl = Url.Action(nameof(Callback), "Auth", new { returnUrl = "https://healthbuddyyy.netlify.app/callback" });
             var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
 
             // Phân biệt provider để định tuyến Auth0 connection
