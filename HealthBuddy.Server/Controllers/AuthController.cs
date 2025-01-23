@@ -54,7 +54,7 @@ namespace HealthBuddy.Server.Controllers
         {
             try
             {
-                var emailExists = await _userRepository.CheckEmailExistsAsync(request.Email);
+                var emailExists = await _userRepository.CheckEmailExistWithProviderAsync(request.Email, "EmailAndPassword");
                 if (emailExists)
                 {
                     return BadRequest(new { error = "Email already exists" });
@@ -144,7 +144,7 @@ namespace HealthBuddy.Server.Controllers
             }
 
             // Kiểm tra người dùng trong cơ sở dữ liệu
-            var existingUser = await _userRepository.GetUserByEmailAsync(email);
+            var existingUser = await _userRepository.GetUserByEmailAndProviderAsync(email, provider);
             if (existingUser == null)
             {
                 // Nếu chưa tồn tại, tạo người dùng mới
