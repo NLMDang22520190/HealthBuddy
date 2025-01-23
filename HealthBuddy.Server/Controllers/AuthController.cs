@@ -100,10 +100,10 @@ namespace HealthBuddy.Server.Controllers
                 return BadRequest(new { error = "Provider is required (e.g., google, facebook)." });
             }
 
-            var redirectUrl = Url.Action(nameof(Callback), "Auth", new { returnUrl = "https://healthbuddyyy.netlify.app/callback" });
+            var redirectUrl = "https://healthbuddyyy.netlify.app/callback"; // URL callback sau khi login
             var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
 
-            // Phân biệt provider để định tuyến Auth0 connection
+            // Xử lý provider để định tuyến Auth0 connection
             if (provider.Equals("google", StringComparison.OrdinalIgnoreCase))
             {
                 properties.Items["connection"] = "google-oauth2"; // Tên connection trên Auth0
@@ -119,6 +119,8 @@ namespace HealthBuddy.Server.Controllers
 
             return Challenge(properties, "Auth0");
         }
+
+
 
         [HttpGet("callback")]
         public async Task<IActionResult> Callback(string returnUrl = "/")

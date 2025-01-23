@@ -16,7 +16,10 @@ const Login = () => {
 
   const handleGoogleLogin = () => {
     window.location.href =
-      "https://healthbuddy-gkgc.onrender.com/api/auth/login/social?provider=google";
+      "https://healthbuddy-gkgc.onrender.com/api/auth/login/social?provider=google&returnUrl=https://healthbuddyyy.netlify.app/callback";
+
+    //    const returnUrl = encodeURIComponent("/dashboard"); // Hoặc bất kỳ trang nào bạn muốn
+    // window.location.href = `https://localhost:7222/api/Auth/login/social?provider=google&returnUrl=${returnUrl}`;
   };
 
   const containerVariants = {
