@@ -34,15 +34,15 @@ namespace HealthBuddy.Server.Controllers
                 var user = await _userRepository.GetUserByEmailAndProviderAsync(lowerEmail, "EmailAndPassword".ToLower());
                 if (user == null)
                 {
-                    return BadRequest(new { error = "User not found with email: " + request.Email });
+                    return BadRequest(new { error = "No user found with this email:" + request.Email });
                 }
                 var response = await _auth0Service.LoginAsync(lowerEmail, request.Password);
 
                 return Ok(new
                 {
-                    token = response,
-                    userID = user.UserId,
-                    role = user.IsAdmin ? "admin" : "user",
+                    accessToken = response,
+                    userId = user.UserId,
+                    userRole = user.IsAdmin ? "admin" : "user",
                     provider = "EmailAndPassword"
                 });
             }
@@ -116,29 +116,6 @@ namespace HealthBuddy.Server.Controllers
             return Ok(new { url = loginUrl });
         }
 
-        // [HttpGet("social-callback")]
-        // public async Task<IActionResult> SocialCallback(string code, string state)
-        // {
-        //     try
-        //     {
-        //         var redirectUri = Url.Action("SocialCallback", "Auth", null, Request.Scheme);
-        //         var authResult = await _auth0Service.HandleSocialCallbackAsync(code, redirectUri);
-
-        //         // Sau khi xử lý, bạn có thể lưu người dùng vào database hoặc trả kết quả về frontend
-        //         return Ok(new
-        //         {
-        //             authResult.AccessToken,
-        //             authResult.IdToken,
-        //             authResult.Email,
-        //             authResult.Name,
-        //             authResult.Provider
-        //         });
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         return BadRequest(new { error = ex.Message });
-        //     }
-        //}
 
         [HttpGet("social-callback")]
         public async Task<IActionResult> SocialCallback(string code, string state)

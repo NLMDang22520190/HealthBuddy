@@ -1,43 +1,72 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
+import { useFormStatus } from "react-dom";
 import { motion } from "framer-motion";
 import { Form, message } from "antd";
 import { Card, TextInput, Label, Spinner } from "flowbite-react";
 import { Link } from "react-router-dom";
 import { Mail, Lock } from "lucide-react";
-import axios from "axios";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+
+import { setAuth } from "../../../features/Auth/Auth";
+import api from "../../../features/AxiosInstance/AxiosInstance";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isGoogleLoginLoading, setIsGoogleLoginLoading] = useState(false);
+  const [isGoogleLoginPending, startGoogleLoginTransition] = useTransition();
+  const { pending } = useFormStatus();
 
-  const handleSubmit = (e) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login attempt:", { email, password });
-  };
-
-  const handleGoogleLogin = async () => {
-    const productURL = "https://healthbuddy-gkgc.onrender.com";
-    const developmentURL = "https://localhost:7222";
-
-    setIsGoogleLoginLoading(true);
     try {
-      const response = await axios.get(`${productURL}/api/auth/social-login`, {
-        params: { provider: "google-oauth2" }, // Bạn có thể thay đổi thành Facebook hoặc các provider khác
+      const response = await api.post("/api/auth/login/email-password", {
+        email,
+        password,
       });
-
-      if (response.data.url) {
-        // Điều hướng người dùng tới URL đăng nhập
-        window.location.href = response.data.url;
+      console.table("Login response:", response.data);
+      dispatch(setAuth(response.data));
+      if (response.data.userRole === "admin") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/");
       }
     } catch (error) {
-      message.error(
-        "Error fetching social login URL:",
-        error.response?.data || error.message
-      );
-    } finally {
-      setIsGoogleLoginLoading(false);
+      // Lấy customData được gắn từ interceptor
+      const errorData = error.customData.error;
+      console.error("Login error:", errorData);
+
+      if (errorData) {
+        message.error(errorData); // Hiển thị thông báo lỗi từ server
+      } else {
+        message.error("Something went wrong!");
+      }
     }
+  };
+
+  const handleGoogleLogin = () => {
+    startGoogleLoginTransition(async () => {
+      try {
+        // Gọi API thông qua instance
+        const response = await api.get("/api/auth/social-login", {
+          params: { provider: "google-oauth2" }, // Có thể thay đổi provider
+        });
+
+        if (response.data.url) {
+          // Điều hướng người dùng tới URL đăng nhập
+          window.location.href = response.data.url;
+        }
+      } catch (error) {
+        message.error(
+          `Error fetching social login URL: ${
+            error.response?.data || error.message
+          }`
+        );
+      }
+    });
   };
 
   const containerVariants = {
@@ -83,7 +112,7 @@ const Login = () => {
             </p>
           </motion.div>
 
-          <Form onFinish={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <motion.div className="space-y-4" variants={itemVariants}>
               <div>
                 <Label className="text-lg" htmlFor="email">
@@ -135,14 +164,19 @@ const Login = () => {
 
             <motion.div variants={itemVariants}>
               <button
+                disabled={pending}
                 type="primary"
                 htmlType="submit"
-                className="w-full rounded-lg h-12 bg-gradient-to-br from-primary-dark to-secondary-dark text-white hover:bg-gradient-to-br hover:from-secondary-dark hover:to-primary-dark font-semibold"
+                className={`w-full rounded-lg h-12 bg-gradient-to-br from-primary-dark to-secondary-dark text-white  font-semibold ${
+                  pending
+                    ? "cursor-not-allowed opacity-50"
+                    : "hover:bg-gradient-to-br hover:from-secondary-dark hover:to-primary-dark"
+                }`}
               >
-                Log in
+                {pending ? <Spinner>Submitting...</Spinner> : "Login"}
               </button>
             </motion.div>
-          </Form>
+          </form>
 
           <motion.div className="relative" variants={itemVariants}>
             <div className="absolute inset-0 flex items-center">
@@ -161,15 +195,15 @@ const Login = () => {
           >
             <div className="group bg-gradient-to-tr from-[#d20404] to-[#ea8d84] rounded-lg p-0.5 shadow-md flex items-center justify-center">
               <button
-                disabled={isGoogleLoginLoading}
+                disabled={isGoogleLoginPending}
                 onClick={() => handleGoogleLogin()}
                 className={`flex-1 flex items-center justify-center font-bold text-xl bg-neutral-50 p-2 rounded-lg transition-all duration-300 ${
-                  isGoogleLoginLoading
+                  isGoogleLoginPending
                     ? "cursor-not-allowed opacity-50"
                     : "hover:bg-transparent group-hover:text-white"
                 }`}
               >
-                {isGoogleLoginLoading ? (
+                {isGoogleLoginPending ? (
                   <Spinner color="pink" aria-label="Pink spinner example" />
                 ) : (
                   <>

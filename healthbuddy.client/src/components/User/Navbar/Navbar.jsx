@@ -2,6 +2,9 @@ import React from "react";
 import { LogOut, AlignJustify } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import { useSelector, useDispatch } from "react-redux";
+
+import { clearAuth } from "../../../features/Auth/Auth";
 import SearchBar from "./SearchBar";
 import logo from "../../../assets/logo.png";
 import BreakPoint from "../../BreakPoint/BreakPoint";
@@ -40,9 +43,19 @@ const ToggleTheme = ({ isDarkTheme, onToggleTheme }) => (
 
 // Component: AuthButtons
 const AuthButtons = ({ user }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    dispatch(clearAuth());
+    navigate("/auth/login");
+  };
+
   if (user) {
     return (
-      <button className="group flex items-center justify-start size-12 bg-compleprimary-dark rounded-full cursor-pointer relative overflow-hidden transition-all duration-200 shadow-lg hover:w-28 hover:rounded-lg active:translate-x-1 active:translate-y-1">
+      <button
+        onClick={() => handleLogout()}
+        className="group flex items-center justify-start size-12 bg-compleprimary-dark rounded-full cursor-pointer relative overflow-hidden transition-all duration-200 shadow-lg hover:w-28 hover:rounded-lg active:translate-x-1 active:translate-y-1"
+      >
         <div className="flex items-center justify-center w-full transition-all duration-300 group-hover:justify-start group-hover:px-3">
           <LogOut className="text-white" />
         </div>
@@ -73,7 +86,8 @@ const AuthButtons = ({ user }) => {
 // Main Navbar Component
 const Navbar = ({ onToggleTheme, isDarkTheme }) => {
   const navigate = useNavigate();
-  const user = null; // Replace with real user logic
+  const authState = useSelector((state) => state.auth);
+  const user = authState.userId;
 
   return (
     <div className="bg-transparent flex items-center justify-between sticky top-0 z-50">
