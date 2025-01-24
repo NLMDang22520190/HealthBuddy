@@ -5,23 +5,19 @@ import axios from "axios";
 const Callback = () => {
   const navigate = useNavigate();
 
-  const handleSocialCallback = () => {
-    const productURL = "https://healthbuddy-gkgc.onrender.com";
-    const developmentURL = "https://localhost:7222";
-  };
-
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const accessToken = params.get("access_token");
-    const idToken = params.get("id_token");
-
-    console.log("Access token:", accessToken);
-    console.log("ID token:", idToken);
+    const userId = params.get("user_id");
+    const userRole = params.get("user_role");
+    const provider = params.get("provider");
 
     if (accessToken && idToken) {
       // Lưu các token vào localStorage (hoặc sessionStorage)
       localStorage.setItem("access_token", accessToken);
-      localStorage.setItem("id_token", idToken);
+      localStorage.setItem("user_id", userId);
+      localStorage.setItem("user_role", userRole);
+      localStorage.setItem("provider", provider);
 
       // Điều hướng về trang chính hoặc dashboard
       navigate("/");
@@ -30,10 +26,6 @@ const Callback = () => {
       navigate("/auth/login");
     }
   }, [navigate]);
-
-  useEffect(() => {
-    handleSocialCallback();
-  }, []);
 
   return (
     <div>
