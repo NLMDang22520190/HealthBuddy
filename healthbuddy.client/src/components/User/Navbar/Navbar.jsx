@@ -1,5 +1,5 @@
 import React from "react";
-import { LogOut, AlignJustify } from "lucide-react";
+import { LogOut, AlignJustify, User } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { useSelector, useDispatch } from "react-redux";
@@ -50,19 +50,34 @@ const AuthButtons = ({ user }) => {
     navigate("/auth/login");
   };
 
+  const handleProfile = (user) => {
+    navigate("/user/" + user);
+  };
+
   if (user) {
     return (
-      <button
-        onClick={() => handleLogout()}
-        className="group flex items-center justify-start size-12 bg-compleprimary-dark rounded-full cursor-pointer relative overflow-hidden transition-all duration-200 shadow-lg hover:w-28 hover:rounded-lg active:translate-x-1 active:translate-y-1"
-      >
-        <div className="flex items-center justify-center w-full transition-all duration-300 group-hover:justify-start group-hover:px-3">
-          <LogOut className="text-white" />
-        </div>
-        <div className="absolute right-5 transform translate-x-full opacity-0 text-white text-lg transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100">
-          Logout
-        </div>
-      </button>
+      <div className="flex flex-col gap-2 items-end justify-center">
+        <button
+          onClick={() => handleProfile(user)}
+          class="group/button relative inline-flex items-center justify-center overflow-hidden rounded-md bg-gradient-to-br from-primary-400 to-secondary-400 backdrop-blur-lg px-4 py-2 text-base font-semibold text-white transition-all duration-300 ease-in-out hover:scale-110 hover:shadow-xl hover:shadow-gray-600/50 border border-white/20"
+        >
+          <User className="text-white mr-2" /> Profile
+          <div class="absolute inset-0 flex h-full w-full justify-center [transform:skew(-13deg)_translateX(-100%)] group-hover/button:duration-1000 group-hover/button:[transform:skew(-13deg)_translateX(100%)]">
+            <div class="relative h-full w-10 bg-white/20"></div>
+          </div>
+        </button>
+        <button
+          onClick={() => handleLogout()}
+          className="group flex items-center justify-start size-12 bg-compleprimary-dark rounded-full cursor-pointer relative overflow-hidden transition-all duration-200 shadow-lg hover:w-28 hover:rounded-lg active:translate-x-1 active:translate-y-1"
+        >
+          <div className="flex items-center justify-center w-full transition-all duration-300 group-hover:justify-start group-hover:px-3">
+            <LogOut className="text-white" />
+          </div>
+          <div className="absolute right-5 transform translate-x-full opacity-0 text-white text-lg transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100">
+            Logout
+          </div>
+        </button>
+      </div>
     );
   }
   return (

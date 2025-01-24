@@ -1,22 +1,45 @@
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { Mail } from "lucide-react";
 import { motion } from "framer-motion";
-import { Form, Input, Button } from "antd";
-import { Card, TextInput, Label } from "flowbite-react";
+import { Card, TextInput, Label, Spinner } from "flowbite-react";
 import { useNavigate, Link } from "react-router-dom";
+import { message } from "antd";
+
+import api from "../../../features/AxiosInstance/AxiosInstance";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
+  const [isForgotPasswordPending, startForgotPasswordTransition] =
+    useTransition();
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Reset password for:", email);
-    // toast({
-    //   title: "Reset link sent",
-    //   description: "Please check your email for the password reset link.",
-    // });
-    navigate(`/auth/verify-code?email=${encodeURIComponent(email)}&type=reset`);
+    startForgotPasswordTransition(async () => {
+      try {
+        const response = await api.post("/api/auth/forgot-password", null, {
+          params: { email }, // Chuyển email vào query parameter
+        });
+        setIsSuccess(true);
+
+        // Tự động điều hướng về trang login sau 5 giây
+        setTimeout(() => {
+          navigate("/auth/login");
+        }, 5000);
+      } catch (error) {
+        console.error(error);
+        const errorData = error.response?.data?.error; // Lấy lỗi từ response nếu có
+        if (errorData) message.error("Error: " + errorData);
+        else message.error("An error occurred. Please try again later.");
+      }
+    });
+  };
+
+  const handleNavigateNow = () => {
+    setIsNavigating(true);
+    navigate("/auth/login");
   };
 
   const containerVariants = {
@@ -38,6 +61,49 @@ const ForgotPassword = () => {
       },
     },
   };
+
+  if (isSuccess) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center p-4 bg-transparent">
+        <motion.div
+          className="w-full max-w-md"
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
+        >
+          <Card className="shadow-md rounded-2xl p-8 space-y-6">
+            <motion.div
+              className="text-center space-y-2"
+              variants={itemVariants}
+            >
+              <h1 className="text-3xl font-semibold text-gray-900 dark:text-white">
+                Email Sent
+              </h1>
+              <p className="text-gray-500 dark:text-secondary-dark">
+                A verification code has been sent to your email. Please check
+                your inbox to reset your password.
+              </p>
+            </motion.div>
+            <motion.div variants={itemVariants} className="text-center">
+              <Spinner size="lg" color="info" className="mb-4" />
+              <p className="text-sm text-gray-500">
+                Redirecting to the login page in 5 seconds...
+              </p>
+            </motion.div>
+            <motion.div variants={itemVariants}>
+              <button
+                onClick={handleNavigateNow}
+                className="w-full rounded-lg h-12 bg-gradient-to-br from-primary-dark to-secondary-dark text-white font-semibold hover:brightness-110"
+                disabled={isNavigating}
+              >
+                Go to Login
+              </button>
+            </motion.div>
+          </Card>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-4 bg-transparent">
