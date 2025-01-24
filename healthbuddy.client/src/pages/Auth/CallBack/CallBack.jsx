@@ -12,7 +12,7 @@ const Callback = () => {
     const userRole = params.get("user_role");
     const provider = params.get("provider");
 
-    if (accessToken && idToken) {
+    if (accessToken) {
       // Lưu các token vào localStorage (hoặc sessionStorage)
       localStorage.setItem("access_token", accessToken);
       localStorage.setItem("user_id", userId);

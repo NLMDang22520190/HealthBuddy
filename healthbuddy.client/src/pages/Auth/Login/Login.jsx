@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Form, message } from "antd";
-import { Card, TextInput, Label, Button } from "flowbite-react";
+import { Card, TextInput, Label, Spinner } from "flowbite-react";
 import { Link } from "react-router-dom";
 import { Mail, Lock } from "lucide-react";
 import axios from "axios";
@@ -163,25 +163,35 @@ const Login = () => {
               <button
                 disabled={isGoogleLoginLoading}
                 onClick={() => handleGoogleLogin()}
-                className=" flex-1 flex items-center justify-center font-bold text-xl bg-neutral-50 hover:bg-transparent p-2 rounded-lg"
+                className={`flex-1 flex items-center justify-center font-bold text-xl bg-neutral-50 p-2 rounded-lg transition-all duration-300 ${
+                  isGoogleLoginLoading
+                    ? "cursor-not-allowed opacity-50"
+                    : "hover:bg-transparent group-hover:text-white"
+                }`}
               >
-                <svg
-                  class="size-6 font-bold text-red-500 group-hover:text-white"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  stroke-width="2"
-                  stroke="currentColor"
-                  fill="none"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  {" "}
-                  <path stroke="none" d="M0 0h24v24H0z" />{" "}
-                  <path d="M17.788 5.108A9 9 0 1021 12h-8" />
-                </svg>
+                {isGoogleLoginLoading ? (
+                  <Spinner color="pink" aria-label="Pink spinner example" />
+                ) : (
+                  <>
+                    <svg
+                      className="size-6 font-bold text-red-500 group-hover:text-white"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      strokeWidth="2"
+                      stroke="currentColor"
+                      fill="none"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" />
+                      <path d="M17.788 5.108A9 9 0 1021 12h-8" />
+                    </svg>
+                  </>
+                )}
               </button>
             </div>
+
             {/* <Button
               outline
               gradientDuoTone="pinkToOrange"
