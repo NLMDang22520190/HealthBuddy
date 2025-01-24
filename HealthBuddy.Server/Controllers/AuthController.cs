@@ -30,17 +30,20 @@ namespace HealthBuddy.Server.Controllers
         {
             try
             {
-                var response = await _auth0Service.LoginAsync(request.Email, request.Password);
-                var user = await _userRepository.GetUserByEmailAsync(request.Email);
+                var lowerEmail = request.Email.ToLower();
+                var user = await _userRepository.GetUserByEmailAndProviderAsync(lowerEmail, "EmailAndPassword".ToLower());
                 if (user == null)
                 {
-                    return BadRequest(new { error = "User not found with email " + request.Email });
+                    return BadRequest(new { error = "User not found with email: " + request.Email });
                 }
+                var response = await _auth0Service.LoginAsync(lowerEmail, request.Password);
+
                 return Ok(new
                 {
                     token = response,
                     userID = user.UserId,
-                    role = user.IsAdmin ? "admin" : "user"
+                    role = user.IsAdmin ? "admin" : "user",
+                    provider = "EmailAndPassword"
                 });
             }
             catch (HttpRequestException ex)
@@ -54,20 +57,21 @@ namespace HealthBuddy.Server.Controllers
         {
             try
             {
-                var emailExists = await _userRepository.CheckEmailExistWithProviderAsync(request.Email, "EmailAndPassword");
+                var lowerEmail = request.Email.ToLower();
+                var emailExists = await _userRepository.CheckEmailExistWithProviderAsync(lowerEmail, "emailandpassword");
                 if (emailExists)
                 {
                     return BadRequest(new { error = "Email already exists" });
                 }
-                var response = await _auth0Service.SignupAsync(request.Email, request.Password);
+                var response = await _auth0Service.SignupAsync(lowerEmail, request.Password);
 
-                var result = await _userRepository.CreateUserAsync(request.Email, request.Password, "EmailAndPassword");
+                var result = await _userRepository.CreateUserAsync(lowerEmail, request.Password, "emailandpassword");
                 if (!result)
                 {
                     return StatusCode(StatusCodes.Status500InternalServerError, "Error creating user");
                 }
 
-                return Ok(JsonSerializer.Deserialize<object>(response));
+                return Ok("User created successfully. Please check your email to verify your account.");
             }
             catch (HttpRequestException ex)
             {
@@ -81,8 +85,14 @@ namespace HealthBuddy.Server.Controllers
         {
             try
             {
-                await _auth0Service.ForgotPasswordAsync(email);
-                return Ok("Email sent");
+                var lowerEmail = email.ToLower();
+                var emailExists = await _userRepository.CheckEmailExistWithProviderAsync(lowerEmail, "emailandpassword");
+                if (!emailExists)
+                {
+                    return BadRequest(new { error = "Email not found" });
+                }
+                await _auth0Service.ForgotPasswordAsync(lowerEmail);
+                return Ok("Reset password email sent");
             }
             catch (HttpRequestException ex)
             {
@@ -91,92 +101,6 @@ namespace HealthBuddy.Server.Controllers
         }
 
         #region SocialLogin
-
-        [HttpGet("login/social")]
-        public IActionResult LoginWithSocial([FromQuery] string provider, [FromQuery] string returnUrl)
-        {
-            if (string.IsNullOrEmpty(provider))
-            {
-                return BadRequest(new { error = "Provider is required (e.g., google, facebook)." });
-            }
-
-            if (string.IsNullOrEmpty(returnUrl))
-            {
-                return BadRequest(new { error = "Return URL is required." });
-            }
-
-            var properties = new AuthenticationProperties { RedirectUri = returnUrl };
-
-            // Phân biệt provider để định tuyến Auth0 connection
-            if (provider.Equals("google", StringComparison.OrdinalIgnoreCase))
-            {
-                properties.Items["connection"] = "google-oauth2"; // Tên connection trên Auth0
-            }
-            else if (provider.Equals("facebook", StringComparison.OrdinalIgnoreCase))
-            {
-                properties.Items["connection"] = "facebook";
-            }
-            else
-            {
-                return BadRequest(new { error = "Invalid provider. Supported providers: google, facebook." });
-            }
-
-            return Challenge(properties, "Auth0");
-        }
-
-
-
-
-        [HttpGet("callback")]
-        public async Task<IActionResult> Callback(string returnUrl = "/")
-        {
-            var authenticateResult = await HttpContext.AuthenticateAsync("Auth0");
-
-            if (!authenticateResult.Succeeded)
-            {
-                return BadRequest(new { error = "Authentication failed.", details = authenticateResult.Failure?.Message });
-            }
-
-            var user = authenticateResult.Principal;
-            var email = user?.FindFirstValue(ClaimTypes.Email);
-            var provider = user?.FindFirstValue("iss") ?? "";
-            if (provider.Contains("google"))
-                provider = "google";
-            else if (provider.Contains("facebook"))
-                provider = "facebook";
-
-            var accessToken = authenticateResult.Properties.GetTokenValue("access_token");
-            var idToken = authenticateResult.Properties.GetTokenValue("id_token");
-
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(idToken))
-            {
-                return BadRequest(new { error = "Invalid data from Auth0." });
-            }
-
-            // Kiểm tra người dùng trong cơ sở dữ liệu
-            var existingUser = await _userRepository.GetUserByEmailAndProviderAsync(email, provider);
-            if (existingUser == null)
-            {
-                // Nếu chưa tồn tại, tạo người dùng mới
-                var result = await _userRepository.CreateUserAsync(email, "", provider); // Tạo người dùng với provider (nếu có)
-
-                if (!result)
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError, "Error creating user");
-                }
-
-                // Sau khi tạo người dùng, lấy lại thông tin người dùng từ cơ sở dữ liệu
-                existingUser = await _userRepository.GetUserByEmailAsync(email);
-            }
-            // Trả về access_token, id_token, userId và role
-            return Ok(new
-            {
-                access_token = accessToken,
-                id_token = idToken,
-                userId = existingUser.UserId,
-                role = existingUser.IsAdmin ? "admin" : "user"
-            });
-        }
 
         [HttpGet("social-login")]
         public IActionResult GetSocialLoginUrl(string provider, string returnUrl = "/")
@@ -224,8 +148,18 @@ namespace HealthBuddy.Server.Controllers
                 var redirectUri = Url.Action("SocialCallback", "Auth", null, Request.Scheme);
                 var authResult = await _auth0Service.HandleSocialCallbackAsync(code, redirectUri);
 
+                // Sau khi xử lý, bạn có thể lưu người dùng vào database hoặc trả kết quả về frontend
+                var lowerEmail = authResult.Email.ToLower();
+                var lowerProvider = authResult.Provider.ToLower();
+                var userExist = await _userRepository.CheckEmailExistWithProviderAsync(lowerEmail, lowerProvider);
+                if (!userExist)
+                {
+                    await _userRepository.CreateUserAsync(lowerEmail, "", lowerProvider);
+                }
+                var user = await _userRepository.GetUserByEmailAndProviderAsync(lowerEmail, lowerProvider);
+
                 // Tạo URL frontend và truyền token vào query string (hoặc sử dụng session/cookie)
-                var frontendUrl = $"https://healthbuddyyy.netlify.app/callback?access_token={authResult.AccessToken}&id_token={authResult.IdToken}";
+                var frontendUrl = $"https://healthbuddyyy.netlify.app/callback?access_token={authResult.AccessToken}&email={user.Email}&role={(user.IsAdmin ? "admin" : "user")}&provider={user.Provider}";
 
                 // Redirect về frontend với các token
                 return Redirect(frontendUrl);
@@ -235,8 +169,6 @@ namespace HealthBuddy.Server.Controllers
                 return BadRequest(new { error = ex.Message });
             }
         }
-
-
 
         // Đăng xuất
         [HttpGet("logout")]

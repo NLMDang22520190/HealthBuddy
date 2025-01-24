@@ -22,9 +22,12 @@ const Login = () => {
 
     setIsGoogleLoginLoading(true);
     try {
-      const response = await axios.get(`${productURL}/api/auth/social-login`, {
-        params: { provider: "google-oauth2" }, // Bạn có thể thay đổi thành Facebook hoặc các provider khác
-      });
+      const response = await axios.get(
+        `${developmentURL}/api/auth/social-login`,
+        {
+          params: { provider: "google-oauth2" }, // Bạn có thể thay đổi thành Facebook hoặc các provider khác
+        }
+      );
 
       if (response.data.url) {
         // Điều hướng người dùng tới URL đăng nhập
