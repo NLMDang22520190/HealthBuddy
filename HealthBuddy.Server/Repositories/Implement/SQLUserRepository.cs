@@ -14,12 +14,13 @@ namespace HealthBuddy.Server.Repositories.Implement
 
         public Task<bool> CheckEmailExistsAsync(string email)
         {
-            return dbContext.Users.AnyAsync(u => u.Email.Normalize().Equals(email.Normalize()));
+            return dbContext.Users.AnyAsync(u => u.Email == email);
         }
 
         public Task<bool> CheckEmailExistWithProviderAsync(string email, string provider)
         {
-            return dbContext.Users.AnyAsync(u => u.Email.Normalize().Equals(email.Normalize()) && u.Provider.Equals(provider));
+            return dbContext.Users.AnyAsync(u => u.Email == email
+            && u.Provider == provider);
         }
 
         public async Task<bool> CreateUserAsync(string email, string password, string Provider)
@@ -27,7 +28,14 @@ namespace HealthBuddy.Server.Repositories.Implement
             try
             {
                 var hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
-                var user = new User { Email = email, Password = hashedPassword, Username = email, IsDeactivated = false, Provider = Provider };
+                var user = new User
+                {
+                    Email = email.Normalize(),
+                    Password = hashedPassword,
+                    Username = email,
+                    IsDeactivated = false,
+                    Provider = Provider.Normalize()
+                };
                 await CreateAsync(user);
                 return true;
             }
@@ -40,12 +48,13 @@ namespace HealthBuddy.Server.Repositories.Implement
 
         public async Task<User> GetUserByEmailAndProviderAsync(string email, string provider)
         {
-            return await dbContext.Users.Where(u => u.Email.Normalize().Equals(email.Normalize()) && u.Provider == provider).FirstOrDefaultAsync();
+            return await dbContext.Users.Where(u => u.Email == email
+            && u.Provider == provider).FirstOrDefaultAsync();
         }
 
         public async Task<User> GetUserByEmailAsync(string email)
         {
-            var user = await dbContext.Users.Where(u => u.Email.Normalize().Equals(email.Normalize())).FirstOrDefaultAsync();
+            var user = await dbContext.Users.Where(u => u.Email == email).FirstOrDefaultAsync();
             return user;
         }
     }

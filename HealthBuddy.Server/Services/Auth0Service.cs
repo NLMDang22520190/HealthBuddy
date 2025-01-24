@@ -72,7 +72,7 @@ public class Auth0Service
     {
         var body = new
         {
-            email,
+            email = email,
             password,
             connection = "Username-Password-Authentication",
             client_id = _settings.ClientId
@@ -158,6 +158,10 @@ public class Auth0Service
                     return;
                 }
             }
+            else // Nếu không có người dùng nào với email đó
+            {
+                throw new HttpRequestException("User not found");
+            }
         }
 
         // Nếu không thành công, xử lý lỗi
@@ -207,11 +211,17 @@ public class Auth0Service
                 var user = jsonDoc.RootElement[0]; // Chúng ta giả sử chỉ có một người dùng với email đó
                 return user.GetProperty("email_verified").GetBoolean();
             }
+            else
+            {
+                // Nếu không có người dùng nào với email đó, trả về false
+                return false;
+            }
         }
-
-        // Nếu không thành công, xử lý lỗi
-        await HandleAuth0Error(response);
-        return false;
+        else
+        {
+            await HandleAuth0Error(response);
+            return false;
+        }
     }
     // This method gets the Management API token using client credentials
     // Hàm lấy token Management API
