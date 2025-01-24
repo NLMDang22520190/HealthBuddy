@@ -65,7 +65,7 @@ namespace HealthBuddy.Server.Controllers
                 }
                 var response = await _auth0Service.SignupAsync(lowerEmail, request.Password);
 
-                var result = await _userRepository.CreateUserAsync(lowerEmail, request.Password, "emailandpassword");
+                var result = await _userRepository.CreateUserAsync(request.Username, lowerEmail, request.Password, "emailandpassword");
                 if (!result)
                 {
                     return StatusCode(StatusCodes.Status500InternalServerError, "Error creating user");
@@ -131,12 +131,12 @@ namespace HealthBuddy.Server.Controllers
                 var userExist = await _userRepository.CheckEmailExistWithProviderAsync(lowerEmail, lowerProvider);
                 if (!userExist)
                 {
-                    await _userRepository.CreateUserAsync(lowerEmail, "", lowerProvider);
+                    var result = await _userRepository.CreateUserAsync(lowerEmail, lowerEmail, "", lowerProvider);
                 }
                 var user = await _userRepository.GetUserByEmailAndProviderAsync(lowerEmail, lowerProvider);
 
                 // Tạo URL frontend và truyền token vào query string (hoặc sử dụng session/cookie)
-                var frontendUrl = $"https://healthbuddyyy.netlify.app/callback?access_token={authResult.AccessToken}&user_id={user.UserId}&role={(user.IsAdmin ? "admin" : "user")}&provider={user.Provider}";
+                var frontendUrl = $"https://localhost:3000/callback?access_token={authResult.AccessToken}&user_id={user.UserId}&role={(user.IsAdmin ? "admin" : "user")}&provider={user.Provider}";
 
                 // Redirect về frontend với các token
                 return Redirect(frontendUrl);

@@ -1,7 +1,6 @@
 import { useState, useEffect, useTransition } from "react";
-import { useFormStatus } from "react-dom";
 import { motion } from "framer-motion";
-import { Form, message } from "antd";
+import { message } from "antd";
 import { Card, TextInput, Label, Spinner } from "flowbite-react";
 import { Link } from "react-router-dom";
 import { Mail, Lock } from "lucide-react";
@@ -15,36 +14,47 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isGoogleLoginPending, startGoogleLoginTransition] = useTransition();
-  const { pending } = useFormStatus();
+  const [isGithubLoginPending, startGithubLoginTransition] = useTransition();
+  const [isLoginFormPending, startLoginFormTransition] = useTransition();
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      const response = await api.post("/api/auth/login/email-password", {
-        email,
-        password,
-      });
-      console.table("Login response:", response.data);
-      dispatch(setAuth(response.data));
-      if (response.data.userRole === "admin") {
-        navigate("/admin/dashboard");
-      } else {
-        navigate("/");
-      }
-    } catch (error) {
-      // Lấy customData được gắn từ interceptor
-      const errorData = error.customData.error;
-      console.error("Login error:", errorData);
+    startLoginFormTransition(async () => {
+      try {
+        const response = await api.post("/api/auth/login/email-password", {
+          email,
+          password,
+        });
+        //console.table("Login response:", response.data);
+        dispatch(setAuth(response.data));
+        if (response.data.userRole === "admin") {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/");
+        }
+      } catch (error) {
+        // Lấy customData được gắn từ interceptor
 
-      if (errorData) {
-        message.error(errorData); // Hiển thị thông báo lỗi từ server
-      } else {
-        message.error("Something went wrong!");
+        const errorData = error.customData.error;
+        //console.error("Login error:", errorData);
+
+        if (errorData) {
+          if (
+            errorData ===
+            "Please verify your email before logging in. A verification link has been sent."
+          )
+            message.error(
+              "Please verify your email before logging in. A verification link has been sent."
+            );
+          else message.error(errorData);
+        } else {
+          message.error("An error occurred. Please try again later.");
+        }
       }
-    }
+    });
   };
 
   const handleGoogleLogin = () => {
@@ -53,6 +63,28 @@ const Login = () => {
         // Gọi API thông qua instance
         const response = await api.get("/api/auth/social-login", {
           params: { provider: "google-oauth2" }, // Có thể thay đổi provider
+        });
+
+        if (response.data.url) {
+          // Điều hướng người dùng tới URL đăng nhập
+          window.location.href = response.data.url;
+        }
+      } catch (error) {
+        message.error(
+          `Error fetching social login URL: ${
+            error.response?.data || error.message
+          }`
+        );
+      }
+    });
+  };
+
+  const handleGithubLogin = () => {
+    startGithubLoginTransition(async () => {
+      try {
+        // Gọi API thông qua instance
+        const response = await api.get("/api/auth/social-login", {
+          params: { provider: "github" }, // Có thể thay đổi provider
         });
 
         if (response.data.url) {
@@ -164,16 +196,23 @@ const Login = () => {
 
             <motion.div variants={itemVariants}>
               <button
-                disabled={pending}
+                disabled={isLoginFormPending}
                 type="primary"
                 htmlType="submit"
                 className={`w-full rounded-lg h-12 bg-gradient-to-br from-primary-dark to-secondary-dark text-white  font-semibold ${
-                  pending
+                  isLoginFormPending
                     ? "cursor-not-allowed opacity-50"
                     : "hover:bg-gradient-to-br hover:from-secondary-dark hover:to-primary-dark"
                 }`}
               >
-                {pending ? <Spinner>Submitting...</Spinner> : "Login"}
+                {isLoginFormPending ? (
+                  <span className="flex items-center justify-center">
+                    <Spinner color="info" aria-label="White spinner example" />
+                    <span className="ml-2">Logging in...</span>
+                  </span>
+                ) : (
+                  "Login"
+                )}
               </button>
             </motion.div>
           </form>
@@ -226,58 +265,34 @@ const Login = () => {
               </button>
             </div>
 
-            {/* <Button
-              outline
-              gradientDuoTone="pinkToOrange"
-              className="group bg-whiteSmoke"
-            >
-              <svg
-                class="size-6 text-compleprimary-dark group-hover:text-white"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                stroke-width="2"
-                stroke="currentColor"
-                fill="none"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+            <div className="group bg-gradient-to-tr from-raisin_black  to-bg_divide_dark rounded-lg p-0.5 shadow-md flex items-center justify-center">
+              <button
+                disabled={isGithubLoginPending}
+                onClick={() => handleGithubLogin()}
+                className={`flex-1 flex items-center justify-center font-bold text-xl bg-neutral-50 p-2 rounded-lg ${
+                  isGithubLoginPending
+                    ? "cursor-not-allowed opacity-50"
+                    : "hover:bg-transparent group-hover:text-white"
+                }`}
               >
-                {" "}
-                <path stroke="none" d="M0 0h24v24H0z" />{" "}
-                <path d="M17.788 5.108A9 9 0 1021 12h-8" />
-              </svg>
-            </Button> */}
-
-            <div className="group bg-gradient-to-tr from-[#3b5998]  to-secondary-dark rounded-lg p-0.5 shadow-md flex items-center justify-center">
-              <button className=" flex-1 flex items-center justify-center font-bold text-xl bg-neutral-50 hover:bg-transparent p-2 rounded-lg">
-                <svg
-                  class="size-6 text-blue-500 group-hover:text-white"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  {" "}
-                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-                </svg>
+                {isGithubLoginPending ? (
+                  <Spinner color="info" />
+                ) : (
+                  <svg
+                    class="size-6 font-bold text-black group-hover:text-white"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    {" "}
+                    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+                  </svg>
+                )}
               </button>
             </div>
-            {/* <Button outline gradientDuoTone="cyanToBlue" className="group">
-              <svg
-                class="size-6 text-secondary-dark group-hover:text-white"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                {" "}
-                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-              </svg>
-            </Button> */}
           </motion.div>
 
           <motion.p

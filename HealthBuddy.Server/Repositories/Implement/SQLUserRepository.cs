@@ -23,7 +23,7 @@ namespace HealthBuddy.Server.Repositories.Implement
             && u.Provider == provider);
         }
 
-        public async Task<bool> CreateUserAsync(string email, string password, string Provider)
+        public async Task<bool> CreateUserAsync(string username, string email, string password, string Provider)
         {
             try
             {
@@ -32,7 +32,7 @@ namespace HealthBuddy.Server.Repositories.Implement
                 {
                     Email = email.Normalize(),
                     Password = hashedPassword,
-                    Username = email,
+                    Username = username,
                     IsDeactivated = false,
                     Provider = Provider.Normalize()
                 };
