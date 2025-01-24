@@ -159,7 +159,7 @@ namespace HealthBuddy.Server.Controllers
                 var user = await _userRepository.GetUserByEmailAndProviderAsync(lowerEmail, lowerProvider);
 
                 // Tạo URL frontend và truyền token vào query string (hoặc sử dụng session/cookie)
-                var frontendUrl = $"https://healthbuddyyy.netlify.app/callback?access_token={authResult.AccessToken}&email={user.Email}&role={(user.IsAdmin ? "admin" : "user")}&provider={user.Provider}";
+                var frontendUrl = $"https://healthbuddyyy.netlify.app/callback?access_token={authResult.AccessToken}&user_id={user.UserId}&role={(user.IsAdmin ? "admin" : "user")}&provider={user.Provider}";
 
                 // Redirect về frontend với các token
                 return Redirect(frontendUrl);
