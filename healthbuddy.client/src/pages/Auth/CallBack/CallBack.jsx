@@ -1,9 +1,11 @@
 import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { setAuth } from "../../../features/Auth/Auth";
 
 const Callback = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -13,11 +15,9 @@ const Callback = () => {
     const provider = params.get("provider");
 
     if (accessToken) {
-      // Lưu các token vào localStorage (hoặc sessionStorage)
-      localStorage.setItem("access_token", accessToken);
-      localStorage.setItem("user_id", userId);
-      localStorage.setItem("user_role", userRole);
-      localStorage.setItem("provider", provider);
+      // Lưu vào Redux và cookies
+      const authData = { accessToken, userId, userRole, provider };
+      dispatch(setAuth(authData));
 
       // Điều hướng về trang chính hoặc dashboard
       navigate("/");
@@ -25,7 +25,7 @@ const Callback = () => {
       // Nếu không có token, xử lý lỗi (hoặc redirect về trang login)
       navigate("/auth/login");
     }
-  }, [navigate]);
+  }, [navigate, dispatch]);
 
   return (
     <div>
