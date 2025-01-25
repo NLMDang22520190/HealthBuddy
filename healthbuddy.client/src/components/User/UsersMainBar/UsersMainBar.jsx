@@ -35,7 +35,7 @@ const UsersMainBar = () => {
       });
       setUsers(mappedUsers); // Sử dụng setUsers để cập nhật users
     } catch (error) {
-      message.error("Error fetching users: ", error);
+      message.error("Error fetching users: " + error.message);
     }
   };
 
