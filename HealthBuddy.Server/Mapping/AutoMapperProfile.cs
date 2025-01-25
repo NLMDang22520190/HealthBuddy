@@ -1,6 +1,7 @@
 using AutoMapper;
 using HealthBuddy.Server.Models.Domain;
 using HealthBuddy.Server.Models.DTO.GET;
+using HealthBuddy.Server.Models.DTO.UPDATE;
 
 namespace HealthBuddy.Server.Mapping
 {
@@ -12,7 +13,9 @@ namespace HealthBuddy.Server.Mapping
             CreateMap<User, UserProfileInfoDTO>().ReverseMap();
             CreateMap<UserDetail, UserDetailDTO>().ReverseMap();
             CreateMap<UserNotificationPreference, UserNotiPrefDTO>().ReverseMap();
-
+            CreateMap<User, UpdateUserRequestDTO>().ReverseMap();
+            CreateMap<UserDetail, UpdateUserDetailRequestDTO>().ReverseMap();
+            CreateMap<UserNotificationPreference, UpdateUserNotiPrefRequestDTO>().ReverseMap();
         }
     }
 }

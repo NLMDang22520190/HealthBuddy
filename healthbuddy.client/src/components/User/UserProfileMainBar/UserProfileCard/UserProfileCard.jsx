@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, Label, Tooltip } from "flowbite-react";
 import { Avatar } from "antd";
 import {
@@ -8,12 +8,14 @@ import {
   Flame,
   UtensilsCrossed,
   Pencil,
-  Mail,
 } from "lucide-react";
 
-import StatCard from "../Detail/StatCard/StatCard";
+import StatCard from "../../Detail/StatCard/StatCard";
+import UpdateUserInfoModal from "../UpdateUserInfoModal/UpdateUserInfoModal";
 
-const UserProfileCard = ({ user }) => {
+const UserProfileCard = ({ user, isCurrentUser, onUpdate }) => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
   const getProviderIcon = (provider) => {
     switch (provider?.toLowerCase()) {
       case "github":
@@ -90,11 +92,16 @@ const UserProfileCard = ({ user }) => {
         <div className="flex gap-4 justify-center md:justify-between md-lg:justify-center lg:justify-between items-center">
           <div className="grid relative">
             <Avatar className="size-40" src={user.avatar} />
-            <div className="absolute right-0 bottom-0 bg-white dark:bg-bg_card_flowbite_dark p-1 rounded-full">
-              <button className="rounded-full border bg-gray-200 p-2">
-                <Pencil className="size-6 fill-primary-dark dark:fill-white text-primary-light dark:text-primary-dark"></Pencil>
-              </button>
-            </div>
+            {isCurrentUser && (
+              <div className="absolute right-0 bottom-0 bg-white dark:bg-bg_card_flowbite_dark p-1 rounded-full">
+                <button
+                  onClick={() => setIsModalVisible(true)}
+                  className="rounded-full border bg-gray-200 p-2"
+                >
+                  <Pencil className="size-6 fill-primary-dark dark:fill-white text-primary-light dark:text-primary-dark"></Pencil>
+                </button>
+              </div>
+            )}
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 md-lg:grid-cols-2 lg:grid-cols-4 gap-2">
             <StatCard
@@ -137,6 +144,12 @@ const UserProfileCard = ({ user }) => {
           </div>
         </div>
       </div>
+      <UpdateUserInfoModal
+        open={isModalVisible}
+        onCancel={() => setIsModalVisible(false)}
+        user={user}
+        onUpdate={onUpdate}
+      ></UpdateUserInfoModal>
     </Card>
   );
 };

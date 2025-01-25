@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using HealthBuddy.Server.Models.Domain;
 using HealthBuddy.Server.Models.DTO.GET;
+using HealthBuddy.Server.Models.DTO.UPDATE;
 using HealthBuddy.Server.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -96,5 +98,90 @@ namespace HealthBuddy.Server.Controllers
         }
         #endregion
 
+        #region Update User By Id
+        [HttpPut("UpdateUser")]
+        public async Task<ActionResult> UpdateUserById(UpdateUserRequestDTO requestDTO)
+        {
+            try
+            {
+                var user = _mapper.Map<User>(requestDTO);
+
+                var updateUser = await _userRepository.UpdateAsync(u => u.UserId == requestDTO.UserId, existingRecord =>
+                {
+                    existingRecord.Username = user.Username;
+                    existingRecord.Avatar = user.Avatar;
+                });
+
+                if (updateUser == null)
+                {
+                    return BadRequest(new { error = "User not found" });
+                }
+                //return Ok(_mapper.Map<UserProfileInfoDTO>(updateUser));
+                return Ok("User updated successfully");
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error updating data from the database: " + e.Message);
+            }
+        }
+
+        [HttpPut("UpdateUserDetail")]
+        public async Task<ActionResult> UpdateUserDetailById(UpdateUserDetailRequestDTO requestDTO)
+        {
+            try
+            {
+
+                var userDetail = _mapper.Map<UserDetail>(requestDTO);
+
+                var updateUserDetail = await _userDetailRepository.UpdateAsync(ud => ud.UserId == requestDTO.UserId, existingRecord =>
+                {
+                    existingRecord.Height = userDetail.Height;
+                    existingRecord.Weight = userDetail.Weight;
+                    existingRecord.HealthCondition = userDetail.HealthCondition;
+                    existingRecord.Allergies = userDetail.Allergies;
+                });
+
+                if (updateUserDetail == null)
+                {
+                    return BadRequest(new { error = "User detail not found" });
+                }
+                //return Ok(_mapper.Map<UserDetailDTO>(updateUserDetail));
+                return Ok("User detail updated successfully");
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error updating data from the database: " + e.Message);
+            }
+        }
+
+        [HttpPut("UpdateUserNotificationPreference")]
+        public async Task<ActionResult> UpdateUserNotificationPreferenceById(UpdateUserNotiPrefRequestDTO requestDTO)
+        {
+            try
+            {
+                var userNotificationPreference = _mapper.Map<UserNotificationPreference>(requestDTO);
+
+                var updateUserNotificationPreference = await _userNotificationPreferenceRepository.UpdateAsync(unp => unp.UserId == requestDTO.UserId, existingRecord =>
+                {
+                    existingRecord.FoodNoti = userNotificationPreference.FoodNoti;
+                    existingRecord.ExerciseNoti = userNotificationPreference.ExerciseNoti;
+                    existingRecord.WorkoutScheduleNoti = userNotificationPreference.WorkoutScheduleNoti;
+                    existingRecord.MealScheduleNoti = userNotificationPreference.MealScheduleNoti;
+                });
+
+                if (updateUserNotificationPreference == null)
+                {
+                    return BadRequest(new { error = "User notification preference not found" });
+                }
+                //return Ok(_mapper.Map<UserNotiPrefDTO>(updateUserNotificationPreference));
+                return Ok("User notification preference updated successfully");
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error updating data from the database: " + e.Message);
+            }
+        }
+
+        #endregion
     }
 }
