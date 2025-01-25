@@ -9,5 +9,7 @@ public partial class ExerciseType
 
     public string ExerciseName { get; set; } = null!;
 
+    public bool IsApproved { get; set; }
+
     public virtual ICollection<Exercise> Exercises { get; set; } = new List<Exercise>();
 }

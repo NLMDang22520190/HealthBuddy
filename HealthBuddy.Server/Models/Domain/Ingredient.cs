@@ -11,5 +11,7 @@ public partial class Ingredient
 
     public string? MeasurementUnit { get; set; }
 
+    public bool IsApproved { get; set; }
+
     public virtual ICollection<Recipe> Recipes { get; set; } = new List<Recipe>();
 }
