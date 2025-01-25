@@ -45,10 +45,24 @@ const SignUp = () => {
           navigate("/auth/login");
         }, 5000);
       } catch (error) {
-        const errorData = error.customData.error;
-        console.log(error);
-        if (errorData) message.error("Error: " + errorData);
-        else message.error("An error occurred. Please try again later.");
+        const errorCustomData = error.customData;
+        if (errorCustomData) {
+          const errorData = errorCustomData.data;
+          //console.error("Login error:", errorData);
+
+          if (errorData) {
+            if (
+              errorData ===
+              "Please verify your email before logging in. A verification link has been sent."
+            )
+              message.error(
+                "Please verify your email before logging in. A verification link has been sent."
+              );
+            else message.error(errorData);
+          } else {
+            message.error("An error occurred. Please try again later.");
+          }
+        } else message.error("An error occurred. Please try again later.");
       }
     });
   };
