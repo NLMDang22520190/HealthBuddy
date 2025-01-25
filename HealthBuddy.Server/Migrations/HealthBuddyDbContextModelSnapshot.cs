@@ -192,6 +192,9 @@ namespace HealthBuddy.Server.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("bit");
+
                     b.HasKey("ExerciseTypeId")
                         .HasName("PK__Exercise__6CBFB0D7781E5789");
 
