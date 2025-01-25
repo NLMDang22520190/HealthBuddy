@@ -1,125 +1,50 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useTransition } from "react";
 import { motion } from "framer-motion";
-import { Card, TextInput } from "flowbite-react";
+import { Card, TextInput, Spinner } from "flowbite-react";
 import { Search } from "lucide-react";
+import { message } from "antd";
 
 import UserCard from "../UserCard/UserCard";
-
-const users = [
-  {
-    id: 1,
-    name: "John Doe",
-    email: "user1@email.com",
-    avatar: "https://placehold.co/50x50.png",
-    FoodPosted: 10,
-    ExercisePosted: 5,
-    WorkoutSchedulePosted: 3,
-    MealSchedulePosted: 2,
-    JoinDated: "2023-12-01",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    email: "user2@email.com",
-    avatar: "https://placehold.co/50x50.png",
-    FoodPosted: 8,
-    ExercisePosted: 4,
-    WorkoutSchedulePosted: 2,
-    MealSchedulePosted: 3,
-    JoinDated: "2023-11-20",
-  },
-  {
-    id: 3,
-    name: "Alice Johnson",
-    email: "user3@email.com",
-    avatar: "https://placehold.co/50x50.png",
-    FoodPosted: 15,
-    ExercisePosted: 6,
-    WorkoutSchedulePosted: 5,
-    MealSchedulePosted: 4,
-    JoinDated: "2023-10-15",
-  },
-  {
-    id: 4,
-    name: "Bob Brown",
-    email: "user4@email.com",
-    avatar: "https://placehold.co/50x50.png",
-    FoodPosted: 5,
-    ExercisePosted: 2,
-    WorkoutSchedulePosted: 1,
-    MealSchedulePosted: 1,
-    JoinDated: "2023-09-10",
-  },
-  {
-    id: 5,
-    name: "Charlie Green",
-    email: "user5@email.com",
-    avatar: "https://placehold.co/50x50.png",
-    FoodPosted: 12,
-    ExercisePosted: 7,
-    WorkoutSchedulePosted: 3,
-    MealSchedulePosted: 2,
-    JoinDated: "2023-08-05",
-  },
-  {
-    id: 6,
-    name: "Diana White",
-    email: "user6@email.com",
-    avatar: "https://placehold.co/50x50.png",
-    FoodPosted: 20,
-    ExercisePosted: 10,
-    WorkoutSchedulePosted: 8,
-    MealSchedulePosted: 5,
-    JoinDated: "2023-07-01",
-  },
-  {
-    id: 7,
-    name: "Ethan Black",
-    email: "user7@email.com",
-    avatar: "https://placehold.co/50x50.png",
-    FoodPosted: 7,
-    ExercisePosted: 3,
-    WorkoutSchedulePosted: 2,
-    MealSchedulePosted: 1,
-    JoinDated: "2023-06-15",
-  },
-  {
-    id: 8,
-    name: "Fiona Blue",
-    email: "user8@email.com",
-    avatar: "https://placehold.co/50x50.png",
-    FoodPosted: 9,
-    ExercisePosted: 5,
-    WorkoutSchedulePosted: 4,
-    MealSchedulePosted: 3,
-    JoinDated: "2023-05-10",
-  },
-  {
-    id: 9,
-    name: "George Yellow",
-    email: "user9@email.com",
-    avatar: "https://placehold.co/50x50.png",
-    FoodPosted: 18,
-    ExercisePosted: 8,
-    WorkoutSchedulePosted: 6,
-    MealSchedulePosted: 5,
-    JoinDated: "2023-04-01",
-  },
-  {
-    id: 10,
-    name: "Hannah Purple",
-    email: "user10@email.com",
-    avatar: "https://placehold.co/50x50.png",
-    FoodPosted: 11,
-    ExercisePosted: 6,
-    WorkoutSchedulePosted: 3,
-    MealSchedulePosted: 2,
-    JoinDated: "2023-03-20",
-  },
-];
+import api from "../../../features/AxiosInstance/AxiosInstance";
 
 const UsersMainBar = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [users, setUsers] = useState([]);
+  const [isPending, startTransition] = useTransition(); // Sử dụng useTransition
+
+  const fetchUsers = async () => {
+    try {
+      const response = await api.get("/api/User");
+      const mappedUsers = response.data.map((user) => {
+        return {
+          id: user.userId,
+          name: user.username,
+          email: user.email,
+          avatar:
+            user.avatar == null
+              ? "https://placehold.co/50x50.png"
+              : user.avatar,
+          FoodPosted: user.numberOfFoodPosts,
+          ExercisePosted: user.numberOfExercisePosts,
+          WorkoutSchedulePosted: user.numberOfWorkoutPosts,
+          MealSchedulePosted: user.numberOfMealPosts,
+          JoinDated: user.createdDate,
+          Provider: user.provider,
+        };
+      });
+
+      // Sử dụng startTransition để cập nhật users
+      startTransition(() => {
+        setUsers(mappedUsers);
+      });
+    } catch (error) {
+      message.error("Error fetching users: ", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const filteredUsers = users.filter(
     (user) =>
@@ -144,11 +69,17 @@ const UsersMainBar = () => {
             placeholder="Search user..."
           ></TextInput>
         </div>
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {filteredUsers.map((user) => (
-            <UserCard key={user.id} user={user} />
-          ))}
-        </div>
+        {isPending ? ( // Hiển thị spinner khi đang tải dữ liệu
+          <div className="flex justify-center items-center">
+            <Spinner size="xl" color="info" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            {filteredUsers.map((user) => (
+              <UserCard key={user.id} user={user} />
+            ))}
+          </div>
+        )}
       </motion.div>
     </div>
   );

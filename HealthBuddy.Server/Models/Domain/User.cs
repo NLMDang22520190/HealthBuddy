@@ -21,6 +21,8 @@ public partial class User
 
     public string Provider { get; set; }
 
+    public DateTime CreatedDate { get; set; }
+
     public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
 
     public virtual ICollection<Exercise> Exercises { get; set; } = new List<Exercise>();
