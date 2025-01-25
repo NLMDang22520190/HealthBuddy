@@ -1,33 +1,32 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useTransition } from "react";
 import { motion } from "framer-motion";
 import { SearchOutlined, UserOutlined } from "@ant-design/icons";
-import { Avatar, Input as AntdInput, Button as AntdButton } from "antd";
-import { Card } from "flowbite-react";
+import { Avatar, Input as AntdInput, Button as AntdButton, Spin } from "antd";
+import { Card, Spinner } from "flowbite-react";
 import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 import PostList from "../PostList/PostList";
 import UserProfileCard from "../UserProfileCard/UserProfileCard";
+import UserDetailProfileCard from "../UserDetailProfileCard/UserDetailProfileCard";
+import UserNotificationProfileCard from "../UserNotificationProfileCard/UserNotificationProfileCard";
 import FilterButtons from "../FilterButtons/FilterButtons";
 import api from "../../../features/AxiosInstance/AxiosInstance";
-
-// const user = {
-//   id: 1,
-//   name: "John Doe",
-//   email: "user1@email.com",
-//   avatar: "https://placehold.co/1920x1080.png",
-//   FoodPosted: 10,
-//   ExercisePosted: 5,
-//   WorkoutSchedulePosted: 3,
-//   MealSchedulePosted: 2,
-//   JoinDated: "2023-12-01",
-// };
 
 const UserProfileMainBar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
 
-  const [user, setUser] = useState({});
+  const auth = useSelector((state) => state.auth);
   const { userId } = useParams();
+  const currentUser = auth.userId;
+
+  const [user, setUser] = useState({});
+  const [userDetail, setUserDetail] = useState({});
+  const [userNotification, setUserNotification] = useState({});
+
+  const [isUserDataPending, startUserDataTransition] = useTransition();
+  const [isUserDetailPending, startUserDetailTransition] = useTransition();
 
   const fetchUser = async () => {
     try {
@@ -54,11 +53,9 @@ const UserProfileMainBar = () => {
   };
 
   useEffect(() => {
-    console.log("Updated user:", user);
-  }, [user]);
-
-  useEffect(() => {
-    fetchUser();
+    startUserDataTransition(async () => {
+      await fetchUser();
+    });
   }, [userId]);
 
   // Mock posts data
@@ -107,40 +104,52 @@ const UserProfileMainBar = () => {
 
   return (
     <div className="user-page-mainbar-content-container">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="flex flex-col p-3 md:p-6 gap-6 user-page-mainbar-content-marginbottom"
-      >
-        {/* User Info Section */}
-        <UserProfileCard user={user} />
+      {isUserDataPending ? (
+        <div className="flex h-full justify-center items-center">
+          <Spinner size="xl" color="info" />
+        </div>
+      ) : (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="flex flex-col p-3 md:p-6 gap-6 user-page-mainbar-content-marginbottom"
+        >
+          {/* User Info Section */}
+          <UserProfileCard user={user} />
 
-        {/* Search and Filter Section */}
-        <Card className="mb-6 space-y-4">
-          <div className="relative">
-            <AntdInput
-              placeholder="Search posts..."
-              prefix={<SearchOutlined />}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+          {/* User Detail Section */}
+          {currentUser === userId && <UserDetailProfileCard />}
+
+          {/* User Notification Section */}
+          {currentUser === userId && <UserNotificationProfileCard />}
+
+          {/* Search and Filter Section */}
+          <Card className="mb-6 space-y-4">
+            <div className="relative">
+              <AntdInput
+                placeholder="Search posts..."
+                prefix={<SearchOutlined />}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <FilterButtons
+              filters={[
+                "all",
+                "dishes",
+                "exercises",
+                "workout-plans",
+                "meal-plans",
+              ]}
+              activeFilter={activeFilter}
+              onFilterChange={setActiveFilter}
             />
-          </div>
-          <FilterButtons
-            filters={[
-              "all",
-              "dishes",
-              "exercises",
-              "workout-plans",
-              "meal-plans",
-            ]}
-            activeFilter={activeFilter}
-            onFilterChange={setActiveFilter}
-          />
-          {/* Posts Section */}
-          <PostList posts={filteredPosts} />
-        </Card>
-      </motion.div>
+            {/* Posts Section */}
+            <PostList posts={filteredPosts} />
+          </Card>
+        </motion.div>
+      )}
     </div>
   );
 };
