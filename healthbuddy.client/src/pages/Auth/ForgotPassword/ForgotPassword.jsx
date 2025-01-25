@@ -29,10 +29,24 @@ const ForgotPassword = () => {
           navigate("/auth/login");
         }, 5000);
       } catch (error) {
-        console.error(error);
-        const errorData = error.response?.data?.error; // Lấy lỗi từ response nếu có
-        if (errorData) message.error("Error: " + errorData);
-        else message.error("An error occurred. Please try again later.");
+        const errorCustomData = error.customData;
+        if (errorCustomData) {
+          const errorData = errorCustomData.data;
+          //console.error("Login error:", errorData);
+
+          if (errorData) {
+            if (
+              errorData ===
+              "Please verify your email before logging in. A verification link has been sent."
+            )
+              message.error(
+                "Please verify your email before logging in. A verification link has been sent."
+              );
+            else message.error(errorData);
+          } else {
+            message.error("An error occurred. Please try again later.");
+          }
+        } else message.error("An error occurred. Please try again later.");
       }
     });
   };
@@ -145,11 +159,23 @@ const ForgotPassword = () => {
 
             <motion.div variants={itemVariants}>
               <button
+                disabled={isForgotPasswordPending}
                 type="primary"
                 htmlType="submit"
-                className="w-full rounded-lg h-12 bg-gradient-to-br from-primary-dark to-secondary-dark text-white hover:bg-gradient-to-br hover:from-secondary-dark hover:to-primary-dark font-semibold"
+                className={`w-full rounded-lg h-12 bg-gradient-to-br from-primary-dark to-secondary-dark text-white  font-semibold ${
+                  isForgotPasswordPending
+                    ? "cursor-not-allowed opacity-50"
+                    : "hover:bg-gradient-to-br hover:from-secondary-dark hover:to-primary-dark"
+                }`}
               >
-                Send Code
+                {isForgotPasswordPending ? (
+                  <span className="flex items-center justify-center">
+                    <Spinner color="info" aria-label="White spinner example" />
+                    <span className="ml-2">Sending Code...</span>
+                  </span>
+                ) : (
+                  "Send Code"
+                )}
               </button>
             </motion.div>
           </form>

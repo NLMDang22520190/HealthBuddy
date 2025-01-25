@@ -37,22 +37,24 @@ const Login = () => {
         }
       } catch (error) {
         // Lấy customData được gắn từ interceptor
+        const errorCustomData = error.customData;
+        if (errorCustomData) {
+          const errorData = errorCustomData.data;
+          //console.error("Login error:", errorData);
 
-        const errorData = error.customData.error;
-        //console.error("Login error:", errorData);
-
-        if (errorData) {
-          if (
-            errorData ===
-            "Please verify your email before logging in. A verification link has been sent."
-          )
-            message.error(
+          if (errorData) {
+            if (
+              errorData ===
               "Please verify your email before logging in. A verification link has been sent."
-            );
-          else message.error(errorData);
-        } else {
-          message.error("An error occurred. Please try again later.");
-        }
+            )
+              message.error(
+                "Please verify your email before logging in. A verification link has been sent."
+              );
+            else message.error(errorData);
+          } else {
+            message.error("An error occurred. Please try again later.");
+          }
+        } else message.error("An error occurred. Please try again later.");
       }
     });
   };
@@ -100,6 +102,9 @@ const Login = () => {
       }
     });
   };
+
+  const anyLoginPending =
+    isGoogleLoginPending || isGithubLoginPending || isLoginFormPending;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -196,15 +201,11 @@ const Login = () => {
 
             <motion.div variants={itemVariants}>
               <button
-                disabled={
-                  isGoogleLoginPending ||
-                  isGithubLoginPending ||
-                  isLoginFormPending
-                }
+                disabled={anyLoginPending}
                 type="primary"
                 htmlType="submit"
                 className={`w-full rounded-lg h-12 bg-gradient-to-br from-primary-dark to-secondary-dark text-white  font-semibold ${
-                  isLoginFormPending
+                  anyLoginPending
                     ? "cursor-not-allowed opacity-50"
                     : "hover:bg-gradient-to-br hover:from-secondary-dark hover:to-primary-dark"
                 }`}
@@ -238,14 +239,10 @@ const Login = () => {
           >
             <div className="group bg-gradient-to-tr from-[#d20404] to-[#ea8d84] rounded-lg p-0.5 shadow-md flex items-center justify-center">
               <button
-                disabled={
-                  isGoogleLoginPending ||
-                  isGithubLoginPending ||
-                  isLoginFormPending
-                }
+                disabled={anyLoginPending}
                 onClick={() => handleGoogleLogin()}
                 className={`flex-1 flex items-center justify-center font-bold text-xl bg-neutral-50 p-2 rounded-lg transition-all duration-300 ${
-                  isGoogleLoginPending
+                  anyLoginPending
                     ? "cursor-not-allowed opacity-50"
                     : "hover:bg-transparent group-hover:text-white"
                 }`}
@@ -255,7 +252,11 @@ const Login = () => {
                 ) : (
                   <>
                     <svg
-                      className="size-6 font-bold text-red-500 group-hover:text-white"
+                      className={`size-6 font-bold text-red-500  ${
+                        anyLoginPending
+                          ? "opacity-50"
+                          : "group-hover:text-white"
+                      }`}
                       width="24"
                       height="24"
                       viewBox="0 0 24 24"
@@ -275,14 +276,10 @@ const Login = () => {
 
             <div className="group bg-gradient-to-tr from-raisin_black  to-bg_divide_dark rounded-lg p-0.5 shadow-md flex items-center justify-center">
               <button
-                disabled={
-                  isGoogleLoginPending ||
-                  isGithubLoginPending ||
-                  isLoginFormPending
-                }
+                disabled={anyLoginPending}
                 onClick={() => handleGithubLogin()}
                 className={`flex-1 flex items-center justify-center font-bold text-xl bg-neutral-50 p-2 rounded-lg ${
-                  isGithubLoginPending
+                  anyLoginPending
                     ? "cursor-not-allowed opacity-50"
                     : "hover:bg-transparent group-hover:text-white"
                 }`}
@@ -291,7 +288,9 @@ const Login = () => {
                   <Spinner color="info" />
                 ) : (
                   <svg
-                    class="size-6 font-bold text-black group-hover:text-white"
+                    class={`size-6 font-bold text-black  ${
+                      anyLoginPending ? "opacity-50" : "group-hover:text-white"
+                    }`}
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
