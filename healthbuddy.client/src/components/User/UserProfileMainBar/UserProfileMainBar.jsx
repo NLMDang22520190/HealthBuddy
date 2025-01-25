@@ -27,7 +27,7 @@ const UserProfileMainBar = () => {
   const auth = useSelector((state) => state.auth);
   const { userId } = useParams();
   const currentUser = auth.userId;
-  const isCurrentUser = currentUser === userId;
+  const [isCurrentUser, setIsCurrentUser] = useState(false);
 
   const [user, setUser] = useState({});
   const [userDetail, setUserDetail] = useState({});
@@ -97,6 +97,10 @@ const UserProfileMainBar = () => {
   };
 
   useEffect(() => {
+    setIsCurrentUser(currentUser == userId);
+  }, [currentUser, userId]);
+
+  useEffect(() => {
     startUserDataTransition(async () => {
       await fetchUser();
     });
@@ -107,7 +111,7 @@ const UserProfileMainBar = () => {
         await Promise.all([userDetailResponse, userNotificationResponse]);
       });
     }
-  }, [userId]);
+  }, [userId, isCurrentUser]);
 
   // Mock posts data
   const posts = [

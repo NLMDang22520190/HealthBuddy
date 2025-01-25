@@ -275,6 +275,9 @@ namespace HealthBuddy.Server.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("bit");
+
                     b.HasKey("FoodTypeId")
                         .HasName("PK__FoodType__D3D1546C6E1FD183");
 
@@ -294,6 +297,9 @@ namespace HealthBuddy.Server.Migrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("bit");
 
                     b.Property<string>("MeasurementUnit")
                         .HasMaxLength(50)
@@ -423,6 +429,9 @@ namespace HealthBuddy.Server.Migrations
                         .HasColumnName("MuscleTypeID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MuscleTypeId"));
+
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("bit");
 
                     b.Property<string>("MuscleTypeName")
                         .IsRequired()
