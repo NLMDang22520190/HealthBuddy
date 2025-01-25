@@ -280,6 +280,10 @@ public class Auth0Service
                 if (root.TryGetProperty("error_description", out var errorDescriptionProperty))
                 {
                     var errorDescription = errorDescriptionProperty.GetString();
+                    if (errorDescription.Equals("Invalid authorization code"))
+                    {
+                        throw new Exception("Invalid authorization code. Please try again.");
+                    }
                     throw new HttpRequestException(errorDescription);
                 }
 

@@ -7,6 +7,7 @@ import VerifyCode from "../pages/Auth/VerifyCode/VerifyCode";
 import ForgotPassword from "../pages/Auth/ForgotPassword/ForgotPassword";
 import ResetPassword from "../pages/Auth/ResetPassword/ResetPassword";
 import Callback from "../pages/Auth/CallBack/CallBack";
+import ErrorHandle from "../pages/ErrorHandle/ErrorHandle";
 
 import Home from "../pages/User/Home/Home";
 import ChatBot from "../pages/User/ChatBot/ChatBot";
@@ -34,6 +35,7 @@ const AllUserRoutes = () => {
       <Route path="auth/forgot-password" element={<ForgotPassword />} />
       <Route path="auth/reset-password" element={<ResetPassword />} />
       <Route path="callback" element={<Callback />} />
+      <Route path="error/:message" element={<ErrorHandle />} />
 
       {/* Add  */}
       <Route path="add/new-food" element={<NewFood />} />

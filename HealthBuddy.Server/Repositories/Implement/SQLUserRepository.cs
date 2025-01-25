@@ -12,11 +12,6 @@ namespace HealthBuddy.Server.Repositories.Implement
         {
         }
 
-        public Task<bool> CheckEmailExistsAsync(string email)
-        {
-            return dbContext.Users.AnyAsync(u => u.Email == email);
-        }
-
         public Task<bool> CheckEmailExistWithProviderAsync(string email, string provider)
         {
             return dbContext.Users.AnyAsync(u => u.Email == email
@@ -52,10 +47,9 @@ namespace HealthBuddy.Server.Repositories.Implement
             && u.Provider == provider).FirstOrDefaultAsync();
         }
 
-        public async Task<User> GetUserByEmailAsync(string email)
+        public Task<User> GetUserByIdAsync(int userId)
         {
-            var user = await dbContext.Users.Where(u => u.Email == email).FirstOrDefaultAsync();
-            return user;
+            return dbContext.Users.Where(u => u.UserId == userId).FirstOrDefaultAsync();
         }
     }
 }

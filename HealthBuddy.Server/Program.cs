@@ -77,6 +77,8 @@ builder.Services.AddCors(options =>
 
 
 builder.Services.AddScoped<IUserRepository, SQLUserRepository>();
+builder.Services.AddScoped<IUserDetailRepository, SQLUserDetailRepository>();
+builder.Services.AddScoped<IUserNotificationPreferenceRepository, SQLUserNotificationPreferenceRepository>();
 
 
 builder.Services.AddScoped(typeof(IHealthBuddyRepository<>), typeof(HealthBuddyRepository<>));

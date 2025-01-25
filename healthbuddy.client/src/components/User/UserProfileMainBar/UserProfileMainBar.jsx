@@ -1,28 +1,65 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { SearchOutlined, UserOutlined } from "@ant-design/icons";
 import { Avatar, Input as AntdInput, Button as AntdButton } from "antd";
 import { Card } from "flowbite-react";
+import { useParams } from "react-router-dom";
 
 import PostList from "../PostList/PostList";
 import UserProfileCard from "../UserProfileCard/UserProfileCard";
 import FilterButtons from "../FilterButtons/FilterButtons";
+import api from "../../../features/AxiosInstance/AxiosInstance";
 
-const user = {
-  id: 1,
-  name: "John Doe",
-  email: "user1@email.com",
-  avatar: "https://placehold.co/1920x1080.png",
-  FoodPosted: 10,
-  ExercisePosted: 5,
-  WorkoutSchedulePosted: 3,
-  MealSchedulePosted: 2,
-  JoinDated: "2023-12-01",
-};
+// const user = {
+//   id: 1,
+//   name: "John Doe",
+//   email: "user1@email.com",
+//   avatar: "https://placehold.co/1920x1080.png",
+//   FoodPosted: 10,
+//   ExercisePosted: 5,
+//   WorkoutSchedulePosted: 3,
+//   MealSchedulePosted: 2,
+//   JoinDated: "2023-12-01",
+// };
 
 const UserProfileMainBar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
+
+  const [user, setUser] = useState({});
+  const { userId } = useParams();
+
+  const fetchUser = async () => {
+    try {
+      const response = await api.get("/api/User/GetUserById/" + userId);
+      const mappedUser = {
+        id: response.data.userId,
+        name: response.data.username,
+        email: response.data.email,
+        avatar:
+          response.data.avatar == null
+            ? "https://placehold.co/1920x1080.png"
+            : response.data.avatar,
+        FoodPosted: response.data.numberOfFoodPosts,
+        ExercisePosted: response.data.numberOfExercisePosts,
+        WorkoutSchedulePosted: response.data.numberOfWorkoutPosts,
+        MealSchedulePosted: response.data.numberOfMealPosts,
+        JoinDated: response.data.createdDate,
+        Provider: response.data.provider,
+      };
+      setUser(mappedUser);
+    } catch (error) {
+      console.error("Error fetching user data: ", error);
+    }
+  };
+
+  useEffect(() => {
+    console.log("Updated user:", user);
+  }, [user]);
+
+  useEffect(() => {
+    fetchUser();
+  }, [userId]);
 
   // Mock posts data
   const posts = [

@@ -120,6 +120,7 @@ namespace HealthBuddy.Server.Controllers
         [HttpGet("social-callback")]
         public async Task<IActionResult> SocialCallback(string code, string state)
         {
+            var baseUrl = "https://healthbuddyyy.netlify.app";
             try
             {
                 var redirectUri = Url.Action("SocialCallback", "Auth", null, Request.Scheme);
@@ -136,15 +137,20 @@ namespace HealthBuddy.Server.Controllers
                 var user = await _userRepository.GetUserByEmailAndProviderAsync(lowerEmail, lowerProvider);
 
                 // Tạo URL frontend và truyền token vào query string (hoặc sử dụng session/cookie)
-                var frontendUrl = $"https://healthbuddyyy.netlify.app/callback?access_token={authResult.AccessToken}&user_id={user.UserId}&role={(user.IsAdmin ? "admin" : "user")}&provider={user.Provider}";
+                var frontendUrl = baseUrl + $"/callback?access_token={authResult.AccessToken}&user_id={user.UserId}&user_role={(user.IsAdmin ? "admin" : "user")}&provider={user.Provider}";
 
                 // Redirect về frontend với các token
                 return Redirect(frontendUrl);
             }
-            catch (Exception ex)
+            catch (HttpRequestException ex)
             {
                 return BadRequest(new { error = ex.Message });
             }
+            catch (Exception ex)
+            {
+                return Redirect(baseUrl + "/error/" + ex.Message);
+            }
+
         }
 
         // Đăng xuất

@@ -41,19 +41,39 @@ const UserCard = ({ user }) => {
           </div>
 
           <div className="flex-1 flex flex-col items-start gap-2">
-            <Label className="text-base font-bold flex gap-1 items-center">
-              <CircleUserRound className="size-4"></CircleUserRound>
-              {user.name}
-            </Label>
-            <Label className="text-sm flex gap-1 items-center font-normal">
-              <Mail className="size-4" />
-              {user.email}
-            </Label>
-            <Label className="text-xs flex gap-1 items-center font-extralight ">
-              <Calendar className="size-4" />
-              Joined {new Date(user.JoinDated).toLocaleDateString()}
-            </Label>
+            <div className="flex gap-1 items-end ">
+              <CircleUserRound className="text-bg_dark dark:text-bg_light size-4"></CircleUserRound>
+              <Label
+                className="text-sm font-bold truncate max-w-[100px]"
+                title={user.name} // Hiển thị tooltip khi hover
+              >
+                {user.name}
+              </Label>
+            </div>
+
+            <div className="flex gap-1 items-end">
+              <Mail className="text-bg_dark dark:text-bg_light size-4" />
+              <Label
+                className="text-sm font-light truncate max-w-[100px]"
+                title={user.email} // Hiển thị tooltip khi hover
+              >
+                {user.email}
+              </Label>
+            </div>
+
+            <div className="flex gap-1 items-end">
+              <Calendar className="text-bg_dark dark:text-bg_light size-4" />
+              <Label
+                className="text-xs font-extralight truncate max-w-[200px]"
+                title={`Joined ${new Date(
+                  user.JoinDated
+                ).toLocaleDateString()}`} // Tooltip
+              >
+                Joined {new Date(user.JoinDated).toLocaleDateString()}
+              </Label>
+            </div>
           </div>
+
           <div className="grid grid-rows-4 gap-1">
             <Tooltip content="Number of food posts">
               <Label className="text-sm font-semibold flex gap-2 items-center">
