@@ -29,7 +29,8 @@ namespace HealthBuddy.Server.Repositories.Implement
                     Password = hashedPassword,
                     Username = username,
                     IsDeactivated = false,
-                    Provider = Provider.Normalize()
+                    Provider = Provider.Normalize(),
+                    CreatedDate = DateTime.Now,
                 };
                 await CreateAsync(user);
                 return true;

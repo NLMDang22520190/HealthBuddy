@@ -25,7 +25,7 @@ function App() {
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
-    //localStorage.setItem("displayMode", darkMode ? "light" : "dark");
+    localStorage.setItem("displayMode", darkMode ? "light" : "dark");
   };
 
   useEffect(() => {

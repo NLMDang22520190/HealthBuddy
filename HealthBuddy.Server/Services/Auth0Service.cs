@@ -111,6 +111,66 @@ public class Auth0Service
         }
     }
 
+    public async Task UpdatePasswordAsync(string email, string currentPassword, string newPassword)
+    {
+        // Bước 1: Xác thực người dùng với mật khẩu hiện tại bằng cách sử dụng LoginAsync
+        try
+        {
+            await LoginAsync(email, currentPassword);
+        }
+        catch (HttpRequestException ex)
+        {
+            throw new HttpRequestException("Current password is incorrect.", ex);
+        }
+
+        // Bước 2: Lấy Management API token
+        var managementApiToken = await GetManagementApiTokenAsync();
+
+        // Bước 3: Lấy thông tin user_id từ email
+        var request = new HttpRequestMessage(HttpMethod.Get, $"https://{_settings.Domain}/api/v2/users-by-email?email={email}");
+        request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", managementApiToken);
+
+        var response = await _httpClient.SendAsync(request);
+        if (!response.IsSuccessStatusCode)
+        {
+            await HandleAuth0Error(response);
+        }
+
+        var responseContent = await response.Content.ReadAsStringAsync();
+        using var jsonDoc = JsonDocument.Parse(responseContent);
+
+        if (jsonDoc.RootElement.GetArrayLength() == 0)
+        {
+            throw new HttpRequestException("User not found.");
+        }
+
+        var user = jsonDoc.RootElement[0];
+        var userId = user.GetProperty("user_id").GetString();
+
+        // Bước 4: Cập nhật mật khẩu mới
+        var updatePasswordRequestBody = new
+        {
+            password = newPassword,
+            connection = "Username-Password-Authentication"
+        };
+
+        var updatePasswordRequest = new HttpRequestMessage(
+            HttpMethod.Patch,
+            $"https://{_settings.Domain}/api/v2/users/{userId}"
+        )
+        {
+            Headers = { Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", managementApiToken) },
+            Content = new StringContent(JsonSerializer.Serialize(updatePasswordRequestBody), Encoding.UTF8, "application/json")
+        };
+
+        var updatePasswordResponse = await _httpClient.SendAsync(updatePasswordRequest);
+        if (!updatePasswordResponse.IsSuccessStatusCode)
+        {
+            await HandleAuth0Error(updatePasswordResponse);
+        }
+    }
+
+
     // Add to your existing Auth0Service class
     public async Task SendVerificationEmailAsync(string email)
     {

@@ -100,6 +100,21 @@ namespace HealthBuddy.Server.Controllers
             }
         }
 
+        [HttpPost("UpdatePassword")]
+        public async Task<IActionResult> UpdatePassword([FromBody] updatePasswordRequestDTO request)
+        {
+            try
+            {
+                var lowerEmail = request.Email.ToLower();
+                await _auth0Service.UpdatePasswordAsync(lowerEmail, request.Password, request.NewPassword);
+                return Ok("Password updated successfully");
+            }
+            catch (HttpRequestException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
         #region SocialLogin
 
         [HttpGet("social-login")]

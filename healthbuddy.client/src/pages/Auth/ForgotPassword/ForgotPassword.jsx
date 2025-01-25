@@ -31,7 +31,7 @@ const ForgotPassword = () => {
       } catch (error) {
         const errorCustomData = error.customData;
         if (errorCustomData) {
-          const errorData = errorCustomData.data;
+          const errorData = errorCustomData.error;
           //console.error("Login error:", errorData);
 
           if (errorData) {
