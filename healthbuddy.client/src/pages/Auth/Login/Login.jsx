@@ -196,7 +196,11 @@ const Login = () => {
 
             <motion.div variants={itemVariants}>
               <button
-                disabled={isLoginFormPending}
+                disabled={
+                  isGoogleLoginPending ||
+                  isGithubLoginPending ||
+                  isLoginFormPending
+                }
                 type="primary"
                 htmlType="submit"
                 className={`w-full rounded-lg h-12 bg-gradient-to-br from-primary-dark to-secondary-dark text-white  font-semibold ${
@@ -234,7 +238,11 @@ const Login = () => {
           >
             <div className="group bg-gradient-to-tr from-[#d20404] to-[#ea8d84] rounded-lg p-0.5 shadow-md flex items-center justify-center">
               <button
-                disabled={isGoogleLoginPending}
+                disabled={
+                  isGoogleLoginPending ||
+                  isGithubLoginPending ||
+                  isLoginFormPending
+                }
                 onClick={() => handleGoogleLogin()}
                 className={`flex-1 flex items-center justify-center font-bold text-xl bg-neutral-50 p-2 rounded-lg transition-all duration-300 ${
                   isGoogleLoginPending
@@ -267,7 +275,11 @@ const Login = () => {
 
             <div className="group bg-gradient-to-tr from-raisin_black  to-bg_divide_dark rounded-lg p-0.5 shadow-md flex items-center justify-center">
               <button
-                disabled={isGithubLoginPending}
+                disabled={
+                  isGoogleLoginPending ||
+                  isGithubLoginPending ||
+                  isLoginFormPending
+                }
                 onClick={() => handleGithubLogin()}
                 className={`flex-1 flex items-center justify-center font-bold text-xl bg-neutral-50 p-2 rounded-lg ${
                   isGithubLoginPending

@@ -6,6 +6,7 @@ import { message } from "antd";
 
 import UserCard from "../UserCard/UserCard";
 import api from "../../../features/AxiosInstance/AxiosInstance";
+import { set } from "date-fns";
 
 const UsersMainBar = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -32,18 +33,16 @@ const UsersMainBar = () => {
           Provider: user.provider,
         };
       });
-
-      // Sử dụng startTransition để cập nhật users
-      startTransition(() => {
-        setUsers(mappedUsers);
-      });
+      setUsers(mappedUsers); // Sử dụng setUsers để cập nhật users
     } catch (error) {
       message.error("Error fetching users: ", error);
     }
   };
 
   useEffect(() => {
-    fetchUsers();
+    startTransition(async () => {
+      await fetchUsers();
+    });
   }, []);
 
   const filteredUsers = users.filter(

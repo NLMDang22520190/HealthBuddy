@@ -73,7 +73,7 @@ const AuthButtons = ({ user }) => {
           <div className="flex items-center justify-center w-full transition-all duration-300 group-hover:justify-start group-hover:px-3">
             <LogOut className="text-white" />
           </div>
-          <div className="absolute right-5 transform translate-x-full opacity-0 text-white text-lg transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100">
+          <div className="absolute right-5 pb-1 transform translate-x-full opacity-0 text-white text-lg transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100">
             Logout
           </div>
         </button>
