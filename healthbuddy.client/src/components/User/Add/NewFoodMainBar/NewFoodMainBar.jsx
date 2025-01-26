@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Button, TextInput, Textarea, Select, Label } from "flowbite-react";
+import {
+  Button,
+  TextInput,
+  Textarea,
+  Select,
+  Label,
+  Badge,
+} from "flowbite-react";
 import { motion } from "framer-motion";
 import {
   Pen,
@@ -11,9 +18,34 @@ import {
   UsersRound,
   Clock4,
   Carrot,
+  XCircle,
   Image,
   Video,
 } from "lucide-react";
+
+import NameTextInput from "../../Add/FormComponent/NameTextInput";
+import TextAreaInput from "../../Add/FormComponent/TextAreaInput";
+import StatTextInput from "../../Add/FormComponent/StatTextInput";
+
+const foodCategories = [
+  { id: 1, name: "Vegetarian" },
+  { id: 2, name: "Vegan" },
+  { id: 3, name: "Dessert" },
+  { id: 4, name: "Meat" },
+  { id: 5, name: "Seafood" },
+  { id: 6, name: "Gluten-Free" },
+  { id: 7, name: "Keto" },
+];
+
+const availableIngredients = [
+  { id: 1, name: "Carrot", unit: "grams" },
+  { id: 2, name: "Potato", unit: "grams" },
+  { id: 3, name: "Onion", unit: "pieces" },
+  { id: 4, name: "Chicken", unit: "grams" },
+  { id: 5, name: "Salt", unit: "teaspoons" },
+  { id: 6, name: "Sugar", unit: "teaspoons" },
+  { id: 7, name: "Flour", unit: "cups" },
+];
 
 const NewFoodMainBar = () => {
   const [formData, setFormData] = useState({
@@ -26,7 +58,16 @@ const NewFoodMainBar = () => {
     healthBenefits: "",
     cookingTime: 30,
     portion: 1,
-    ingredients: [{ name: "", quantity: "" }],
+    ingredients: [{ name: "", quantity: "", unit: "" }],
+    foodTypes: [],
+  });
+  const [newFoodType, setNewFoodType] = useState("");
+  const [newFoodTypesList, setNewFoodTypesList] = useState([]);
+
+  const [ingredientSearch, setIngredientSearch] = useState("");
+  const [customIngredient, setCustomIngredient] = useState({
+    name: "",
+    unit: "",
   });
 
   const handleChange = (e) => {
@@ -38,17 +79,71 @@ const NewFoodMainBar = () => {
     setFormData({ ...formData, image: e.target.files[0] });
   };
 
-  const handleIngredientChange = (index, field, value) => {
-    const newIngredients = [...formData.ingredients];
-    newIngredients[index][field] = value;
-    setFormData({ ...formData, ingredients: newIngredients });
+  const handleAddIngredient = (ingredient) => {
+    if (formData.ingredients.length >= 10) return;
+
+    const exists = formData.ingredients.find((i) => i.name === ingredient.name);
+    if (!exists) {
+      setFormData({
+        ...formData,
+        ingredients: [...formData.ingredients, ingredient],
+      });
+      setIngredientSearch("");
+    }
   };
 
-  const addIngredient = () => {
+  const handleRemoveIngredient = (id) => {
     setFormData({
       ...formData,
-      ingredients: [...formData.ingredients, { name: "", quantity: "" }],
+      ingredients: formData.ingredients.filter(
+        (ingredient) => ingredient.id !== id
+      ),
     });
+  };
+
+  const handleCustomIngredientAdd = () => {
+    if (customIngredient.name && customIngredient.unit) {
+      const newIngredient = {
+        id: Date.now(),
+        name: customIngredient.name,
+        unit: customIngredient.unit,
+      };
+      handleAddIngredient(newIngredient);
+      setCustomIngredient({ name: "", unit: "" });
+    }
+  };
+
+  const handleFoodTypeSelect = (type) => {
+    if (
+      formData.foodTypes.length < 3 &&
+      !formData.foodTypes.some((foodType) => foodType.id === type.id)
+    ) {
+      setFormData({ ...formData, foodTypes: [...formData.foodTypes, type] });
+    }
+  };
+
+  const handleFoodTypeRemove = (typeId) => {
+    setFormData({
+      ...formData,
+      foodTypes: formData.foodTypes.filter(
+        (foodType) => foodType.id !== typeId
+      ),
+    });
+  };
+
+  const addNewFoodType = () => {
+    if (
+      newFoodType &&
+      !foodCategories.some(
+        (cat) => cat.name.toLowerCase() === newFoodType.toLowerCase()
+      ) &&
+      !newFoodTypesList.some((type) => type.name === newFoodType)
+    ) {
+      const newType = { id: Date.now(), name: newFoodType };
+      foodCategories.push(newType);
+      setNewFoodTypesList([...newFoodTypesList, newType]);
+      setNewFoodType("");
+    }
   };
 
   const handleSubmit = (e) => {
@@ -56,6 +151,10 @@ const NewFoodMainBar = () => {
     console.log(formData);
     alert("Dish added successfully!");
   };
+
+  const filteredIngredients = availableIngredients.filter((ingredient) =>
+    ingredient.name.toLowerCase().includes(ingredientSearch.toLowerCase())
+  );
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -87,58 +186,45 @@ const NewFoodMainBar = () => {
         className="flex flex-col p-3 md:p-6 user-page-mainbar-content-marginbottom"
       >
         <Label variants={itemVariants} className="text-2xl font-bold mb-8">
-          Add New Dish
+          Add New Food
         </Label>
         <form onSubmit={handleSubmit} className="space-y-8">
-          <motion.div variants={itemVariants}>
-            <Label className="block mb-2 text-sm font-medium">Dish Name</Label>
-            <TextInput
-              icon={Pen}
-              name="name"
-              placeholder="Enter dish name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-            />
-          </motion.div>
+          <NameTextInput
+            labelText="Food Name"
+            onChange={handleChange}
+            placeholder="Enter food name"
+            name={formData.name}
+            itemVariants={itemVariants}
+          ></NameTextInput>
 
-          <motion.div variants={itemVariants}>
-            <Label className="block mb-2 text-sm font-medium">
-              Description
-            </Label>
-            <Textarea
-              name="description"
-              placeholder="Enter dish description"
-              value={formData.description}
-              onChange={handleChange}
-              required
-            />
-          </motion.div>
+          <TextAreaInput
+            labelText="Description"
+            placeholder="Enter food description"
+            text={formData.description}
+            name="description"
+            onChange={handleChange}
+            itemVariants={itemVariants}
+          ></TextAreaInput>
 
-          <motion.div variants={itemVariants}>
-            <Label className="block mb-2 text-sm font-medium">
-              Health Benefits
-            </Label>
-            <Textarea
-              name="healthBenefits"
-              placeholder="Enter health benefits"
-              value={formData.healthBenefits}
-              onChange={handleChange}
-            />
-          </motion.div>
+          <TextAreaInput
+            labelText="Health Benefits"
+            placeholder="Enter health benefits"
+            text={formData.healthBenefits}
+            name="healthBenefits"
+            onChange={handleChange}
+            itemVariants={itemVariants}
+          ></TextAreaInput>
 
           <div className="grid grid-cols-2 gap-4">
-            <motion.div variants={itemVariants}>
-              <Label className="block mb-2 text-sm font-medium">Calories</Label>
-              <TextInput
-                icon={Flame}
-                type="number"
-                name="calories"
-                value={formData.calories}
-                onChange={handleChange}
-                required
-              />
-            </motion.div>
+            <StatTextInput
+              labelText="Calories"
+              onChange={handleChange}
+              name="calories"
+              value={formData.calories}
+              itemVariants={itemVariants}
+              type="number"
+              icon={Flame}
+            ></StatTextInput>
 
             <motion.div variants={itemVariants}>
               <Label className="block mb-2 text-sm font-medium">
@@ -158,36 +244,159 @@ const NewFoodMainBar = () => {
               </Select>
             </motion.div>
 
-            <motion.div variants={itemVariants}>
-              <Label className="block mb-2 text-sm font-medium">
-                Cooking Time (minutes)
-              </Label>
-              <TextInput
-                icon={Clock4}
-                type="number"
-                name="cookingTime"
-                value={formData.cookingTime}
-                onChange={handleChange}
-                required
-              />
-            </motion.div>
+            <StatTextInput
+              labelText="Cooking Time (minutes)"
+              onChange={handleChange}
+              name="cookingTime"
+              value={formData.cookingTime}
+              itemVariants={itemVariants}
+              type="number"
+              icon={Clock4}
+            ></StatTextInput>
 
-            <motion.div variants={itemVariants}>
-              <Label className="block mb-2 text-sm font-medium">
-                Portion Size
-              </Label>
-              <TextInput
-                icon={UsersRound}
-                type="number"
-                name="portion"
-                value={formData.portion}
-                onChange={handleChange}
-                required
-              />
-            </motion.div>
+            <StatTextInput
+              labelText="Portion Size"
+              onChange={handleChange}
+              name="portion"
+              value={formData.portion}
+              itemVariants={itemVariants}
+              type="number"
+              icon={UsersRound}
+            ></StatTextInput>
           </div>
 
           <motion.div variants={itemVariants}>
+            <Label className="block mb-2 text-sm font-medium">Food Types</Label>
+            <TextInput
+              placeholder="Search or add a food type"
+              value={newFoodType}
+              onChange={(e) => setNewFoodType(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addNewFoodType();
+                }
+              }}
+            />
+            <div className="flex flex-wrap gap-2 mt-4">
+              {formData.foodTypes.map((type) => (
+                <Badge
+                  key={type.id}
+                  color="info"
+                  className="flex py-2 items-center"
+                >
+                  <span className="flex">
+                    {type.name}{" "}
+                    <XCircle
+                      size={16}
+                      className="ml-1 cursor-pointer"
+                      onClick={() => handleFoodTypeRemove(type.id)}
+                    />
+                  </span>
+                </Badge>
+              ))}
+            </div>
+            <div className="mt-4 max-h-48 overflow-y-auto border border-gray-300 rounded-lg p-2">
+              {foodCategories
+                .filter((type) =>
+                  type.name.toLowerCase().includes(newFoodType.toLowerCase())
+                )
+                .map((type) => (
+                  <div
+                    key={type.id}
+                    className="flex justify-between items-center p-2 hover:bg-gray-100 cursor-pointer"
+                    onClick={() => handleFoodTypeSelect(type)}
+                  >
+                    <Label>{type.name}</Label>
+                    {formData.foodTypes.some(
+                      (foodType) => foodType.id === type.id
+                    ) && <span className="text-gray-400">Selected</span>}
+                  </div>
+                ))}
+            </div>
+          </motion.div>
+
+          <motion.div>
+            <Label className="block mb-2 text-sm font-medium">
+              Ingredients
+            </Label>
+            <TextInput
+              placeholder="Search for an ingredient"
+              value={ingredientSearch}
+              onChange={(e) => setIngredientSearch(e.target.value)}
+            />
+            <div className="mt-2 max-h-48 overflow-y-auto border border-gray-300 rounded-lg p-2">
+              {filteredIngredients.map((ingredient) => (
+                <div
+                  key={ingredient.id}
+                  className="flex justify-between items-center p-2 hover:bg-gray-100 cursor-pointer"
+                  onClick={() => handleAddIngredient(ingredient)}
+                >
+                  <Label>
+                    {ingredient.name} ({ingredient.unit})
+                  </Label>
+                </div>
+              ))}
+            </div>
+
+            <Label className="block mt-4 mb-2 text-sm font-medium">
+              Add Custom Ingredient
+            </Label>
+            <div className="flex gap-4">
+              <TextInput
+                placeholder="Ingredient name"
+                value={customIngredient.name}
+                onChange={(e) =>
+                  setCustomIngredient({
+                    ...customIngredient,
+                    name: e.target.value,
+                  })
+                }
+              />
+              <TextInput
+                placeholder="Unit (e.g., grams, cups)"
+                value={customIngredient.unit}
+                onChange={(e) =>
+                  setCustomIngredient({
+                    ...customIngredient,
+                    unit: e.target.value,
+                  })
+                }
+              />
+              <Button color="gray" onClick={handleCustomIngredientAdd}>
+                Add
+              </Button>
+            </div>
+
+            <div className="mt-4">
+              {formData.ingredients.map((ingredient) => (
+                <Badge
+                  key={ingredient.id}
+                  color="info"
+                  className="flex py-2 items-center mb-2"
+                >
+                  <span className="flex items-center">
+                    {ingredient.name} ({ingredient.unit})
+                    <XCircle
+                      size={16}
+                      className="ml-1 cursor-pointer"
+                      onClick={() => handleRemoveIngredient(ingredient.id)}
+                    />
+                  </span>
+                </Badge>
+              ))}
+            </div>
+
+            <p className="text-sm mt-2 text-gray-500">
+              {formData.ingredients.length < 5
+                ? "Please add at least 5 ingredients."
+                : formData.ingredients.length > 10
+                ? "You can only add up to 10 ingredients."
+                : ""}
+            </p>
+          </motion.div>
+
+          {/* <motion.div variants={itemVariants}>
             <Label className="block mb-2 text-sm font-medium">
               Ingredients
             </Label>
@@ -209,6 +418,13 @@ const NewFoodMainBar = () => {
                     handleIngredientChange(index, "quantity", e.target.value)
                   }
                 />
+                <TextInput
+                  placeholder="Unit (e.g., grams, cups)"
+                  value={ingredient.unit}
+                  onChange={(e) =>
+                    handleIngredientChange(index, "unit", e.target.value)
+                  }
+                />
               </div>
             ))}
             <Button
@@ -219,7 +435,7 @@ const NewFoodMainBar = () => {
             >
               Add Ingredient
             </Button>
-          </motion.div>
+          </motion.div> */}
 
           <motion.div variants={itemVariants}>
             <Label className="block mb-2 text-sm font-medium">Image</Label>
