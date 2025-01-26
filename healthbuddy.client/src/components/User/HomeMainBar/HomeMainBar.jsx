@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Modal } from "antd";
+import { useSelector } from "react-redux";
 
 import PostList from "../PostList/PostList";
 import UserAddNewPost from "../UserAddNewPost/UserAddNewPost";
@@ -173,6 +173,8 @@ const HomeMainBar = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
+  const user = useSelector((state) => state.auth.userId);
+
   const handleAddClick = () => {
     setIsOpen(true);
     //navigate("/add/new-food");
@@ -182,7 +184,7 @@ const HomeMainBar = () => {
     <div className="user-page-mainbar-content-container">
       {/* Content bên trong scroll */}
       <div className="min-h-screen divide-gray-400 divide-y user-page-mainbar-content-marginbottom">
-        <UserAddNewPost onAddClick={handleAddClick} />
+        {user && <UserAddNewPost onAddClick={handleAddClick} />}
         <PostList posts={posts} />
       </div>
       <AddNewNavigateModal
