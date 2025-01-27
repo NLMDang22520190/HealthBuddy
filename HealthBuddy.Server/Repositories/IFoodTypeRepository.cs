@@ -4,5 +4,6 @@ namespace HealthBuddy.Server.Repositories
 {
     public interface IFoodTypeRepository : IHealthBuddyRepository<FoodType>
     {
+        public Task<List<FoodType>> GetApprovedFoodTypes();
     }
 }
