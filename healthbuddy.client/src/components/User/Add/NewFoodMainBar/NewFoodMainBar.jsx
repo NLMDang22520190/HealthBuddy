@@ -1,18 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useTransition } from "react";
 import {
   Button,
   TextInput,
-  Textarea,
-  Select,
   Label,
   Badge,
+  Select,
+  Spinner,
 } from "flowbite-react";
 import { motion } from "framer-motion";
 import {
-  Pen,
-  NotebookText,
-  Cross,
-  HeartPulse,
   Flame,
   Layers,
   UsersRound,
@@ -22,36 +18,20 @@ import {
   Image,
   Video,
 } from "lucide-react";
+import { message, Select as AntdSelect } from "antd";
 
+import api from "../../../../features/AxiosInstance/AxiosInstance";
 import NameTextInput from "../../Add/FormComponent/NameTextInput";
 import TextAreaInput from "../../Add/FormComponent/TextAreaInput";
 import StatTextInput from "../../Add/FormComponent/StatTextInput";
-
-const foodCategories = [
-  { id: 1, name: "Vegetarian" },
-  { id: 2, name: "Vegan" },
-  { id: 3, name: "Dessert" },
-  { id: 4, name: "Meat" },
-  { id: 5, name: "Seafood" },
-  { id: 6, name: "Gluten-Free" },
-  { id: 7, name: "Keto" },
-];
-
-const availableIngredients = [
-  { id: 1, name: "Carrot", unit: "grams" },
-  { id: 2, name: "Potato", unit: "grams" },
-  { id: 3, name: "Onion", unit: "pieces" },
-  { id: 4, name: "Chicken", unit: "grams" },
-  { id: 5, name: "Salt", unit: "teaspoons" },
-  { id: 6, name: "Sugar", unit: "teaspoons" },
-  { id: 7, name: "Flour", unit: "cups" },
-];
+import DeleteButton from "../FormComponent/DeleteButton";
+import AddNewIngredientModal from "../AddNewIngredientModal/AddNewIngredientModal";
 
 const NewFoodMainBar = () => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    image: null,
+    imageUrl: "",
     videoUrl: "",
     calories: 0,
     difficultyLevel: "medium",
@@ -62,57 +42,117 @@ const NewFoodMainBar = () => {
     foodTypes: [],
   });
   const [newFoodType, setNewFoodType] = useState("");
-  const [newFoodTypesList, setNewFoodTypesList] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
-  const [ingredientSearch, setIngredientSearch] = useState("");
-  const [customIngredient, setCustomIngredient] = useState({
-    name: "",
-    unit: "",
-  });
+  const [availableIngredients, setAvailableIngredients] = useState([]);
+  const [foodCategories, setFoodCategories] = useState([]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
+  const [isFetchingDataPending, startFetchingDataTransition] = useTransition();
 
-  const handleFileChange = (e) => {
-    setFormData({ ...formData, image: e.target.files[0] });
-  };
-
-  const handleAddIngredient = (ingredient) => {
-    if (formData.ingredients.length >= 10) return;
-
-    const exists = formData.ingredients.find((i) => i.name === ingredient.name);
-    if (!exists) {
-      setFormData({
-        ...formData,
-        ingredients: [...formData.ingredients, ingredient],
-      });
-      setIngredientSearch("");
+  //#region fetch data
+  const fetchIngredients = async () => {
+    try {
+      const response = await api.get(
+        "/api/Ingredient/GetAllApprovedIngredients"
+      );
+      const mappedData = response.data.map((data) => ({
+        id: data.ingredientId,
+        name: data.ingredientName,
+        unit: data.measurementUnit,
+        isNew: false,
+      }));
+      setAvailableIngredients(mappedData);
+    } catch (error) {
+      message.error("Error fetching ingredients: " + error.message);
     }
   };
 
-  const handleRemoveIngredient = (id) => {
+  const fetchFoodCategories = async () => {
+    try {
+      const response = await api.get("/api/FoodType/GetAllApprovedFoodTypes");
+      const mappedData = response.data.map((data) => ({
+        id: data.foodTypeId,
+        name: data.foodTypeName,
+        isNew: false,
+      }));
+      setFoodCategories(mappedData);
+    } catch (error) {
+      message.error("Error fetching food categories: " + error.message);
+    }
+  };
+
+  useEffect(() => {
+    startFetchingDataTransition(async () => {
+      console.log("log");
+      const ingredientsResponse = fetchIngredients();
+      const foodCategoriesResponse = fetchFoodCategories();
+      await Promise.all([ingredientsResponse, foodCategoriesResponse]);
+    });
+  }, []);
+
+  //#endregion
+
+  //#region Ingredient
+  const handleIngredientChange = (index, field, value) => {
+    const newIngredients = [...formData.ingredients];
+
+    if (field === "name") {
+      // Khi chọn nguyên liệu, tự động cập nhật đơn vị đo
+      const selectedIngredient = availableIngredients.find(
+        (ingredient) => ingredient.name === value
+      );
+      newIngredients[index]["unit"] = selectedIngredient
+        ? selectedIngredient.unit
+        : "";
+    }
+
+    newIngredients[index][field] = value;
+    setFormData({ ...formData, ingredients: newIngredients });
+  };
+
+  const getAvailableOptions = (index) => {
+    const selectedIngredients = formData.ingredients.map(
+      (ingredient) => ingredient.name
+    );
+
+    return availableIngredients.filter(
+      (ingredient) =>
+        !selectedIngredients.includes(ingredient.name) ||
+        formData.ingredients[index]?.name === ingredient.name
+    );
+  };
+
+  const addIngredient = () => {
     setFormData({
       ...formData,
-      ingredients: formData.ingredients.filter(
-        (ingredient) => ingredient.id !== id
-      ),
+      ingredients: [
+        ...formData.ingredients,
+        { name: "", quantity: "", unit: "" },
+      ],
     });
   };
 
-  const handleCustomIngredientAdd = () => {
-    if (customIngredient.name && customIngredient.unit) {
-      const newIngredient = {
-        id: Date.now(),
-        name: customIngredient.name,
-        unit: customIngredient.unit,
-      };
-      handleAddIngredient(newIngredient);
-      setCustomIngredient({ name: "", unit: "" });
+  const addNewIngredient = (ingre) => {
+    const ingreExist = availableIngredients.some(
+      (i) => i.name.toLowerCase() === ingre.name.toLowerCase()
+    );
+
+    if (!ingreExist) {
+      message.success("New ingredient added: " + ingre.name);
+      availableIngredients.push(ingre);
+    } else {
+      message.error("Ingredient already exists: " + ingre.name);
     }
   };
 
+  const removeIngredient = (index) => {
+    const newIngredients = formData.ingredients.filter((_, i) => i !== index);
+    setFormData({ ...formData, ingredients: newIngredients });
+  };
+
+  //#endregion
+
+  //#region Food Type
   const handleFoodTypeSelect = (type) => {
     if (
       formData.foodTypes.length < 3 &&
@@ -136,26 +176,43 @@ const NewFoodMainBar = () => {
       newFoodType &&
       !foodCategories.some(
         (cat) => cat.name.toLowerCase() === newFoodType.toLowerCase()
-      ) &&
-      !newFoodTypesList.some((type) => type.name === newFoodType)
+      )
     ) {
-      const newType = { id: Date.now(), name: newFoodType };
+      const newType = { id: Date.now(), name: newFoodType, isNew: true };
       foodCategories.push(newType);
-      setNewFoodTypesList([...newFoodTypesList, newType]);
       setNewFoodType("");
     }
+  };
+  //#endregion
+
+  //#region form data
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleFileChange = (e) => {
+    setFormData({ ...formData, image: e.target.files[0] });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(formData);
-    alert("Dish added successfully!");
+
+    const newFoodTypes = formData.foodTypes.filter(
+      (type) => type.isNew === true
+    );
+    if (newFoodTypes.length > 0) {
+      newFoodTypes.forEach((type) => {
+        message.success("New food type added: " + type.name);
+      }); // Add new food types to the database
+    }
+
+    message.success("Dish added successfully!");
   };
+  //#endregion
 
-  const filteredIngredients = availableIngredients.filter((ingredient) =>
-    ingredient.name.toLowerCase().includes(ingredientSearch.toLowerCase())
-  );
-
+  //#region motion
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -176,6 +233,7 @@ const NewFoodMainBar = () => {
       },
     },
   };
+  //#endregion
 
   return (
     <div className="user-page-mainbar-content-container">
@@ -296,104 +354,28 @@ const NewFoodMainBar = () => {
                 </Badge>
               ))}
             </div>
-            <div className="mt-4 max-h-48 overflow-y-auto border border-gray-300 rounded-lg p-2">
-              {foodCategories
-                .filter((type) =>
-                  type.name.toLowerCase().includes(newFoodType.toLowerCase())
-                )
-                .map((type) => (
-                  <div
-                    key={type.id}
-                    className="flex justify-between items-center p-2 hover:bg-gray-100 cursor-pointer"
-                    onClick={() => handleFoodTypeSelect(type)}
-                  >
-                    <Label>{type.name}</Label>
-                    {formData.foodTypes.some(
-                      (foodType) => foodType.id === type.id
-                    ) && <span className="text-gray-400">Selected</span>}
-                  </div>
-                ))}
-            </div>
-          </motion.div>
-
-          <motion.div>
-            <Label className="block mb-2 text-sm font-medium">
-              Ingredients
-            </Label>
-            <TextInput
-              placeholder="Search for an ingredient"
-              value={ingredientSearch}
-              onChange={(e) => setIngredientSearch(e.target.value)}
-            />
-            <div className="mt-2 max-h-48 overflow-y-auto border border-gray-300 rounded-lg p-2">
-              {filteredIngredients.map((ingredient) => (
-                <div
-                  key={ingredient.id}
-                  className="flex justify-between items-center p-2 hover:bg-gray-100 cursor-pointer"
-                  onClick={() => handleAddIngredient(ingredient)}
-                >
-                  <Label>
-                    {ingredient.name} ({ingredient.unit})
-                  </Label>
-                </div>
-              ))}
-            </div>
-
-            <Label className="block mt-4 mb-2 text-sm font-medium">
-              Add Custom Ingredient
-            </Label>
-            <div className="flex gap-4">
-              <TextInput
-                placeholder="Ingredient name"
-                value={customIngredient.name}
-                onChange={(e) =>
-                  setCustomIngredient({
-                    ...customIngredient,
-                    name: e.target.value,
-                  })
-                }
-              />
-              <TextInput
-                placeholder="Unit (e.g., grams, cups)"
-                value={customIngredient.unit}
-                onChange={(e) =>
-                  setCustomIngredient({
-                    ...customIngredient,
-                    unit: e.target.value,
-                  })
-                }
-              />
-              <Button color="gray" onClick={handleCustomIngredientAdd}>
-                Add
-              </Button>
-            </div>
-
-            <div className="mt-4">
-              {formData.ingredients.map((ingredient) => (
-                <Badge
-                  key={ingredient.id}
-                  color="info"
-                  className="flex py-2 items-center mb-2"
-                >
-                  <span className="flex items-center">
-                    {ingredient.name} ({ingredient.unit})
-                    <XCircle
-                      size={16}
-                      className="ml-1 cursor-pointer"
-                      onClick={() => handleRemoveIngredient(ingredient.id)}
-                    />
-                  </span>
-                </Badge>
-              ))}
-            </div>
-
-            <p className="text-sm mt-2 text-gray-500">
-              {formData.ingredients.length < 5
-                ? "Please add at least 5 ingredients."
-                : formData.ingredients.length > 10
-                ? "You can only add up to 10 ingredients."
-                : ""}
-            </p>
+            {isFetchingDataPending ? (
+              <Spinner color="info"></Spinner>
+            ) : (
+              <div className="mt-4 max-h-48 overflow-y-auto border border-gray-300 rounded-lg p-2">
+                {foodCategories
+                  .filter((type) =>
+                    type.name.toLowerCase().includes(newFoodType.toLowerCase())
+                  )
+                  .map((type) => (
+                    <div
+                      key={type.id}
+                      className="flex justify-between items-center p-2 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => handleFoodTypeSelect(type)}
+                    >
+                      <Label>{type.name}</Label>
+                      {formData.foodTypes.some(
+                        (foodType) => foodType.id === type.id
+                      ) && <span className="text-gray-400">Selected</span>}
+                    </div>
+                  ))}
+              </div>
+            )}
           </motion.div>
 
           {/* <motion.div variants={itemVariants}>
@@ -435,8 +417,91 @@ const NewFoodMainBar = () => {
             >
               Add Ingredient
             </Button>
-          </motion.div> */}
+          </motion.div>  */}
 
+          <motion.div variants={itemVariants}>
+            <Label className="block mb-2 text-sm font-medium">
+              Ingredients
+            </Label>
+            {isFetchingDataPending ? (
+              <Spinner color="info"></Spinner>
+            ) : (
+              <>
+                {formData.ingredients.map((ingredient, index) => (
+                  <div
+                    key={index}
+                    className="flex gap-4 mt-2 justify-between items-center"
+                  >
+                    {/* Dropdown chọn nguyên liệu */}
+                    <AntdSelect
+                      showSearch
+                      className="w-1/2 h-10 text-white "
+                      placeholder="Select Ingredient"
+                      optionFilterProp="label"
+                      value={ingredient.name || undefined} // Gán giá trị hiện tại
+                      onChange={(value) =>
+                        handleIngredientChange(index, "name", value)
+                      } // Xử lý khi thay đổi
+                      filterSort={(optionA, optionB) =>
+                        (optionA?.label ?? "")
+                          .toLowerCase()
+                          .localeCompare((optionB?.label ?? "").toLowerCase())
+                      }
+                      options={getAvailableOptions(index).map(
+                        (availableIngredient) => ({
+                          value: availableIngredient.name, // Giá trị sẽ được trả về khi chọn
+                          label: availableIngredient.name, // Hiển thị label trong dropdown
+                        })
+                      )}
+                    />
+                    {/* Ô nhập số lượng */}
+                    <TextInput
+                      type="number"
+                      required
+                      placeholder="Quantity"
+                      value={ingredient.quantity}
+                      className="w-1/4"
+                      onChange={(e) =>
+                        handleIngredientChange(
+                          index,
+                          "quantity",
+                          e.target.value
+                        )
+                      }
+                    />
+                    {/* Ô đơn vị đo (tự động điền) */}
+                    <TextInput
+                      readOnly
+                      className="w-1/4"
+                      placeholder="Unit"
+                      value={ingredient.unit}
+                    />
+                    {/* Nút xóa nguyên liệu */}
+                    <DeleteButton onClick={() => removeIngredient(index)} />
+                  </div>
+                ))}
+                <div className="flex gap-4 mt-4">
+                  <Button
+                    type="button"
+                    color="gray"
+                    onClick={addIngredient}
+                    className="flex-grow"
+                  >
+                    Add Ingredient
+                  </Button>
+                  <Button
+                    type="button"
+                    color="success"
+                    onClick={() => setIsModalVisible(true)}
+                    className="flex-grow"
+                  >
+                    Add New Ingredient
+                  </Button>
+                </div>
+              </>
+            )}
+          </motion.div>
+          {/* 
           <motion.div variants={itemVariants}>
             <Label className="block mb-2 text-sm font-medium">Image</Label>
             <input
@@ -445,12 +510,25 @@ const NewFoodMainBar = () => {
               onChange={handleFileChange}
               className="block w-full text-sm text-gray-500"
             />
+          </motion.div> */}
+
+          <motion.div variants={itemVariants}>
+            <Label className="block mb-2 text-sm font-medium">Image URL</Label>
+            <TextInput
+              icon={Image}
+              name="imageUrl"
+              required
+              placeholder="Enter image URL"
+              value={formData.imageUrl}
+              onChange={handleChange}
+            />
           </motion.div>
 
           <motion.div variants={itemVariants}>
             <Label className="block mb-2 text-sm font-medium">Video URL</Label>
             <TextInput
               icon={Video}
+              required
               name="videoUrl"
               placeholder="Enter video URL"
               value={formData.videoUrl}
@@ -468,6 +546,11 @@ const NewFoodMainBar = () => {
           </motion.button>
         </form>
       </motion.div>
+      <AddNewIngredientModal
+        open={isModalVisible}
+        onCancel={() => setIsModalVisible(false)}
+        onUpdate={addNewIngredient}
+      ></AddNewIngredientModal>
     </div>
   );
 };

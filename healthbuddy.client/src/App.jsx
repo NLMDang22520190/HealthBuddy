@@ -47,6 +47,10 @@ function App() {
             headerBg: modalColor,
             titleColor: titleColor,
           },
+          Select: {
+            activeBorderColor: "#000",
+            selectorBg: "#F9FAFB",
+          },
         },
       }}
     >
