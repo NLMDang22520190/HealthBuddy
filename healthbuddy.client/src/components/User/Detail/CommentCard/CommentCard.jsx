@@ -110,12 +110,14 @@ const comments = [
   },
 ];
 
-const CommentCard = () => {
+const CommentCard = ({ numberOfLikes, numberOfComments }) => {
   const [liked, setLiked] = useState(false);
 
   return (
     <div className="flex flex-col border rounded-lg mb-6 dark:border-bg_divide_dark border-bg_divide_light">
       <InteractButton
+        numberOfLikes={numberOfLikes}
+        numberOfComments={numberOfComments}
         liked={liked}
         onLikeClick={() => setLiked(!liked)}
       ></InteractButton>

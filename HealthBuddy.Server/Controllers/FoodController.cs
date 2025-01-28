@@ -2,6 +2,7 @@ using System.Diagnostics;
 using AutoMapper;
 using HealthBuddy.Server.Models.Domain;
 using HealthBuddy.Server.Models.DTO.ADD;
+using HealthBuddy.Server.Models.DTO.GET;
 using HealthBuddy.Server.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -35,6 +36,24 @@ namespace HealthBuddy.Server.Controllers
             catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database");
+            }
+        }
+
+        [HttpGet("GetFoodById/{foodId}")]
+        public async Task<ActionResult> GetFoodById(int foodId)
+        {
+            try
+            {
+                var food = await _foodRepository.GetFoodById(foodId);
+                if (food == null)
+                {
+                    return BadRequest(new { error = "Food not found" });
+                }
+                return Ok(_mapper.Map<FoodDTO>(food));
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database: " + e.Message);
             }
         }
 
