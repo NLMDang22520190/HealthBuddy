@@ -130,7 +130,7 @@ const AddNewExerciseMainBar = () => {
 
             <motion.div variants={itemVariants}>
               <Label className="block mb-2 font-medium">
-                Time Between Sets (seconds)
+                Time Between Sets (s)
               </Label>
               <TextInput
                 icon={Clock4}

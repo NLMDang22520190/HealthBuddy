@@ -35,6 +35,10 @@ public partial class Exercise
 
     public int NumberOfComments { get; set; }
 
+    public DateTime CreatedDate { get; set; }
+
+    public DateTime UpdatedDate { get; set; }
+
     public virtual User Uploader { get; set; } = null!;
 
     public virtual ICollection<WorkoutDetail> WorkoutDetails { get; set; } = new List<WorkoutDetail>();

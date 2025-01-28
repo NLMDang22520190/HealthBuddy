@@ -35,6 +35,10 @@ public partial class Food
 
     public int NumberOfComments { get; set; }
 
+    public DateTime CreatedDate { get; set; }
+
+    public DateTime UpdatedDate { get; set; }
+
     public virtual ICollection<MealDetail> MealDetails { get; set; } = new List<MealDetail>();
 
     public virtual ICollection<Recipe> Recipes { get; set; } = new List<Recipe>();
