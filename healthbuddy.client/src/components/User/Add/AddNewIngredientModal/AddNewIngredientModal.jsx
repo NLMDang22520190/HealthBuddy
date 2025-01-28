@@ -9,7 +9,7 @@ const AddNewIngredientModal = ({ open, onCancel, onUpdate }) => {
   const handleAddClick = () => {
     if (!ingredientName || !unit) return;
 
-    onUpdate({ id: Date.now(), name: ingredientName, unit });
+    onUpdate({ id: Date.now(), name: ingredientName, unit, isNew: true });
     onCancel();
   };
 
