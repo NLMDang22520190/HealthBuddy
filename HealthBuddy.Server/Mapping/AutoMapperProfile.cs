@@ -22,7 +22,9 @@ namespace HealthBuddy.Server.Mapping
             CreateMap<Ingredient, AddIngreRequestDTO>().ReverseMap();
             CreateMap<FoodType, FoodTypeDTO>().ReverseMap();
             CreateMap<Ingredient, IngredientDTO>().ReverseMap();
-            CreateMap<Recipe, RecipeDTO>().ReverseMap();
+            CreateMap<Recipe, Models.DTO.RecipeDTO>().ReverseMap();
+            CreateMap<Food, FoodDTO>().ReverseMap();
+            CreateMap<Recipe, Models.DTO.GET.RecipeDTO>().ReverseMap();
             CreateMap<Food, AddFoodRequestDTO>().ReverseMap();
             CreateMap<User, UserPostedDTO>().ReverseMap();
             CreateMap<PostDTO, Food>()

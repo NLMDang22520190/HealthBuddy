@@ -19,7 +19,10 @@ namespace HealthBuddy.Server.Repositories.Implement
 
         public async Task<Food> GetFoodById(int foodId)
         {
-            return await dbContext.Foods.FirstOrDefaultAsync(f => f.FoodId == foodId);
+            return await dbContext.Foods
+            .Include(f => f.FoodTypes)
+            .Include(f => f.Recipes).ThenInclude(r => r.Ingredient)
+            .FirstOrDefaultAsync(f => f.FoodId == foodId);
         }
     }
 }

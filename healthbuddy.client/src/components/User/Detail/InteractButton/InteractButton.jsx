@@ -6,7 +6,12 @@ import { MessageCircle } from "lucide-react";
 import { message } from "antd";
 import SharePopover from "../../../SharePopover/SharePopover";
 
-const InteractButton = ({ liked, onLikeClick }) => {
+const InteractButton = ({
+  liked,
+  onLikeClick,
+  numberOfLikes,
+  numberOfComments,
+}) => {
   const onShareClick = () => {
     const currentUrl = window.location.href; // Lấy URL hiện tại
     navigator.clipboard
@@ -35,7 +40,7 @@ const InteractButton = ({ liked, onLikeClick }) => {
         >
           <Heart className={`size-7 ${liked ? "fill-current" : ""}`} />
         </button>
-        <Label className="text-sm cursor-pointer">333 Likes</Label>
+        <Label className="text-sm cursor-pointer">{numberOfLikes} Likes</Label>
       </motion.div>
 
       <motion.div
@@ -46,7 +51,7 @@ const InteractButton = ({ liked, onLikeClick }) => {
         <button className="text-primary-light dark:text-primary-dark">
           <MessageCircle className="size-7" />
         </button>
-        <Label className="text-sm">333 Comments</Label>
+        <Label className="text-sm">{numberOfComments} Comments</Label>
       </motion.div>
 
       <motion.div
