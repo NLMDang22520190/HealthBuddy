@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useTransition } from "react";
 import { motion } from "framer-motion";
 import { ArrowUp, Ellipsis } from "lucide-react";
 import { Card, Textarea } from "flowbite-react";
@@ -16,6 +16,8 @@ const ChatBotMainBar = () => {
     },
   ]);
   const [newMessage, setNewMessage] = useState("");
+  const [isBotTyping, setIsBotTyping] = useState(false); // Trạng thái bot đang gõ
+  const [isBotTypingPending, startBotTypingTransition] = useTransition();
 
   const handleSendMessage = (e) => {
     e.preventDefault();
@@ -32,15 +34,21 @@ const ChatBotMainBar = () => {
     setMessages((prev) => [...prev, userMessage]);
     setNewMessage("");
 
-    setTimeout(() => {
-      const botMessage = {
-        id: messages.length + 2,
-        text: "I'm a demo bot. In a real application, I would process your message and provide a meaningful response.",
-        sender: "bot",
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, botMessage]);
-    }, 1000);
+    // Đánh dấu bot bắt đầu "gõ"
+    setIsBotTyping(true);
+    startBotTypingTransition(() => {
+      setTimeout(() => {
+        const botMessage = {
+          id: messages.length + 2,
+          text: "I'm a demo bot. In a real application, I would process your message and provide a meaningful response.",
+          sender: "bot",
+          timestamp: new Date(),
+        };
+
+        setMessages((prev) => [...prev, botMessage]);
+        setIsBotTyping(false); // Sau khi bot phản hồi, dừng trạng thái "gõ"
+      }, 3000); // Thời gian phản hồi giả lập
+    });
   };
 
   return (
@@ -92,6 +100,23 @@ const ChatBotMainBar = () => {
                 </div>
               </motion.div>
             ))}
+
+            {/* Hiển thị loading indicator khi bot đang phản hồi */}
+            {isBotTyping && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                className="flex items-center gap-2"
+              >
+                <Avatar className="size-10 bg-white" src={logo} />
+                <div className="flex flex-row gap-2">
+                  <div className="size-2 rounded-full bg-gradient-to-br from-primary-dark to-secondary-dark animate-bounce"></div>
+                  <div className="size-2 rounded-full  bg-gradient-to-br from-primary-dark to-secondary-dark animate-bounce [animation-delay:-.3s]"></div>
+                  <div className="size-2 rounded-full bg-gradient-to-br from-primary-dark to-secondary-dark animate-bounce [animation-delay:-.5s]"></div>
+                </div>
+              </motion.div>
+            )}
           </div>
         </Card>
         <form onSubmit={handleSendMessage} className="flex gap-2">
