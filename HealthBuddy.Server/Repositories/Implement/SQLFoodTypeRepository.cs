@@ -14,5 +14,10 @@ namespace HealthBuddy.Server.Repositories.Implement
         {
             return await dbContext.FoodTypes.Where(ft => ft.IsApproved).ToListAsync();
         }
+
+        public Task<FoodType> GetFoodTypeById(int id)
+        {
+            return dbContext.FoodTypes.FirstOrDefaultAsync(ft => ft.FoodTypeId == id);
+        }
     }
 }

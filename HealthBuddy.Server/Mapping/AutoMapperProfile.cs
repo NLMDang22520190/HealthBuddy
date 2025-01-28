@@ -1,5 +1,6 @@
 using AutoMapper;
 using HealthBuddy.Server.Models.Domain;
+using HealthBuddy.Server.Models.DTO;
 using HealthBuddy.Server.Models.DTO.ADD;
 using HealthBuddy.Server.Models.DTO.GET;
 using HealthBuddy.Server.Models.DTO.UPDATE;
@@ -21,6 +22,8 @@ namespace HealthBuddy.Server.Mapping
             CreateMap<Ingredient, AddIngreRequestDTO>().ReverseMap();
             CreateMap<FoodType, FoodTypeDTO>().ReverseMap();
             CreateMap<Ingredient, IngredientDTO>().ReverseMap();
+            CreateMap<Recipe, RecipeDTO>().ReverseMap();
+            CreateMap<Food, AddFoodRequestDTO>().ReverseMap();
         }
     }
 }
