@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { message, Select as AntdSelect } from "antd";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 import api from "../../../../features/AxiosInstance/AxiosInstance";
 import NameTextInput from "../../Add/FormComponent/NameTextInput";
@@ -52,6 +53,7 @@ const NewFoodMainBar = () => {
   const [isFormSubmitting, startFormSubmitTransition] = useTransition();
 
   const navigate = useNavigate();
+  const userId = useSelector((state) => state.auth.userId);
 
   //#region add data
   const addNewIngredientAPI = async (ingre) => {
@@ -104,7 +106,7 @@ const NewFoodMainBar = () => {
         healthBenefits: formData.healthBenefits,
         cookingTime: formData.cookingTime,
         portion: formData.portion,
-        uploaderId: 13, // Thay bằng ID người dùng thực tế nếu cần
+        uploaderId: userId, // Thay bằng ID người dùng thực tế nếu cần
         foodTypeIds: formData.foodTypes.map((type) => type.id), // Lấy danh sách ID của `foodTypes`
         recipes: formData.ingredients.map((ingredient) => ({
           ingredientId: ingredient.id, // ID của ingredient
@@ -413,7 +415,7 @@ const NewFoodMainBar = () => {
       await addNewFoodAPI(formData);
       setTimeout(() => {
         navigate("/");
-      }, 2000); // Chờ 2 giây để hiển thị thông báo
+      }, 250);
     });
   };
   //#endregion

@@ -24,6 +24,20 @@ namespace HealthBuddy.Server.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet("GetAllFoods")]
+        public async Task<ActionResult> GetAllFoods()
+        {
+            try
+            {
+                var foods = await _foodRepository.GetAllAsync();
+                return Ok(_mapper.Map<List<AddFoodRequestDTO>>(foods));
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database");
+            }
+        }
+
         [HttpPost("AddNewFood")]
         public async Task<ActionResult> AddFood(AddFoodRequestDTO foodDTO)
         {
@@ -43,6 +57,8 @@ namespace HealthBuddy.Server.Controllers
                 foodDomain.IsHidden = false;
                 foodDomain.NumberOfComments = 0;
                 foodDomain.NumberOfLikes = 0;
+                foodDomain.CreatedDate = DateTime.Now;
+                foodDomain.UpdatedDate = DateTime.Now;
 
                 var createdFoodDomain = await _foodRepository.CreateAsync(foodDomain);
                 if (createdFoodDomain == null)
@@ -54,6 +70,27 @@ namespace HealthBuddy.Server.Controllers
             catch (Exception e)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error adding food to the database" + e.Message);
+            }
+        }
+
+        [HttpPut("ApproveFood/{foodId}")]
+        public async Task<ActionResult> ApproveFood(int foodId)
+        {
+            try
+            {
+                var updatedFood = await _foodRepository.UpdateAsync(f => f.FoodId == foodId, existingRecord =>
+                {
+                    existingRecord.IsApproved = true;
+                });
+                if (updatedFood == null)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Error approving food in the database");
+                }
+                return Ok(_mapper.Map<AddFoodRequestDTO>(updatedFood));
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error approving food in the database: " + e.Message);
             }
         }
     }

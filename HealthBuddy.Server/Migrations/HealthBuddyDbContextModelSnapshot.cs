@@ -127,6 +127,9 @@ namespace HealthBuddy.Server.Migrations
                     b.Property<int?>("CaloriesBurned")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -162,6 +165,9 @@ namespace HealthBuddy.Server.Migrations
 
                     b.Property<int?>("TimeBetweenSet")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("UploaderId")
                         .HasColumnType("int")
@@ -216,6 +222,9 @@ namespace HealthBuddy.Server.Migrations
                     b.Property<int>("CookingTime")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -248,6 +257,9 @@ namespace HealthBuddy.Server.Migrations
 
                     b.Property<int>("Portion")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("UploaderId")
                         .HasColumnType("int")

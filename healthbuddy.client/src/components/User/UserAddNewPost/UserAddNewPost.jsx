@@ -1,17 +1,54 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Label } from "flowbite-react";
-import { Avatar } from "antd";
-import { Link } from "react-router-dom";
+import { Avatar, message } from "antd";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { motion } from "framer-motion";
+
+import api from "../../../features/AxiosInstance/AxiosInstance";
 
 const UserAddNewPost = ({ onAddClick }) => {
+  const userId = useSelector((state) => state.auth.userId);
+  const navigate = useNavigate();
+
+  const [avatar, setAvatar] = useState("https://placehold.co/50x50.png");
+
+  const handleUserNavigate = () => {
+    navigate(`/user/${userId}`);
+  };
+
+  useEffect(() => {
+    try {
+      const fetchUser = async () => {
+        const response = await api.get("/api/User/GetUserById/" + userId);
+        const avatar =
+          response.data.avatar == null
+            ? "https://placehold.co/1920x1080.png"
+            : response.data.avatar;
+        setAvatar(avatar);
+      };
+      fetchUser();
+    } catch (error) {
+      console.log(error);
+      message.error("Error fetching user data: " + error.message);
+    }
+  }, []);
+
   return (
     <div className="p-3 md:p-6 flex gap-3">
-      <div className="p-px rounded-full bg-gradient-to-tr from-primary-dark to-secondary-dark">
-        <Avatar
-          className="min-w-12 h-12 md:size-14"
-          src="https://placehold.co/50x50.png"
-        ></Avatar>
-      </div>
+      <motion.div
+        className="h-fit"
+        whileHover={{ scale: 1.05 }}
+        transition={{ duration: 0.2 }}
+      >
+        <div className="p-px rounded-full bg-gradient-to-tr from-primary-dark to-secondary-dark">
+          <Avatar
+            onClick={() => handleUserNavigate()}
+            className="cursor-pointer min-w-12 h-12 md:size-14"
+            src={avatar}
+          />
+        </div>
+      </motion.div>
       <div
         onClick={onAddClick}
         className="items-center cursor-pointer flex-1 flex justify-between"
