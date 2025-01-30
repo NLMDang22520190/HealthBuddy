@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Button } from "flowbite-react";
+import React, { useState, useTransition, useEffect } from "react";
+import { Spinner, Badge } from "flowbite-react";
 import { TextInput, Textarea, Select, Label } from "flowbite-react";
 import { motion } from "framer-motion";
 import {
@@ -10,7 +10,13 @@ import {
   Clock4,
   Video,
   Anvil,
+  Image,
+  XCircle,
 } from "lucide-react";
+
+import NameTextInput from "../FormComponent/NameTextInput";
+import TextAreaInput from "../FormComponent/TextAreaInput";
+import StatTextInput from "../FormComponent/StatTextInput";
 
 const exerciseTypes = ["Cardio", "Strength", "Flexibility", "Balance", "HIIT"];
 
@@ -28,7 +34,7 @@ const AddNewExerciseMainBar = () => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    image: null,
+    imageUrl: "",
     videoUrl: "",
     difficultyLevel: "intermediate",
     numberOfReps: 10,
@@ -39,6 +45,91 @@ const AddNewExerciseMainBar = () => {
     muscleGroups: [],
   });
 
+  const [newExerciseType, setNewExerciseType] = useState("");
+  const [newMuscleType, setNewMuscleType] = useState("");
+
+  const [exerciseCategories, setExerciseCategories] = useState([]);
+  const [muscleCategories, setMuscleCategories] = useState([]);
+
+  const [isFetchingDataPending, startFetchingDataTransition] = useTransition();
+  const [isFormSubmitting, startFormSubmitTransition] = useTransition();
+
+  //#region muscle types
+  const handleMuscleTypeSelect = (type) => {
+    if (
+      formData.muscleGroups.length < 3 &&
+      !formData.muscleGroups.some((muscleType) => muscleType.id === type.id)
+    ) {
+      setFormData({
+        ...formData,
+        muscleGroups: [...formData.muscleGroups, type],
+      });
+    }
+  };
+
+  const handleMuscleTypeRemove = (typeId) => {
+    setFormData({
+      ...formData,
+      muscleGroups: formData.muscleGroups.filter(
+        (muscleType) => muscleType.id !== typeId
+      ),
+    });
+  };
+
+  const addNewMuscleType = () => {
+    if (
+      newMuscleType &&
+      !muscleCategories.some(
+        (cat) => cat.name.toLowerCase() === newMuscleType.toLowerCase()
+      )
+    ) {
+      const newType = { id: Date.now(), name: newMuscleType, isNew: true };
+      muscleCategories.push(newType);
+      setNewMuscleType("");
+    }
+  };
+  //#endregion
+
+  //#region exercise types
+
+  const handleExerciseTypeSelect = (type) => {
+    if (
+      formData.exerciseTypes.length < 3 &&
+      !formData.exerciseTypes.some(
+        (exerciseType) => exerciseType.id === type.id
+      )
+    ) {
+      setFormData({
+        ...formData,
+        exerciseTypes: [...formData.exerciseTypes, type],
+      });
+    }
+  };
+
+  const handleExerciseTypeRemove = (typeId) => {
+    setFormData({
+      ...formData,
+      exerciseTypes: formData.exerciseTypes.filter(
+        (exerciseType) => exerciseType.id !== typeId
+      ),
+    });
+  };
+
+  const addNewExerciseType = () => {
+    if (
+      newExerciseType &&
+      !exerciseCategories.some(
+        (cat) => cat.name.toLowerCase() === newExerciseType.toLowerCase()
+      )
+    ) {
+      const newType = { id: Date.now(), name: newExerciseType, isNew: true };
+      exerciseCategories.push(newType);
+      setNewExerciseType("");
+    }
+  };
+  //#endregion
+
+  //#region form data
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
     setFormData({
@@ -52,7 +143,9 @@ const AddNewExerciseMainBar = () => {
     console.log(formData);
     alert("Exercise added successfully!");
   };
+  //#endregion
 
+  //#region motion
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -73,6 +166,7 @@ const AddNewExerciseMainBar = () => {
       },
     },
   };
+  //#endregion
 
   return (
     <div className="user-page-mainbar-content-container">
@@ -84,73 +178,63 @@ const AddNewExerciseMainBar = () => {
       >
         <Label className="text-2xl font-bold mb-8">Add New Exercise</Label>
         <form onSubmit={handleSubmit} className="space-y-8">
-          <motion.div variants={itemVariants}>
-            <Label className="block mb-2 font-medium">Exercise Name</Label>
-            <TextInput
-              icon={Pen}
-              placeholder="Enter exercise name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-            />
-          </motion.div>
+          <NameTextInput
+            labelText="Exercise Name"
+            onChange={handleChange}
+            placeholder="Enter exercise name"
+            name={formData.name}
+            itemVariants={itemVariants}
+          ></NameTextInput>
 
-          <motion.div variants={itemVariants}>
-            <Label className="block mb-2 font-medium">Description</Label>
-            <Textarea
-              placeholder="Enter exercise description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-            />
-          </motion.div>
+          <TextAreaInput
+            labelText="Description"
+            placeholder="Enter exercise description"
+            text={formData.description}
+            name="description"
+            onChange={handleChange}
+            itemVariants={itemVariants}
+          ></TextAreaInput>
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <motion.div variants={itemVariants}>
-              <Label className="block mb-2 font-medium">Number of Reps</Label>
-              <TextInput
-                icon={Anvil}
-                type="number"
-                name="numberOfReps"
-                value={formData.numberOfReps}
-                onChange={handleChange}
-              />
-            </motion.div>
+            <StatTextInput
+              labelText="Number of Reps"
+              onChange={handleChange}
+              name="numberOfReps"
+              value={formData.numberOfReps}
+              itemVariants={itemVariants}
+              type="number"
+              icon={Anvil}
+            ></StatTextInput>
 
-            <motion.div variants={itemVariants}>
-              <Label className="block mb-2 font-medium">Number of Sets</Label>
-              <TextInput
-                icon={ChartCandlestick}
-                type="number"
-                name="numberOfSets"
-                value={formData.numberOfSets}
-                onChange={handleChange}
-              />
-            </motion.div>
+            <StatTextInput
+              labelText="Number of Sets"
+              onChange={handleChange}
+              name="numberOfSets"
+              value={formData.numberOfSets}
+              itemVariants={itemVariants}
+              type="number"
+              icon={ChartCandlestick}
+            ></StatTextInput>
 
-            <motion.div variants={itemVariants}>
-              <Label className="block mb-2 font-medium">
-                Time Between Sets (s)
-              </Label>
-              <TextInput
-                icon={Clock4}
-                type="number"
-                name="timeBetweenSets"
-                value={formData.timeBetweenSets}
-                onChange={handleChange}
-              />
-            </motion.div>
+            <StatTextInput
+              labelText="Time Between Sets (s)"
+              onChange={handleChange}
+              name="timeBetweenSets"
+              value={formData.timeBetweenSets}
+              itemVariants={itemVariants}
+              type="number"
+              icon={Clock4}
+            ></StatTextInput>
 
-            <motion.div variants={itemVariants}>
-              <Label className="block mb-2 font-medium">Calories Burned</Label>
-              <TextInput
-                icon={Flame}
-                type="number"
-                name="caloriesBurned"
-                value={formData.caloriesBurned}
-                onChange={handleChange}
-              />
-            </motion.div>
+            <StatTextInput
+              labelText="Calories Burned"
+              onChange={handleChange}
+              name="caloriesBurned"
+              value={formData.caloriesBurned}
+              itemVariants={itemVariants}
+              type="number"
+              icon={Flame}
+            ></StatTextInput>
 
             <motion.div variants={itemVariants}>
               <Label className="block mb-2 font-medium">Difficulty Level</Label>
@@ -168,11 +252,145 @@ const AddNewExerciseMainBar = () => {
           </div>
 
           <motion.div variants={itemVariants}>
+            <Label className="block mb-2 text-sm font-medium">
+              Exercise Types
+            </Label>
+            <TextInput
+              placeholder="Search or add an exercise type"
+              value={newExerciseType}
+              onChange={(e) => setNewExerciseType(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addNewExerciseType();
+                }
+              }}
+            />
+            <div className="flex flex-wrap gap-2 mt-4">
+              {formData.exerciseTypes.map((type) => (
+                <Badge
+                  key={type.id}
+                  color="info"
+                  className="flex py-2 items-center"
+                >
+                  <span className="flex">
+                    {type.name}{" "}
+                    <XCircle
+                      size={16}
+                      className="ml-1 cursor-pointer"
+                      onClick={() => handleExerciseTypeRemove(type.id)}
+                    />
+                  </span>
+                </Badge>
+              ))}
+            </div>
+            {isFetchingDataPending ? (
+              <div className="flex justify-center">
+                <Spinner color="info"></Spinner>
+              </div>
+            ) : (
+              <div className="mt-4 max-h-48 overflow-y-auto border border-gray-300 rounded-lg p-2">
+                {exerciseCategories
+                  .filter((type) =>
+                    type.name
+                      .toLowerCase()
+                      .includes(newExerciseType.toLowerCase())
+                  )
+                  .map((type) => (
+                    <div
+                      key={type.id}
+                      className="flex justify-between items-center p-2 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => handleExerciseTypeSelect(type)}
+                    >
+                      <Label>{type.name}</Label>
+                      {formData.exerciseTypes.some(
+                        (exerciseType) => exerciseType.id === type.id
+                      ) && <span className="text-gray-400">Selected</span>}
+                    </div>
+                  ))}
+              </div>
+            )}
+          </motion.div>
+
+          <motion.div variants={itemVariants}>
+            <Label className="block mb-2 text-sm font-medium">
+              Muscle Type
+            </Label>
+            <TextInput
+              placeholder="Search or add a muscle type"
+              value={newMuscleType}
+              onChange={(e) => setNewMuscleType(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addNewMuscleType();
+                }
+              }}
+            />
+            <div className="flex flex-wrap gap-2 mt-4">
+              {formData.muscleGroups.map((type) => (
+                <Badge
+                  key={type.id}
+                  color="info"
+                  className="flex py-2 items-center"
+                >
+                  <span className="flex">
+                    {type.name}{" "}
+                    <XCircle
+                      size={16}
+                      className="ml-1 cursor-pointer"
+                      onClick={() => handleMuscleTypeRemove(type.id)}
+                    />
+                  </span>
+                </Badge>
+              ))}
+            </div>
+            {isFetchingDataPending ? (
+              <div className="flex justify-center">
+                <Spinner color="info"></Spinner>
+              </div>
+            ) : (
+              <div className="mt-4 max-h-48 overflow-y-auto border border-gray-300 rounded-lg p-2">
+                {muscleCategories
+                  .filter((type) =>
+                    type.name
+                      .toLowerCase()
+                      .includes(newMuscleType.toLowerCase())
+                  )
+                  .map((type) => (
+                    <div
+                      key={type.id}
+                      className="flex justify-between items-center p-2 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => handleMuscleTypeSelect(type)}
+                    >
+                      <Label>{type.name}</Label>
+                      {formData.muscleGroups.some(
+                        (muscleType) => muscleType.id === type.id
+                      ) && <span className="text-gray-400">Selected</span>}
+                    </div>
+                  ))}
+              </div>
+            )}
+          </motion.div>
+
+          {/* <motion.div variants={itemVariants}>
             <Label className="block mb-2 font-medium">Image</Label>
             <TextInput
               type="file"
               accept="image/*"
               name="image"
+              onChange={handleChange}
+            />
+          </motion.div> */}
+
+          <motion.div variants={itemVariants}>
+            <Label className="block mb-2 text-sm font-medium">Image URL</Label>
+            <TextInput
+              icon={Image}
+              name="imageUrl"
+              required
+              placeholder="Enter image URL"
+              value={formData.imageUrl}
               onChange={handleChange}
             />
           </motion.div>

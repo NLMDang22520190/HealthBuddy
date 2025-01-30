@@ -32,6 +32,10 @@ namespace HealthBuddy.Server.Mapping
                .ForMember(dest => dest.FoodName, opt => opt.MapFrom(src => src.Title)).ReverseMap()
                .ForMember(dest => dest.PostId, opt => opt.MapFrom(src => src.FoodId)) // Map FoodId sang PostId
                .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.FoodName)); // Map FoodName sang Title // Map Title sang FoodName
+            CreateMap<MuscleType, MuscleTypeDTO>().ReverseMap();
+            CreateMap<ExerciseType, ExerciseTypeDTO>().ReverseMap();
+            CreateMap<ExerciseType, AddExerciseTypeRequestDTO>().ReverseMap();
+            CreateMap<MuscleType, AddMuscleTypeRequestDTO>().ReverseMap();
         }
     }
 }
