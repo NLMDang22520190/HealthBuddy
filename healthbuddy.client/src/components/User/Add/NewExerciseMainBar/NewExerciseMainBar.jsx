@@ -13,22 +13,12 @@ import {
   Image,
   XCircle,
 } from "lucide-react";
+import { message } from "antd";
 
 import NameTextInput from "../FormComponent/NameTextInput";
 import TextAreaInput from "../FormComponent/TextAreaInput";
 import StatTextInput from "../FormComponent/StatTextInput";
-
-const exerciseTypes = ["Cardio", "Strength", "Flexibility", "Balance", "HIIT"];
-
-const muscleGroups = [
-  "Chest",
-  "Back",
-  "Shoulders",
-  "Arms",
-  "Legs",
-  "Core",
-  "Full Body",
-];
+import api from "../../../../features/AxiosInstance/AxiosInstance";
 
 const AddNewExerciseMainBar = () => {
   const [formData, setFormData] = useState({
@@ -36,13 +26,27 @@ const AddNewExerciseMainBar = () => {
     description: "",
     imageUrl: "",
     videoUrl: "",
-    difficultyLevel: "intermediate",
+    difficultyLevel: "Beginner",
     numberOfReps: 10,
     numberOfSets: 3,
     timeBetweenSets: 60,
     caloriesBurned: 0,
     exerciseTypes: [],
     muscleGroups: [],
+  });
+
+  const [formDataValidationError, setFormDataValidationError] = useState({
+    name: null,
+    description: null,
+    imageUrl: null,
+    videoUrl: null,
+    difficultyLevel: null,
+    numberOfReps: null,
+    numberOfSets: null,
+    timeBetweenSets: null,
+    caloriesBurned: null,
+    exerciseTypes: null,
+    muscleGroups: null,
   });
 
   const [newExerciseType, setNewExerciseType] = useState("");
@@ -53,6 +57,48 @@ const AddNewExerciseMainBar = () => {
 
   const [isFetchingDataPending, startFetchingDataTransition] = useTransition();
   const [isFormSubmitting, startFormSubmitTransition] = useTransition();
+
+  //#region fetch data
+  const fetchExerciseCategories = async () => {
+    try {
+      const response = await api.get(
+        "/api/ExerciseType/GetAllApprovedExerciseTypes"
+      );
+      const mappedData = response.data.map((data) => ({
+        id: data.exerciseTypeId,
+        name: data.exerciseName,
+        isNew: false,
+      }));
+      setExerciseCategories(mappedData);
+    } catch (error) {
+      message.error("Error fetching food categories: " + error.message);
+    }
+  };
+
+  const fetchMuscleCategories = async () => {
+    try {
+      const response = await api.get(
+        "/api/MuscleType/GetAllApprovedMuscleTypes"
+      );
+      const mappedData = response.data.map((data) => ({
+        id: data.muscleTypeId,
+        name: data.muscleTypeName,
+        isNew: false,
+      }));
+      setMuscleCategories(mappedData);
+    } catch (error) {
+      message.error("Error fetching muscle categories: " + error.message);
+    }
+  };
+
+  useEffect(() => {
+    startFetchingDataTransition(async () => {
+      const exerciseTypeResponse = fetchExerciseCategories();
+      const muscleTypeResponse = fetchMuscleCategories();
+      await Promise.all([exerciseTypeResponse, muscleTypeResponse]);
+    });
+  }, []);
+  //#endregion
 
   //#region muscle types
   const handleMuscleTypeSelect = (type) => {
@@ -130,18 +176,86 @@ const AddNewExerciseMainBar = () => {
   //#endregion
 
   //#region form data
+  const validateField = (name, value) => {
+    switch (name) {
+      case "name":
+        return value.trim().length < 5
+          ? "Name must be at least 5 characters"
+          : null;
+      case "description":
+        return value.trim().length < 10
+          ? "Description must be at least 10 characters"
+          : null;
+      case "numberOfReps":
+        return value <= 0 ? "Number of reps must be greater than 0" : null;
+      case "numberOfSets":
+        return value <= 0 ? "Number of sets must be greater than 0" : null;
+      case "timeBetweenSets":
+        return value < 0
+          ? "Time between sets must be at least 0 seconds"
+          : null;
+      case "caloriesBurned":
+        return value < 0 ? "Calories burned must be at least 0" : null;
+      case "exerciseTypes":
+        return value.length === 0
+          ? "Please select at least one exercise type"
+          : null;
+      case "muscleGroups":
+        return value.length === 0
+          ? "Please select at least one muscle type"
+          : null;
+      default:
+        return null;
+    }
+  };
+
+  const validateForm = () => {
+    const errors = {
+      name: validateField("name", formData.name),
+      description: validateField("description", formData.description),
+      numberOfReps: validateField("numberOfReps", formData.numberOfReps),
+      numberOfSets: validateField("numberOfSets", formData.numberOfSets),
+      timeBetweenSets: validateField(
+        "timeBetweenSets",
+        formData.timeBetweenSets
+      ),
+      caloriesBurned: validateField("caloriesBurned", formData.caloriesBurned),
+      exerciseTypes: validateField("exerciseTypes", formData.exerciseTypes),
+      muscleGroups: validateField("muscleGroups", formData.muscleGroups),
+    };
+
+    setFormDataValidationError(errors);
+
+    return Object.values(errors).every((error) => error === null); // Trả về true nếu không có lỗi
+  };
+
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
+    const newValue = type === "file" ? files[0] : value;
+
+    // Cập nhật formData
     setFormData({
       ...formData,
-      [name]: type === "file" ? files[0] : value,
+      [name]: newValue,
     });
+
+    // Cập nhật lỗi dựa trên giá trị nhập vào
+    setFormDataValidationError((prevErrors) => ({
+      ...prevErrors,
+      [name]: validateField(name, newValue), // Gọi hàm validate từng field
+    }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
-    alert("Exercise added successfully!");
+
+    //#region validation
+    if (validateForm()) {
+      message.success("Form submitted successfully!");
+    } else {
+      message.error("Form contains errors. Please check again!");
+    }
+    //#endregion
   };
   //#endregion
 
@@ -184,6 +298,7 @@ const AddNewExerciseMainBar = () => {
             placeholder="Enter exercise name"
             name={formData.name}
             itemVariants={itemVariants}
+            error={formDataValidationError.name}
           ></NameTextInput>
 
           <TextAreaInput
@@ -193,6 +308,7 @@ const AddNewExerciseMainBar = () => {
             name="description"
             onChange={handleChange}
             itemVariants={itemVariants}
+            error={formDataValidationError.description}
           ></TextAreaInput>
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -204,6 +320,7 @@ const AddNewExerciseMainBar = () => {
               itemVariants={itemVariants}
               type="number"
               icon={Anvil}
+              error={formDataValidationError.numberOfReps}
             ></StatTextInput>
 
             <StatTextInput
@@ -214,6 +331,7 @@ const AddNewExerciseMainBar = () => {
               itemVariants={itemVariants}
               type="number"
               icon={ChartCandlestick}
+              error={formDataValidationError.numberOfSets}
             ></StatTextInput>
 
             <StatTextInput
@@ -224,6 +342,7 @@ const AddNewExerciseMainBar = () => {
               itemVariants={itemVariants}
               type="number"
               icon={Clock4}
+              error={formDataValidationError.timeBetweenSets}
             ></StatTextInput>
 
             <StatTextInput
@@ -234,6 +353,7 @@ const AddNewExerciseMainBar = () => {
               itemVariants={itemVariants}
               type="number"
               icon={Flame}
+              error={formDataValidationError.caloriesBurned}
             ></StatTextInput>
 
             <motion.div variants={itemVariants}>
@@ -266,6 +386,11 @@ const AddNewExerciseMainBar = () => {
                 }
               }}
             />
+            {formDataValidationError.exerciseTypes && (
+              <p className="mt-1 text-red-500 text-xs italic">
+                {formDataValidationError.exerciseTypes}
+              </p>
+            )}
             <div className="flex flex-wrap gap-2 mt-4">
               {formData.exerciseTypes.map((type) => (
                 <Badge
@@ -327,6 +452,11 @@ const AddNewExerciseMainBar = () => {
                 }
               }}
             />
+            {formDataValidationError.muscleGroups && (
+              <p className="mt-1 text-red-500 text-xs italic">
+                {formDataValidationError.muscleGroups}
+              </p>
+            )}
             <div className="flex flex-wrap gap-2 mt-4">
               {formData.muscleGroups.map((type) => (
                 <Badge
@@ -399,6 +529,7 @@ const AddNewExerciseMainBar = () => {
             <Label className="block mb-2 font-medium">Video URL</Label>
             <TextInput
               icon={Video}
+              required
               placeholder="Enter video URL"
               name="videoUrl"
               value={formData.videoUrl}
