@@ -33,12 +33,18 @@ const UserProfileMainBar = () => {
   const [userDetail, setUserDetail] = useState({});
   const [userNotification, setUserNotification] = useState({});
 
-  const [isUserDataPending, startUserDataTransition] = useTransition();
-  const [isUserDetailPending, startUserDetailTransition] = useTransition();
+  // const [isUserDataPending, startUserDataTransition] = useTransition();
+  // const [isUserDetailPending, startUserDetailTransition] = useTransition();
 
-  const fetchUser = async () => {
+  const [isUserDataPending, setIsUserDataPending] = useState(false);
+  const [isUserDetailPending, setIsUserDetailPending] = useState(false);
+
+  const fetchUser = async (signal) => {
+    setIsUserDataPending(true);
     try {
-      const response = await api.get("/api/User/GetUserById/" + userId);
+      const response = await api.get("/api/User/GetUserById/" + userId, {
+        signal,
+      });
       const mappedUser = {
         id: response.data.userId,
         name: response.data.username,
@@ -56,14 +62,23 @@ const UserProfileMainBar = () => {
       };
       setUser(mappedUser);
     } catch (error) {
+      if (error.name === "AbortError") {
+        console.log("Request was cancelled");
+        return;
+      }
       message.error("Error fetching user data: " + error.message);
+    } finally {
+      setIsUserDataPending(false);
     }
   };
 
-  const fetchUserDetail = async () => {
+  const fetchUserDetail = async (signal) => {
     try {
       const response = await api.get(
-        "/api/User/GetUserDetailById/" + currentUser
+        "/api/User/GetUserDetailById/" + currentUser,
+        {
+          signal,
+        }
       );
       const mappedUserDetail = {
         id: response.data.userId,
@@ -74,14 +89,21 @@ const UserProfileMainBar = () => {
       };
       setUserDetail(mappedUserDetail);
     } catch (error) {
+      if (error.name === "AbortError") {
+        console.log("Request was cancelled");
+        return;
+      }
       message.error("Error fetching user detail data: " + error.message);
     }
   };
 
-  const fetchUserNotification = async () => {
+  const fetchUserNotification = async (signal) => {
     try {
       const response = await api.get(
-        "/api/User/GetUserNotificationPreferenceById/" + currentUser
+        "/api/User/GetUserNotificationPreferenceById/" + currentUser,
+        {
+          signal,
+        }
       );
       const mappedUserNotification = {
         id: response.data.userId,
@@ -92,6 +114,10 @@ const UserProfileMainBar = () => {
       };
       setUserNotification(mappedUserNotification);
     } catch (error) {
+      if (error.name === "AbortError") {
+        console.log("Request was cancelled");
+        return;
+      }
       message.error("Error fetching user notification data: " + error.message);
     }
   };
@@ -101,15 +127,29 @@ const UserProfileMainBar = () => {
   }, [currentUser, userId]);
 
   useEffect(() => {
-    startUserDataTransition(async () => {
-      await fetchUser();
-    });
+    const controller = new AbortController();
+    fetchUser(controller.signal);
     if (isCurrentUser) {
-      startUserDetailTransition(async () => {
-        const userDetailResponse = fetchUserDetail();
-        const userNotificationResponse = fetchUserNotification();
-        await Promise.all([userDetailResponse, userNotificationResponse]);
-      });
+      setIsUserDetailPending(true);
+      try {
+        const userDetailResponse = fetchUserDetail(controller.signal);
+        const userNotificationResponse = fetchUserNotification(
+          controller.signal
+        );
+        Promise.all([userDetailResponse, userNotificationResponse]);
+      } catch (error) {
+        message.error(
+          "Error fetching user detail and notification data: " + error.message
+        );
+      } finally {
+        setIsUserDetailPending(false);
+      }
+
+      // startUserDetailTransition(async () => {
+      //   const userDetailResponse = fetchUserDetail();
+      //   const userNotificationResponse = fetchUserNotification();
+      //   await Promise.all([userDetailResponse, userNotificationResponse]);
+      // });
     }
   }, [userId, isCurrentUser]);
 
@@ -159,7 +199,7 @@ const UserProfileMainBar = () => {
 
   return (
     <div className="user-page-mainbar-content-container">
-      {isUserDataPending ? (
+      {isUserDataPending || user ? (
         <div className="flex h-full justify-center items-center">
           <Spinner size="xl" color="info" />
         </div>

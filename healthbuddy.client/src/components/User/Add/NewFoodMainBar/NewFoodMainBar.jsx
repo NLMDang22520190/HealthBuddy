@@ -588,47 +588,6 @@ const NewFoodMainBar = () => {
             )}
           </motion.div>
 
-          {/* <motion.div variants={itemVariants}>
-            <Label className="block mb-2 text-sm font-medium">
-              Ingredients
-            </Label>
-            {formData.ingredients.map((ingredient, index) => (
-              <div key={index} className="flex gap-4 mt-2">
-                <TextInput
-                  icon={Carrot}
-                  placeholder="Ingredient name"
-                  value={ingredient.name}
-                  onChange={(e) =>
-                    handleIngredientChange(index, "name", e.target.value)
-                  }
-                />
-                <TextInput
-                  type="number"
-                  placeholder="Quantity"
-                  value={ingredient.quantity}
-                  onChange={(e) =>
-                    handleIngredientChange(index, "quantity", e.target.value)
-                  }
-                />
-                <TextInput
-                  placeholder="Unit (e.g., grams, cups)"
-                  value={ingredient.unit}
-                  onChange={(e) =>
-                    handleIngredientChange(index, "unit", e.target.value)
-                  }
-                />
-              </div>
-            ))}
-            <Button
-              type="button"
-              color="gray"
-              className="mt-2"
-              onClick={addIngredient}
-            >
-              Add Ingredient
-            </Button>
-          </motion.div>  */}
-
           <motion.div variants={itemVariants}>
             <Label className="block mb-2 text-sm font-medium">
               Ingredients

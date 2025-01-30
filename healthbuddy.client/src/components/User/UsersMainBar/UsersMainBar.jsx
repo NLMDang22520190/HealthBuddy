@@ -11,11 +11,15 @@ import { set } from "date-fns";
 const UsersMainBar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [users, setUsers] = useState([]);
-  const [isPending, startTransition] = useTransition(); // Sử dụng useTransition
+  //const [isPending, startTransition] = useTransition(); // Sử dụng useTransition
+  const [isPending, setIsPending] = useState(false);
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (signal) => {
+    setIsPending(true);
     try {
-      const response = await api.get("/api/User");
+      const response = await api.get("/api/User", {
+        signal,
+      });
       const mappedUsers = response.data.map((user) => {
         return {
           id: user.userId,
@@ -35,14 +39,28 @@ const UsersMainBar = () => {
       });
       setUsers(mappedUsers); // Sử dụng setUsers để cập nhật users
     } catch (error) {
+      if (error.name === "AbortError") {
+        console.log("Request was cancelled");
+        return;
+      }
       message.error("Error fetching users: " + error.message);
+    } finally {
+      setIsPending(false);
     }
   };
 
   useEffect(() => {
-    startTransition(async () => {
-      await fetchUsers();
-    });
+    const controller = new AbortController();
+
+    fetchUsers(controller.signal);
+
+    return () => {
+      controller.abort();
+    };
+
+    // startTransition(async () => {
+    //   await fetchUsers();
+    // });
   }, []);
 
   const filteredUsers = users.filter(
@@ -68,7 +86,7 @@ const UsersMainBar = () => {
             placeholder="Search user..."
           ></TextInput>
         </div>
-        {isPending ? ( // Hiển thị spinner khi đang tải dữ liệu
+        {isPending || users.length === 0 ? ( // Hiển thị spinner khi đang tải dữ liệu
           <div className="flex justify-center items-center">
             <Spinner size="xl" color="info" />
           </div>

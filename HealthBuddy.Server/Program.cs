@@ -82,6 +82,9 @@ builder.Services.AddScoped<IUserNotificationPreferenceRepository, SQLUserNotific
 builder.Services.AddScoped<IFoodTypeRepository, SQLFoodTypeRepository>();
 builder.Services.AddScoped<IFoodRepository, SQLFoodRepository>();
 builder.Services.AddScoped<IIngredientRepository, SQLIngredientRepository>();
+builder.Services.AddScoped<IMuscleTypeRepository, SQLMuscleTypeRepository>();
+builder.Services.AddScoped<IExerciseTypeRepository, SQLExerciseTypeRepository>();
+builder.Services.AddScoped<IExerciseRepository, SQLExerciseRepository>();
 
 
 builder.Services.AddScoped(typeof(IHealthBuddyRepository<>), typeof(HealthBuddyRepository<>));
