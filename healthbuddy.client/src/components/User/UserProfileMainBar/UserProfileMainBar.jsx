@@ -199,7 +199,7 @@ const UserProfileMainBar = () => {
 
   return (
     <div className="user-page-mainbar-content-container">
-      {isUserDataPending || user ? (
+      {isUserDataPending ? (
         <div className="flex h-full justify-center items-center">
           <Spinner size="xl" color="info" />
         </div>

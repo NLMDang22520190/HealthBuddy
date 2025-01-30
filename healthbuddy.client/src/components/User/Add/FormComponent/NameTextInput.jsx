@@ -9,6 +9,7 @@ const NameTextInput = ({
   name,
   onChange,
   itemVariants,
+  error,
 }) => {
   return (
     <motion.div variants={itemVariants}>
@@ -21,6 +22,7 @@ const NameTextInput = ({
         onChange={onChange}
         required
       />
+      {error && <p className="mt-1 text-red-500 text-xs italic">{error}</p>}
     </motion.div>
   );
 };

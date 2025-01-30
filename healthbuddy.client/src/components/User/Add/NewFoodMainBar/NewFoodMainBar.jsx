@@ -36,13 +36,28 @@ const NewFoodMainBar = () => {
     imageUrl: "",
     videoUrl: "",
     calories: 0,
-    difficultyLevel: "medium",
+    difficultyLevel: "Easy",
     healthBenefits: "",
     cookingTime: 30,
     portion: 1,
     ingredients: [{ id: "", name: "", quantity: "", unit: "", isNew: false }],
     foodTypes: [],
   });
+
+  const [formDataValidationError, setFormDataValidationError] = useState({
+    name: null,
+    description: null,
+    imageUrl: null,
+    videoUrl: null,
+    calories: null,
+    difficultyLevel: null,
+    healthBenefits: null,
+    cookingTime: null,
+    portion: null,
+    ingredients: [],
+    foodTypes: null,
+  });
+
   const [newFoodType, setNewFoodType] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -62,16 +77,16 @@ const NewFoodMainBar = () => {
         ingredientName: ingre.name,
         measurementUnit: ingre.unit,
       });
-      const newIngredient = {
+
+      return {
         id: response.data.ingredientId,
         name: response.data.ingredientName,
         unit: response.data.measurementUnit,
-        isNew: true,
+        isNew: false, // Đánh dấu không còn là mới
       };
-      return newIngredient;
     } catch (error) {
       message.error("Error adding new ingredient: " + error.message);
-      throw error; // Đảm bảo lỗi được ném ra để promise có thể xử lý
+      throw error;
     }
   };
 
@@ -80,21 +95,22 @@ const NewFoodMainBar = () => {
       const response = await api.post("/api/FoodType/AddFoodType", {
         foodTypeName: type.name,
       });
-      const newType = {
+
+      return {
         id: response.data.foodTypeId,
         name: response.data.foodTypeName,
-        isNew: false,
+        isNew: false, // Đánh dấu không còn là mới
       };
-      return newType;
     } catch (error) {
       message.error("Error adding new food type: " + error.message);
-      throw error; // Đảm bảo lỗi được ném ra để promise có thể xử lý
+      throw error;
     }
   };
 
   const addNewFoodAPI = async (formData) => {
     try {
       // Chuẩn bị dữ liệu body từ formData
+      console.log(formData);
 
       const requestBody = {
         foodName: formData.name, // Sử dụng `name` thay vì `foodName`
@@ -119,6 +135,9 @@ const NewFoodMainBar = () => {
 
       // Xử lý kết quả trả về
       message.success("Food added successfully: " + response.data.foodName);
+      setTimeout(() => {
+        navigate("/");
+      }, 250);
 
       return response.data; // Trả về dữ liệu của món ăn mới
     } catch (error) {
@@ -273,7 +292,69 @@ const NewFoodMainBar = () => {
   //#region form data
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+
+    // Cập nhật lỗi của field đó
+    setFormDataValidationError((prevErrors) => ({
+      ...prevErrors,
+      [name]: validateField(name, value),
+    }));
+  };
+
+  const validateField = (name, value) => {
+    switch (name) {
+      case "name":
+        return value.trim().length < 5
+          ? "Name must be at least 5 characters"
+          : null;
+      case "description":
+        return value.trim().length < 10
+          ? "Description must be at least 10 characters"
+          : null;
+      case "healthBenefits":
+        return value.trim().length < 10
+          ? "Health benefits must be at least 10 characters"
+          : null;
+      case "calories":
+        return value <= 0 ? "Calories must be greater than 0!" : null;
+      case "cookingTime":
+        return value <= 0 ? "Cooking time must be greater than 0!" : null;
+      case "portion":
+        return value <= 0 ? "Portion size must be greater than 0!" : null;
+      default:
+        return null;
+    }
+  };
+
+  const validateForm = () => {
+    const errors = {
+      name: validateField("name", formData.name),
+      calories: validateField("calories", formData.calories),
+      cookingTime: validateField("cookingTime", formData.cookingTime),
+      portion: validateField("portion", formData.portion),
+      foodTypes:
+        formData.foodTypes.length === 0
+          ? "Please select at least one food type!"
+          : null,
+      ingredients:
+        formData.ingredients.length === 0
+          ? "Please add at least one ingredient!"
+          : formData.ingredients.map((ingredient) =>
+              !ingredient.name.trim() || ingredient.quantity <= 0
+                ? "Invalid ingredient"
+                : null
+            ),
+    };
+
+    setFormDataValidationError(errors);
+    return Object.values(errors).every(
+      (error) =>
+        error === null ||
+        (Array.isArray(error) && error.every((e) => e === null))
+    );
   };
 
   const handleFileChange = (e) => {
@@ -284,44 +365,13 @@ const NewFoodMainBar = () => {
     e.preventDefault();
 
     //#region Validation
-    if (formData.calories <= 0) {
-      message.error("Calories must be greater than 0!");
+    if (!validateForm()) {
+      message.error("Form contains errors. Please check again!");
       return;
-    }
-
-    if (formData.cookingTime <= 0) {
-      message.error("Cooking time must be greater than 0!");
-      return;
-    }
-
-    if (formData.portion <= 0) {
-      message.error("Portion size must be greater than 0!");
-      return;
-    }
-
-    if (formData.foodTypes.length === 0) {
-      message.error("Please select at least one food type!");
-      return; // Dừng submit nếu có lỗi
-    }
-
-    if (formData.ingredients.length === 0) {
-      message.error("Please add at least one ingredient!");
-      return; // Dừng submit nếu có lỗi
-    }
-
-    const invalidIngredients = formData.ingredients.some(
-      (ingredient) =>
-        !ingredient.name.trim() || // Kiểm tra tên trống
-        ingredient.quantity <= 0 // Kiểm tra số lượng trống
-    );
-
-    if (invalidIngredients) {
-      message.error(
-        "All ingredients must have a name and an appropriate quantity!"
-      );
-      return; // Dừng submit nếu có lỗi
     }
     //#endregion
+
+    console.log(formData);
 
     startFormSubmitTransition(async () => {
       //#region add new type and ingredient
@@ -333,25 +383,34 @@ const NewFoodMainBar = () => {
         (ingre) => ingre.isNew === true
       );
 
-      // Tạo mảng các promise cho từng loại nếu cần
       const promises = [];
 
+      // Tạo mảng các promise cho từng loại nếu cần
       if (newFoodTypes.length > 0) {
         const foodTypePromise = Promise.all(
           newFoodTypes.map((type) => addNewFoodTypeAPI(type))
         ).then((addedFoodTypes) => {
           setFormData((prevFormData) => {
-            const updatedFoodTypes = [
-              ...prevFormData.foodTypes.filter((type) => !type.isNew),
-              ...addedFoodTypes, // Thêm các food types mới đã có id
-            ];
+            // Tạo map để lưu trữ tương ứng giữa tên và ID mới
+            const nameToNewType = {};
+            addedFoodTypes.forEach((newType) => {
+              nameToNewType[newType.name] = newType;
+            });
+
+            // Cập nhật foodTypes với ID mới
+            const updatedFoodTypes = prevFormData.foodTypes.map((type) => {
+              if (type.isNew && nameToNewType[type.name]) {
+                // Nếu là type mới và tìm thấy trong response, sử dụng ID mới
+                return nameToNewType[type.name];
+              }
+              return type;
+            });
 
             return {
               ...prevFormData,
-              foodTypes: updatedFoodTypes, // Cập nhật lại foodTypes trong formData
+              foodTypes: updatedFoodTypes,
             };
           });
-          message.success("All new food types have been added successfully.");
         });
 
         promises.push(foodTypePromise);
@@ -362,60 +421,55 @@ const NewFoodMainBar = () => {
           newIngredients.map((ingre) => addNewIngredientAPI(ingre))
         ).then((addedIngredients) => {
           setFormData((prevFormData) => {
-            // Cập nhật lại ingredients trong formData
+            // Tạo map để lưu trữ tương ứng giữa tên và ingredient mới
+            const nameToNewIngredient = {};
+            addedIngredients.forEach((newIngre) => {
+              nameToNewIngredient[newIngre.name] = newIngre;
+            });
+
+            // Cập nhật ingredients với ID mới
             const updatedIngredients = prevFormData.ingredients.map((ingre) => {
-              // Tìm nguyên liệu mới trong addedIngredients
-              const newIngre = addedIngredients.find(
-                (newIngre) =>
-                  newIngre.name === ingre.name && ingre.isNew === true
-              );
-              if (newIngre) {
-                // Thay thế ingredient cũ bằng ingredient mới
-                const newlyAddedIngredient = {
-                  ...newIngre, // Cập nhật với id mới và các thông tin khác
-                  quantity: isNaN(ingre.quantity) ? 0 : ingre.quantity, // Giữ lại quantity cũ, tránh NaN
+              if (ingre.isNew && nameToNewIngredient[ingre.name]) {
+                // Nếu là ingredient mới và tìm thấy trong response, sử dụng ID mới
+                return {
+                  ...nameToNewIngredient[ingre.name],
+                  quantity: ingre.quantity || 0,
+                  isNew: false,
                 };
-
-                return newlyAddedIngredient;
               }
-
-              return ingre; // Nếu không phải là ingredient mới, giữ nguyên
+              return ingre;
             });
 
             return {
               ...prevFormData,
-              ingredients: updatedIngredients, // Cập nhật lại ingredients trong formData
+              ingredients: updatedIngredients,
             };
           });
-          message.success("All new ingredients have been added successfully.");
         });
 
         promises.push(ingredientPromise);
       }
 
-      // Chạy tất cả các promise cùng lúc
+      // Thực thi tất cả promises
       if (promises.length > 0) {
-        await Promise.all(promises)
-          .then(() => {
-            message.success(
-              "All new food types and ingredients have been added successfully."
-            );
-          })
-          .catch((error) => {
-            console.error("Error adding food types or ingredients:", error);
-            message.error(
-              "Failed to add some food types or ingredients: " + error.message
-            );
-          });
+        try {
+          await Promise.all(promises);
+          console.log("Updated formData:", formData); // Để debug
+          message.success(
+            "All new food types and ingredients have been added successfully."
+          );
+        } catch (error) {
+          console.error("Error adding food types or ingredients:", error);
+          message.error(
+            "Failed to add some food types or ingredients: " + error.message
+          );
+        }
       }
 
       //#endregion
 
       // Gọi API để thêm món ăn mới
       await addNewFoodAPI(formData);
-      setTimeout(() => {
-        navigate("/");
-      }, 250);
     });
   };
   //#endregion
@@ -461,6 +515,7 @@ const NewFoodMainBar = () => {
             placeholder="Enter food name"
             name={formData.name}
             itemVariants={itemVariants}
+            error={formDataValidationError.name}
           ></NameTextInput>
 
           <TextAreaInput
@@ -470,6 +525,7 @@ const NewFoodMainBar = () => {
             name="description"
             onChange={handleChange}
             itemVariants={itemVariants}
+            error={formDataValidationError.description}
           ></TextAreaInput>
 
           <TextAreaInput
@@ -479,6 +535,7 @@ const NewFoodMainBar = () => {
             name="healthBenefits"
             onChange={handleChange}
             itemVariants={itemVariants}
+            error={formDataValidationError.healthBenefits}
           ></TextAreaInput>
 
           <div className="grid grid-cols-2 gap-4">
@@ -490,6 +547,7 @@ const NewFoodMainBar = () => {
               itemVariants={itemVariants}
               type="number"
               icon={Flame}
+              error={formDataValidationError.calories}
             ></StatTextInput>
 
             <motion.div variants={itemVariants}>
@@ -518,6 +576,7 @@ const NewFoodMainBar = () => {
               itemVariants={itemVariants}
               type="number"
               icon={Clock4}
+              error={formDataValidationError.cookingTime}
             ></StatTextInput>
 
             <StatTextInput
@@ -528,6 +587,7 @@ const NewFoodMainBar = () => {
               itemVariants={itemVariants}
               type="number"
               icon={UsersRound}
+              error={formDataValidationError.portion}
             ></StatTextInput>
           </div>
 
@@ -544,6 +604,11 @@ const NewFoodMainBar = () => {
                 }
               }}
             />
+            {formDataValidationError.foodTypes && (
+              <p className="text-red-500 text-xs italic">
+                {formDataValidationError.foodTypes}
+              </p>
+            )}
             <div className="flex flex-wrap gap-2 mt-4">
               {formData.foodTypes.map((type) => (
                 <Badge
@@ -592,6 +657,11 @@ const NewFoodMainBar = () => {
             <Label className="block mb-2 text-sm font-medium">
               Ingredients
             </Label>
+            {formDataValidationError.ingredients && (
+              <p className="text-red-500 text-xs italic">
+                {formDataValidationError.ingredients}
+              </p>
+            )}
             {isFetchingDataPending ? (
               <div className="flex justify-center">
                 <Spinner color="info"></Spinner>

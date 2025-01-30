@@ -97,14 +97,13 @@ namespace HealthBuddy.Server.Controllers
         {
             try
             {
-                var updatedFood = await _foodRepository.UpdateAsync(f => f.FoodId == foodId, existingRecord =>
-                {
-                    existingRecord.IsApproved = true;
-                });
+
+                var updatedFood = await _foodRepository.ApproveFood(foodId);
                 if (updatedFood == null)
                 {
-                    return StatusCode(StatusCodes.Status500InternalServerError, "Error approving food in the database");
+                    return NotFound("Food not found");
                 }
+
                 return Ok(_mapper.Map<AddFoodRequestDTO>(updatedFood));
             }
             catch (Exception e)

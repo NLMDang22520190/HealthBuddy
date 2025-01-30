@@ -6,6 +6,7 @@ namespace HealthBuddy.Server.Repositories
     {
         public Task<Food> GetFoodById(int foodId);
 
+        public Task<Food> ApproveFood(int foodId);
         public Task<List<Food>> GetApprovedFoods();
     }
 }
