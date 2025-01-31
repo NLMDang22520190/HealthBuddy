@@ -84,7 +84,7 @@ namespace HealthBuddy.Server.Controllers
                 {
                     return StatusCode(StatusCodes.Status500InternalServerError, "Error adding food to the database");
                 }
-                return Ok(_mapper.Map<AddFoodRequestDTO>(createdFoodDomain));
+                return Ok(_mapper.Map<FoodDTO>(createdFoodDomain));
             }
             catch (Exception e)
             {
@@ -104,7 +104,7 @@ namespace HealthBuddy.Server.Controllers
                     return NotFound("Food not found");
                 }
 
-                return Ok(_mapper.Map<AddFoodRequestDTO>(updatedFood));
+                return Ok(_mapper.Map<FoodDTO>(updatedFood));
             }
             catch (Exception e)
             {

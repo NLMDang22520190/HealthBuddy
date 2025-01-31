@@ -1,12 +1,59 @@
 using HealthBuddy.Server.Models;
 using HealthBuddy.Server.Models.Domain;
+using Microsoft.EntityFrameworkCore;
 
 namespace HealthBuddy.Server.Repositories.Implement
 {
     public class SQLExerciseRepository : HealthBuddyRepository<Exercise>, IExerciseRepository
     {
-        public SQLExerciseRepository(HealthBuddyDbContext dbContext) : base(dbContext)
+        private readonly DbContextOptions<HealthBuddyDbContext> _dbContextOptions;
+        public SQLExerciseRepository(HealthBuddyDbContext dbContext, DbContextOptions<HealthBuddyDbContext> dbContextOptions) : base(dbContext)
         {
+            _dbContextOptions = dbContextOptions;
+        }
+
+        public async Task<Exercise> ApproveExercise(int exerciseId)
+        {
+            var exercise = await dbContext.Exercises
+                           .Include(e => e.ExerciseTypes)
+                           .Include(e => e.MuscleTypes)
+                           .FirstOrDefaultAsync(e => e.ExerciseId == exerciseId);
+
+            if (exercise == null)
+            {
+                return null; // Trả về null nếu không tìm thấy
+            }
+
+            exercise.IsApproved = true;
+
+            foreach (var exerciseType in exercise.ExerciseTypes)
+            {
+                exerciseType.IsApproved = true;
+            }
+
+            foreach (var muscleType in exercise.MuscleTypes)
+            {
+                muscleType.IsApproved = true;
+            }
+
+            await dbContext.SaveChangesAsync();
+            return exercise;
+        }
+
+        public async Task<List<Exercise>> GetApprovedExercises()
+        {
+            using (var dbContext = new HealthBuddyDbContext(_dbContextOptions))
+            {
+                return await dbContext.Exercises.Where(e => e.IsApproved == true && e.IsHidden == false).Include(e => e.Uploader).ToListAsync();
+            }
+        }
+
+        public async Task<Exercise> GetExerciseById(int exerciseId)
+        {
+            return await dbContext.Exercises
+            .Include(e => e.ExerciseTypes)
+            .Include(e => e.MuscleTypes)
+            .FirstOrDefaultAsync(e => e.ExerciseId == exerciseId);
         }
     }
 }

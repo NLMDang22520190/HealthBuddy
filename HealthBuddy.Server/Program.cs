@@ -17,7 +17,10 @@ builder.Services.Configure<Auth0Settings>(builder.Configuration.GetSection("Auth
 // Đọc ConnectionString từ appsettings.json
 //Console.WriteLine("connection string: " + builder.Configuration.GetConnectionString("HealthBuddy"));
 builder.Services.AddDbContext<HealthBuddyDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("HealthBuddy")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("HealthBuddy"), sqlOptions =>
+    {
+        sqlOptions.EnableRetryOnFailure();
+    }));
 
 var auth0Settings = builder.Configuration.GetSection("Auth0").Get<Auth0Settings>();
 

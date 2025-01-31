@@ -361,115 +361,109 @@ const NewFoodMainBar = () => {
     setFormData({ ...formData, image: e.target.files[0] });
   };
 
+  const handleAddFood = async () => {
+    const promises = [];
+
+    const newFoodTypes = formData.foodTypes.filter(
+      (type) => type.isNew === true
+    );
+    const newIngredients = formData.ingredients.filter(
+      (ingre) => ingre.isNew === true
+    );
+
+    let updatedFormData = { ...formData }; // Tạo một bản sao của formData
+
+    // Tạo promise cho food types
+    if (newFoodTypes.length > 0) {
+      const foodTypePromise = Promise.all(
+        newFoodTypes.map((type) => addNewFoodTypeAPI(type))
+      ).then((addedFoodTypes) => {
+        const nameToNewType = {};
+        addedFoodTypes.forEach((newType) => {
+          nameToNewType[newType.name] = newType;
+        });
+
+        const updatedFoodTypes = updatedFormData.foodTypes.map((type) => {
+          if (type.isNew && nameToNewType[type.name]) {
+            return nameToNewType[type.name];
+          }
+          return type;
+        });
+
+        return updatedFoodTypes; // Trả về mảng foodTypes đã cập nhật
+      });
+      promises.push({ type: "foodTypes", promise: foodTypePromise });
+    }
+
+    // Tạo promise cho ingredients
+    if (newIngredients.length > 0) {
+      const ingredientPromise = Promise.all(
+        newIngredients.map((ingre) => addNewIngredientAPI(ingre))
+      ).then((addedIngredients) => {
+        const nameToNewIngredient = {};
+        addedIngredients.forEach((newIngre) => {
+          nameToNewIngredient[newIngre.name] = newIngre;
+        });
+
+        const updatedIngredients = updatedFormData.ingredients.map((ingre) => {
+          if (ingre.isNew && nameToNewIngredient[ingre.name]) {
+            return {
+              ...nameToNewIngredient[ingre.name],
+              quantity: ingre.quantity || 0,
+              isNew: false,
+            };
+          }
+          return ingre;
+        });
+
+        return updatedIngredients; // Trả về mảng ingredients đã cập nhật
+      });
+      promises.push({ type: "ingredients", promise: ingredientPromise });
+    }
+
+    try {
+      // Chạy tất cả promises song song và đợi kết quả
+      const results = await Promise.all(promises.map((p) => p.promise));
+
+      // Cập nhật formData với kết quả từ tất cả promises
+      const finalFormData = { ...formData };
+      promises.forEach((p, index) => {
+        if (p.type === "foodTypes") {
+          finalFormData.foodTypes = results[index];
+        } else if (p.type === "ingredients") {
+          finalFormData.ingredients = results[index];
+        }
+      });
+
+      // Cập nhật state với dữ liệu cuối cùng
+      setFormData(finalFormData);
+
+      // Log để kiểm tra
+      console.log("Final updated form data:", finalFormData);
+
+      // Gọi API để thêm món ăn mới
+      await addNewFoodAPI(finalFormData);
+    } catch (error) {
+      console.error("Error in process:", error);
+      message.error("Failed to process: " + error.message);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    //#region Validation
     if (!validateForm()) {
       message.error("Form contains errors. Please check again!");
       return;
     }
-    //#endregion
-
-    console.log(formData);
 
     startFormSubmitTransition(async () => {
       //#region add new type and ingredient
 
-      const newFoodTypes = formData.foodTypes.filter(
-        (type) => type.isNew === true
-      );
-      const newIngredients = formData.ingredients.filter(
-        (ingre) => ingre.isNew === true
-      );
-
-      const promises = [];
-
-      // Tạo mảng các promise cho từng loại nếu cần
-      if (newFoodTypes.length > 0) {
-        const foodTypePromise = Promise.all(
-          newFoodTypes.map((type) => addNewFoodTypeAPI(type))
-        ).then((addedFoodTypes) => {
-          setFormData((prevFormData) => {
-            // Tạo map để lưu trữ tương ứng giữa tên và ID mới
-            const nameToNewType = {};
-            addedFoodTypes.forEach((newType) => {
-              nameToNewType[newType.name] = newType;
-            });
-
-            // Cập nhật foodTypes với ID mới
-            const updatedFoodTypes = prevFormData.foodTypes.map((type) => {
-              if (type.isNew && nameToNewType[type.name]) {
-                // Nếu là type mới và tìm thấy trong response, sử dụng ID mới
-                return nameToNewType[type.name];
-              }
-              return type;
-            });
-
-            return {
-              ...prevFormData,
-              foodTypes: updatedFoodTypes,
-            };
-          });
-        });
-
-        promises.push(foodTypePromise);
-      }
-
-      if (newIngredients.length > 0) {
-        const ingredientPromise = Promise.all(
-          newIngredients.map((ingre) => addNewIngredientAPI(ingre))
-        ).then((addedIngredients) => {
-          setFormData((prevFormData) => {
-            // Tạo map để lưu trữ tương ứng giữa tên và ingredient mới
-            const nameToNewIngredient = {};
-            addedIngredients.forEach((newIngre) => {
-              nameToNewIngredient[newIngre.name] = newIngre;
-            });
-
-            // Cập nhật ingredients với ID mới
-            const updatedIngredients = prevFormData.ingredients.map((ingre) => {
-              if (ingre.isNew && nameToNewIngredient[ingre.name]) {
-                // Nếu là ingredient mới và tìm thấy trong response, sử dụng ID mới
-                return {
-                  ...nameToNewIngredient[ingre.name],
-                  quantity: ingre.quantity || 0,
-                  isNew: false,
-                };
-              }
-              return ingre;
-            });
-
-            return {
-              ...prevFormData,
-              ingredients: updatedIngredients,
-            };
-          });
-        });
-
-        promises.push(ingredientPromise);
-      }
-
-      // Thực thi tất cả promises
-      if (promises.length > 0) {
-        try {
-          await Promise.all(promises);
-          console.log("Updated formData:", formData); // Để debug
-          message.success(
-            "All new food types and ingredients have been added successfully."
-          );
-        } catch (error) {
-          console.error("Error adding food types or ingredients:", error);
-          message.error(
-            "Failed to add some food types or ingredients: " + error.message
-          );
-        }
-      }
-
       //#endregion
-
+      await handleAddFood();
       // Gọi API để thêm món ăn mới
-      await addNewFoodAPI(formData);
+      //await addNewFoodAPI(formData);
     });
   };
   //#endregion

@@ -11,12 +11,14 @@ namespace HealthBuddy.Server.Controllers
     public class PostController : ControllerBase
     {
         private readonly IFoodRepository _foodRepository;
+        private readonly IExerciseRepository _exerciseRepository;
         private readonly IMapper _mapper;
 
-        public PostController(IFoodRepository foodRepository, IMapper mapper)
+        public PostController(IFoodRepository foodRepository, IMapper mapper, IExerciseRepository exerciseRepository)
         {
             _foodRepository = foodRepository;
             _mapper = mapper;
+            _exerciseRepository = exerciseRepository;
         }
 
         [HttpGet("GetAllHomeApprovedPosts")]
@@ -24,13 +26,36 @@ namespace HealthBuddy.Server.Controllers
         {
             try
             {
-                var foods = await _foodRepository.GetApprovedFoods();
-                var postDTO = _mapper.Map<List<PostDTO>>(foods);
-                foreach (var post in postDTO)
+                var foodTask = Task.Run(() => _foodRepository.GetApprovedFoods());
+                var exerciseTask = Task.Run(() => _exerciseRepository.GetApprovedExercises());
+
+                await Task.WhenAll(foodTask, exerciseTask);
+
+                // Lấy kết quả từ các task
+                var foods = await foodTask;
+                var exercises = await exerciseTask;
+
+                // Map từ Food và Exercise sang PostDTO
+                var foodPosts = _mapper.Map<List<PostDTO>>(foods);
+                var exercisePosts = _mapper.Map<List<PostDTO>>(exercises);
+
+                // Gán loại bài post (food hoặc exercise)
+                foreach (var post in foodPosts)
                 {
                     post.PostType = "food";
                 }
-                return Ok(postDTO);
+
+                foreach (var post in exercisePosts)
+                {
+                    post.PostType = "exercise";
+                }
+
+                // Gộp cả hai danh sách lại
+                var allPosts = new List<PostDTO>();
+                allPosts.AddRange(foodPosts);
+                allPosts.AddRange(exercisePosts);
+
+                return Ok(allPosts.OrderByDescending(p => p.CreatedDate));
             }
             catch (Exception e)
             {

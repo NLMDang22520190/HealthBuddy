@@ -14,6 +14,8 @@ import {
   XCircle,
 } from "lucide-react";
 import { message } from "antd";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 import NameTextInput from "../FormComponent/NameTextInput";
 import TextAreaInput from "../FormComponent/TextAreaInput";
@@ -49,6 +51,9 @@ const AddNewExerciseMainBar = () => {
     muscleGroups: null,
   });
 
+  const userId = useSelector((state) => state.auth.userId);
+  const navigate = useNavigate();
+
   const [newExerciseType, setNewExerciseType] = useState("");
   const [newMuscleType, setNewMuscleType] = useState("");
 
@@ -57,6 +62,81 @@ const AddNewExerciseMainBar = () => {
 
   const [isFetchingDataPending, startFetchingDataTransition] = useTransition();
   const [isFormSubmitting, startFormSubmitTransition] = useTransition();
+
+  //#region add data
+  const addNewExerciseTypeAPI = async (type) => {
+    try {
+      const response = await api.post("/api/ExerciseType/AddExerciseType", {
+        exerciseName: type.name,
+      });
+
+      return {
+        id: response.data.exerciseTypeId,
+        name: response.data.exerciseName,
+        isNew: false, // Đánh dấu không còn là mới
+      };
+    } catch (error) {
+      message.error("Error adding new exercise type: " + error.message);
+      throw error;
+    }
+  };
+
+  const addNewMuscleTypeAPI = async (type) => {
+    try {
+      const response = await api.post("/api/ExerciseType/AddExerciseType", {
+        muscleTypeName: type.name,
+      });
+
+      return {
+        id: response.data.muscleTypeId,
+        name: response.data.muscleTypeName,
+        isNew: false, // Đánh dấu không còn là mới
+      };
+    } catch (error) {
+      message.error("Error adding new muscle type: " + error.message);
+      throw error;
+    }
+  };
+
+  const addNewExerciseAPI = async (formData) => {
+    try {
+      // Chuẩn bị dữ liệu body từ formData
+      const requestBody = {
+        exerciseName: formData.name, // Sử dụng `name` thay vì `foodName`
+        description: formData.description,
+        imgUrl: formData.imageUrl, // Sử dụng `imageUrl` thay vì `imgUrl`
+        videoUrl: formData.videoUrl,
+        numberOfReps: formData.numberOfReps,
+        difficultyLevel: formData.difficultyLevel,
+        numberOfSets: formData.numberOfSets,
+        timeBetweenSet: formData.timeBetweenSets,
+        caloriesBurned: formData.caloriesBurned,
+        uploaderId: userId, // Thay bằng ID người dùng thực tế nếu cần
+        exerciseTypeIds: formData.exerciseTypes.map((type) => type.id), // Lấy danh sách ID của `foodTypes`
+        muscleTypeIds: formData.muscleGroups.map((type) => type.id), // Lấy danh sách ID của `foodTypes`
+      };
+
+      // Gọi API để thêm food mới
+      const response = await api.post(
+        "/api/Exercise/AddNewExercise",
+        requestBody
+      );
+
+      // Xử lý kết quả trả về
+      message.success(
+        "Exercise added successfully: " + response.data.exerciseName
+      );
+      setTimeout(() => {
+        navigate("/");
+      }, 250);
+
+      return response.data; // Trả về dữ liệu của món ăn mới
+    } catch (error) {
+      console.error("Error adding new exercise:", error);
+      message.error("Failed to add new exercise: " + error.message);
+    }
+  };
+  //#endregion
 
   //#region fetch data
   const fetchExerciseCategories = async () => {
@@ -71,7 +151,7 @@ const AddNewExerciseMainBar = () => {
       }));
       setExerciseCategories(mappedData);
     } catch (error) {
-      message.error("Error fetching food categories: " + error.message);
+      message.error("Error fetching exercise categories: " + error.message);
     }
   };
 
@@ -246,16 +326,104 @@ const AddNewExerciseMainBar = () => {
     }));
   };
 
+  const handleAddExercise = async () => {
+    const promises = [];
+
+    const newExerciseTypes = formData.exerciseTypes.filter(
+      (type) => type.isNew === true
+    );
+    const newMuscleTypes = formData.muscleGroups.filter(
+      (type) => type.isNew === true
+    );
+
+    let updatedFormData = { ...formData }; // Tạo một bản sao của formData
+
+    // Tạo promise cho types
+    if (newExerciseTypes.length > 0) {
+      const exerciseTypePromise = Promise.all(
+        newExerciseTypes.map((type) => addNewExerciseTypeAPI(type))
+      ).then((addedExerciseTypes) => {
+        const nameToNewType = {};
+        addedExerciseTypes.forEach((newType) => {
+          nameToNewType[newType.name] = newType;
+        });
+
+        const updatedExerciseTypes = updatedFormData.exerciseTypes.map(
+          (type) => {
+            if (type.isNew && nameToNewType[type.name]) {
+              return nameToNewType[type.name];
+            }
+            return type;
+          }
+        );
+        return updatedExerciseTypes; // Trả về mảng foodTypes đã cập nhật
+      });
+      promises.push({ type: "exerciseTypes", promise: exerciseTypePromise });
+    }
+
+    // Tạo promise cho types
+    if (newMuscleTypes.length > 0) {
+      const muscleTypePromise = Promise.all(
+        newMuscleTypes.map((type) => addNewMuscleTypeAPI(type))
+      ).then((addedMuscleTypes) => {
+        const nameToNewType = {};
+        addedMuscleTypes.forEach((newType) => {
+          nameToNewType[newType.name] = newType;
+        });
+
+        const updatedMuscleTypes = updatedFormData.muscleGroups.map((type) => {
+          if (type.isNew && nameToNewType[type.name]) {
+            return nameToNewType[type.name];
+          }
+          return type;
+        });
+        console.log(updatedMuscleTypes);
+
+        return updatedMuscleTypes; // Trả về mảng foodTypes đã cập nhật
+      });
+      promises.push({ type: "muscleTypes", promise: muscleTypePromise });
+    }
+
+    try {
+      // Chạy tất cả promises song song và đợi kết quả
+      const results = await Promise.all(promises.map((p) => p.promise));
+
+      // Cập nhật formData với kết quả từ tất cả promises
+      const finalFormData = { ...formData };
+      promises.forEach((p, index) => {
+        if (p.type === "exerciseTypes") {
+          finalFormData.exerciseTypes = results[index];
+        } else if (p.type === "muscleTypes") {
+          finalFormData.muscleGroups = results[index];
+        }
+      });
+
+      // Cập nhật state với dữ liệu cuối cùng
+      setFormData(finalFormData);
+
+      // Log để kiểm tra
+      console.log("Final updated form data:", finalFormData);
+
+      // Gọi API để thêm món ăn mới
+      await addNewExerciseAPI(finalFormData);
+    } catch (error) {
+      console.error("Error in process:", error);
+      message.error("Failed to process: " + error.message);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
     //#region validation
-    if (validateForm()) {
-      message.success("Form submitted successfully!");
-    } else {
+    if (!validateForm()) {
       message.error("Form contains errors. Please check again!");
+      return;
     }
     //#endregion
+    startFormSubmitTransition(async () => {
+      await handleAddExercise();
+    });
   };
   //#endregion
 
@@ -539,11 +707,23 @@ const AddNewExerciseMainBar = () => {
 
           <motion.button
             whileHover={{ scale: 1.02 }}
+            disabled={isFormSubmitting}
             whileTap={{ scale: 0.98 }}
-            className="flex justify-self-end items-center p-4 rounded-2xl h-12 bg-gradient-to-br from-primary-dark to-secondary-dark text-white hover:bg-gradient-to-br hover:from-secondary-dark hover:to-primary-dark font-semibold"
+            className={`flex justify-self-end items-center p-4 rounded-2xl h-12 bg-gradient-to-br from-primary-dark to-secondary-dark text-white font-semibold ${
+              isFormSubmitting
+                ? "cursor-not-allowed opacity-50"
+                : " hover:bg-gradient-to-br hover:from-secondary-dark hover:to-primary-dark"
+            }`}
             type="submit"
           >
-            Add new exercise
+            {isFormSubmitting ? (
+              <span className="flex items-center justify-center">
+                <Spinner color="info" aria-label="White spinner example" />
+                <span className="ml-2">Submitting...</span>
+              </span>
+            ) : (
+              "Add Exercise"
+            )}
           </motion.button>
         </form>
       </motion.div>
