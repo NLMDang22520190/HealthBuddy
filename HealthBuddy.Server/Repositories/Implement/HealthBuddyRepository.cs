@@ -5,7 +5,7 @@ using HealthBuddy.Server.Models;
 
 namespace HealthBuddy.Server.Repositories.Implement
 {
-    public class HealthBuddyRepository<T> : IHealthBuddyRepository<T> where T: class
+    public class HealthBuddyRepository<T> : IHealthBuddyRepository<T> where T : class
     {
         protected readonly HealthBuddyDbContext dbContext;
         protected DbSet<T> _dbSet;

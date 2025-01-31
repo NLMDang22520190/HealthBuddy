@@ -53,10 +53,8 @@ const HomeMainBar = () => {
 
   const fetchPosts = async (signal) => {
     setIsPostLoading(true);
-    console.log("fetchPosts");
 
     try {
-      console.log("isPostLoading", isPostLoading);
       const response = await api.get("/api/Post/GetAllHomeApprovedPosts", {
         signal,
       });
@@ -92,7 +90,6 @@ const HomeMainBar = () => {
 
   useEffect(() => {
     const controller = new AbortController();
-    console.log("fetching posts");
     // startPostTransition(async () => {
     //   await fetchPosts(controller.signal);
     // });

@@ -6,9 +6,10 @@ namespace HealthBuddy.Server.Repositories.Implement
 {
     public class SQLFoodRepository : HealthBuddyRepository<Food>, IFoodRepository
     {
-        public SQLFoodRepository(HealthBuddyDbContext dbContext) : base(dbContext)
+        private readonly DbContextOptions<HealthBuddyDbContext> _dbContextOptions;
+        public SQLFoodRepository(HealthBuddyDbContext dbContext, DbContextOptions<HealthBuddyDbContext> dbContextOptions) : base(dbContext)
         {
-
+            _dbContextOptions = dbContextOptions;
         }
 
         public async Task<Food> ApproveFood(int foodId)
@@ -45,9 +46,13 @@ namespace HealthBuddy.Server.Repositories.Implement
 
         public async Task<List<Food>> GetApprovedFoods()
         {
-            return await dbContext.Foods.Where(f => f.IsApproved == true && f.IsHidden == false).
-            Include(f => f.Uploader).
-            ToListAsync();
+            using (var dbContext = new HealthBuddyDbContext(_dbContextOptions))
+            {
+                return await dbContext.Foods.Where(f => f.IsApproved == true && f.IsHidden == false).Include(f => f.Uploader).ToListAsync();
+            }
+            // return await dbContext.Foods.Where(f => f.IsApproved == true && f.IsHidden == false).
+            // Include(f => f.Uploader).
+            // ToListAsync();
         }
 
         public async Task<Food> GetFoodById(int foodId)
