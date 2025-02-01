@@ -1,17 +1,21 @@
 import { useEffect, useState, version } from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 import "@ant-design/v5-patch-for-react-19";
+import { ConfigProvider } from "antd";
+import { useSelector } from "react-redux";
 
 import "./App.css";
 import Navbar from "./components/User/Navbar/Navbar";
-import LeftSideBar from "./components/User/LeftSideBar/LeftSideBar";
+import SideMenu from "./components/Admin/SideMenu/SideMenu";
 import AllUserRoutes from "./routes/AllUserRoutes";
-import { ConfigProvider } from "antd";
+import AllAdminRoutes from "./routes/AllAdminRoutes";
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [modalColor, setModalColor] = useState("#1D1F21");
   const [titleColor, setTitleColor] = useState("#000");
+
+  const userRole = useSelector((state) => state.auth.userRole);
 
   useEffect(() => {
     let savedMode = localStorage.getItem("displayMode");
@@ -56,10 +60,24 @@ function App() {
     >
       <div className={` ${darkMode ? "dark" : ""}`}>
         <div className="bg-bg_light dark:bg-bg_dark min-h-screen">
-          <Router>
-            <Navbar onToggleTheme={toggleDarkMode} isDarkTheme={darkMode} />
-            <AllUserRoutes />
-          </Router>
+          {userRole === "admin" ? (
+            <Router>
+              <div className="flex w-screen relative min-h-screen ">
+                <div className="bg-blue-900 flex-grow">
+                  <SideMenu
+                    onToggleTheme={toggleDarkMode}
+                    isDarkTheme={darkMode}
+                  ></SideMenu>
+                </div>
+                <AllAdminRoutes />
+              </div>
+            </Router>
+          ) : (
+            <Router>
+              <Navbar onToggleTheme={toggleDarkMode} isDarkTheme={darkMode} />
+              <AllUserRoutes />
+            </Router>
+          )}
         </div>
       </div>
     </ConfigProvider>
