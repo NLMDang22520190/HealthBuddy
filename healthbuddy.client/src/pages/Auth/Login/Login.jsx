@@ -30,11 +30,7 @@ const Login = () => {
         });
         //console.table("Login response:", response.data);
         dispatch(setAuth(response.data));
-        if (response.data.userRole === "admin") {
-          navigate("/admin/dashboard");
-        } else {
-          navigate("/");
-        }
+        navigate("/");
       } catch (error) {
         // Lấy customData được gắn từ interceptor
         const errorCustomData = error.customData;

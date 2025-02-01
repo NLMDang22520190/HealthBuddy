@@ -9,14 +9,26 @@ import {
   LaptopMinimal,
   LayoutDashboard,
   Users,
+  ChevronDown,
+  LogOut,
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import classNames from "classnames";
+import {
+  Disclosure,
+  DisclosureButton,
+  DisclosurePanel,
+} from "@headlessui/react";
+import { useDispatch } from "react-redux";
+import { clearAuth } from "../../../features/Auth/Auth";
 
 import logo from "../../../assets/logo.png";
+import { Label } from "flowbite-react";
 
 const SideMenu = ({ isDarkTheme, onToggleTheme }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -40,6 +52,11 @@ const SideMenu = ({ isDarkTheme, onToggleTheme }) => {
     { icon: BicepsFlexed, label: "Muscle Types", to: "/admin/muscle-types" },
   ];
 
+  const handleLogout = () => {
+    dispatch(clearAuth());
+    navigate("/auth/login");
+  };
+
   return (
     <div
       className={`sticky top-10  text-white ${
@@ -61,7 +78,7 @@ const SideMenu = ({ isDarkTheme, onToggleTheme }) => {
           </div>
         </div>
       </button>
-      <Link to="/" className="bg-white flex justify-center items-center ">
+      <Link to="/" className="bg-white flex justify-center items-center gap-4 ">
         <img
           src={isOpen ? logo : logo}
           className={`${
@@ -69,6 +86,11 @@ const SideMenu = ({ isDarkTheme, onToggleTheme }) => {
           } transition-height duration-300`}
           alt="Stack Overflow Logo"
         />
+        {isOpen && (
+          <label className="cursor-pointer hidden sm:block bg-gradient-to-br from-primary-dark to-secondary-dark font-bold text-transparent bg-clip-text text-2xl">
+            health buddy
+          </label>
+        )}
       </Link>
       <nav className="">
         <ul>
@@ -82,19 +104,65 @@ const SideMenu = ({ isDarkTheme, onToggleTheme }) => {
             />
           ))}
         </ul>
+        <Disclosure as="div" className="" defaultOpen={false}>
+          <DisclosureButton className="group flex w-full items-center justify-between hover:bg-secondary-dark dark:hover:bg-secondary-light">
+            <SidebarItem icon={Beef} label="Food" isOpen={isOpen}></SidebarItem>
+            <ChevronDown className="size-5 fill-white/60 group-data-[hover]:fill-white/50 group-data-[open]:rotate-180 mr-2" />
+          </DisclosureButton>
+          <DisclosurePanel
+            className={`mt-2 text-sm/5  ${isOpen ? "ml-4" : "ml-1"} `}
+          >
+            <ul>
+              {foodSidebarItems.map((item, index) => (
+                <SidebarItem
+                  key={index}
+                  icon={item.icon}
+                  label={item.label}
+                  isOpen={isOpen}
+                  to={item.to}
+                />
+              ))}
+            </ul>
+          </DisclosurePanel>
+        </Disclosure>
+        <Disclosure as="div" className="" defaultOpen={false}>
+          <DisclosureButton className="group flex w-full items-center justify-between hover:bg-secondary-dark dark:hover:bg-secondary-light">
+            <SidebarItem
+              icon={Dumbbell}
+              label="Exercise"
+              isOpen={isOpen}
+            ></SidebarItem>
+            <ChevronDown className="size-5 fill-white/60 group-data-[hover]:fill-white/50 group-data-[open]:rotate-180 mr-2" />
+          </DisclosureButton>
+          <DisclosurePanel
+            className={`mt-2 text-sm/5  ${isOpen ? "ml-4" : "ml-1"} `}
+          >
+            <ul>
+              {exerciseSidebarItems.map((item, index) => (
+                <SidebarItem
+                  key={index}
+                  icon={item.icon}
+                  label={item.label}
+                  isOpen={isOpen}
+                  to={item.to}
+                />
+              ))}
+            </ul>
+          </DisclosurePanel>
+        </Disclosure>
       </nav>
+      <button
+        className="flex items-center p-4 w-full text-left hover:bg-secondary-dark dark:hover:bg-secondary-light  transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-white cursor-pointer"
+        onClick={() => handleLogout()}
+      >
+        <LogOut className="w-6 h-6" aria-hidden="true" />
+        {isOpen && <span className="ml-4">Sign Out</span>}
+      </button>
       <Switch
         isDarkTheme={isDarkTheme}
         onToggleTheme={onToggleTheme}
         isOpen={isOpen}
       />
-      {/* <button
-        className="flex items-center p-4 w-full text-left hover:bg-blue-500  transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-white cursor-pointer"
-        onClick={handleSignOut}
-      >
-        <SignOutIcon className="w-6 h-6" aria-hidden="true" />
-        {isOpen && <span className="ml-4">Sign Out</span>}
-      </button> */}
     </div>
   );
 };
@@ -114,7 +182,9 @@ const SidebarItem = ({ icon: Icon, label, isOpen, to }) => {
   return (
     <li
       className={`flex items-center p-4 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-white cursor-pointer ${
-        isActive ? "bg-blue-500" : "hover:bg-blue-500"
+        isActive
+          ? "bg-secondary-dark dark:bg-secondary-light"
+          : "hover:bg-secondary-dark dark:hover:bg-secondary-light"
       }`}
       onClick={handleClick}
     >
@@ -127,13 +197,13 @@ const SidebarItem = ({ icon: Icon, label, isOpen, to }) => {
 const Switch = ({ isDarkTheme, onToggleTheme, isOpen }) => {
   return (
     <div
-      className={`flex items-center ${
-        isOpen ? "justify-start px-6" : "justify-center"
+      className={`flex items-center mt-4 justify-start gap-4 ${
+        isOpen ? " px-6" : " px-1"
       }`}
     >
       <label
         className={`relative inline-flex items-center cursor-pointer transition-transform duration-300 ${
-          isOpen ? "scale-150" : "scale-100"
+          isOpen ? "scale-110" : "scale-100"
         }`}
       >
         <input
@@ -142,8 +212,9 @@ const Switch = ({ isDarkTheme, onToggleTheme, isOpen }) => {
           type="checkbox"
           className="sr-only peer"
         />
-        <div className="group peer bg-white rounded-full duration-300 w-14 h-8 ring-2 ring-red-500 after:duration-300 after:bg-red-500 peer-checked:after:bg-green-500 peer-checked:ring-green-500 after:rounded-full after:absolute after:h-6 after:w-6 after:top-1 after:left-1 after:flex after:justify-center after:items-center peer-checked:after:translate-x-6 peer-hover:after:scale-95" />
+        <div className="group peer bg-white rounded-full duration-300 w-14 h-8 ring-2 ring-yellow-300 after:duration-300 after:bg-yellow-300 peer-checked:after:bg-zinc-800 peer-checked:ring-zinc-800 after:rounded-full after:absolute after:h-6 after:w-6 after:top-1 after:left-1 after:flex after:justify-center after:items-center peer-checked:after:translate-x-6 peer-hover:after:scale-95" />
       </label>
+      {isOpen && <label className="">Theme toggle</label>}
     </div>
   );
 };
