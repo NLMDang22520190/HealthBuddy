@@ -88,5 +88,5 @@ export default {
       },
     },
   },
-  plugins: [flowbite.plugin()],
+  plugins: [flowbite.plugin(), require("tailwind-hamburgers")],
 };

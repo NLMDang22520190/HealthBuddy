@@ -10,11 +10,13 @@ import {
 } from "lucide-react";
 import { Accordion, Checkbox, Label, Spinner } from "flowbite-react";
 import { useParams } from "react-router-dom";
+import { message } from "antd";
 
 import StatCard from "../StatCard/StatCard";
 import DescriptionCard from "../DescriptionCard/DescriptionCard";
 import CommentCard from "../CommentCard/CommentCard";
 import CommentAccordition from "../CommentAccordition/CommentAccordition";
+import ShowImageModal from "../../../ShowImageModal/ShowImageModal";
 import api from "../../../../features/AxiosInstance/AxiosInstance";
 
 // const exerciseDetail = {
@@ -35,6 +37,7 @@ import api from "../../../../features/AxiosInstance/AxiosInstance";
 // };
 
 const ExerciseMainBar = () => {
+  const [showImageModal, setShowImageModal] = useState(false);
   const [exerciseDetail, setExerciseDetail] = useState(null);
   const [isDataLoading, startDataTransition] = useTransition();
   const { postId } = useParams();
@@ -93,9 +96,10 @@ const ExerciseMainBar = () => {
       >
         {/* Main image */}
         <motion.img
+          onClick={() => setShowImageModal(true)}
           src={exerciseDetail.image}
           alt="Exercise"
-          className="w-full h-64 object-cover rounded-lg mb-6"
+          className="cursor-pointer w-full h-64 object-cover rounded-lg mb-6"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2 }}
@@ -190,6 +194,11 @@ const ExerciseMainBar = () => {
       </motion.div>
 
       <CommentAccordition></CommentAccordition>
+      <ShowImageModal
+        image={exerciseDetail.image}
+        show={showImageModal}
+        onCancel={() => setShowImageModal(false)}
+      ></ShowImageModal>
     </div>
   );
 };
