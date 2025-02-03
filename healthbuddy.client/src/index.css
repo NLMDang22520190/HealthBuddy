@@ -28,4 +28,7 @@
   .user-page-mainbar-content-marginbottom {
     @apply mb-40 md:mb-24;
   }
+  .admin-page-container {
+    @apply flex bg-white dark:bg-bg_content_dark flex-col w-full-sidebar max-h-screen p-6 gap-4;
+  }
 }

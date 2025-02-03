@@ -81,6 +81,10 @@ export default {
         "90%": "90%",
         "full-navbar": "calc(100vh - 100px)",
         "full-navbar-default": "calc(100vh - 200px)",
+        sidebar: "calc(100vh - 70px)",
+      },
+      width: {
+        "full-sidebar": "calc(100vw - 65px)",
       },
       screens: {
         "sm-md": "700px", // Giữa sm và md
