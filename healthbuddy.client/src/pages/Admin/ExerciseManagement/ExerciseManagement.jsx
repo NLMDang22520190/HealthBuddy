@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Beef, CircleCheck, CircleX, Eye, EyeOff } from "lucide-react";
+import { Dumbbell, CircleCheck, CircleX, Eye, EyeOff } from "lucide-react";
 import { Table, message } from "antd";
 import { Label } from "flowbite-react";
 
@@ -7,8 +7,8 @@ import api from "../../../features/AxiosInstance/AxiosInstance";
 import TopMenu from "../../../components/Admin/TopMenu/TopMenu";
 import ShowImageModal from "../../../components/ShowImageModal/ShowImageModal";
 
-const FoodManagement = () => {
-  const [food, setFood] = useState([]);
+const ExerciseManagement = () => {
+  const [exercises, setExercises] = useState([]);
 
   const [search, setSearch] = useState("");
   const [searchedData, setSearchedData] = useState([]);
@@ -18,13 +18,11 @@ const FoodManagement = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [BreadcrumbList, setBreadcrumbList] = useState([
-    { to: "/admin/food", label: "Food", icon: Beef },
-    { to: "/admin/food", label: "Food Managment", icon: Beef },
+    { to: "/admin/exercise", label: "Exercise", icon: Dumbbell },
+    { to: "/admin/exercise", label: "Exercise Managment", icon: Dumbbell },
   ]);
 
-  const onChange = (pagination, filters, sorter, extra) => {
-    console.log("params", pagination, filters, sorter, extra);
-  };
+  const onChange = (pagination, filters, sorter, extra) => {};
 
   const handleShowImageClick = (url) => {
     console.log("click");
@@ -34,14 +32,16 @@ const FoodManagement = () => {
 
   const columns = [
     {
-      title: "Food Name",
-      dataIndex: "foodName",
-      key: "foodName",
+      title: "Exercise Name",
+      dataIndex: "exerciseName",
+      key: "exerciseName",
+      ellipsis: true,
     },
     {
       title: "Description",
       dataIndex: "description",
       key: "description",
+      ellipsis: true,
     },
     {
       title: "Image",
@@ -59,29 +59,39 @@ const FoodManagement = () => {
       ),
     },
     {
-      title: "Calories",
-      dataIndex: "calories",
-      key: "calories",
-    },
-    {
-      title: "Difficulty",
+      title: "Difficulty Level",
       dataIndex: "difficultyLevel",
       key: "difficultyLevel",
     },
     {
-      title: "Health Benefits",
-      dataIndex: "healthBenefits",
-      key: "healthBenefits",
+      title: "Reps",
+      dataIndex: "numberOfReps",
+      key: "numberOfReps",
     },
     {
-      title: "Cooking Time (min)",
-      dataIndex: "cookingTime",
-      key: "cookingTime",
+      title: "Sets",
+      dataIndex: "numberOfSets",
+      key: "numberOfSets",
     },
     {
-      title: "Portion",
-      dataIndex: "portion",
-      key: "portion",
+      title: "Time Between Sets (s)",
+      dataIndex: "timeBetweenSet",
+      key: "timeBetweenSet",
+    },
+    {
+      title: "Calories Burned",
+      dataIndex: "caloriesBurned",
+      key: "caloriesBurned",
+    },
+    {
+      title: "Video",
+      dataIndex: "videoUrl",
+      key: "videoUrl",
+      render: (url) => (
+        <a href={url} target="_blank" rel="noopener noreferrer">
+          Watch
+        </a>
+      ),
     },
     {
       title: "Approved",
@@ -112,25 +122,26 @@ const FoodManagement = () => {
     setIsLoading(true);
 
     try {
-      const response = await api.get("/api/Food/GetAllFoods", {
+      const response = await api.get("/api/Exercise/GetAllExercises", {
         signal,
       });
       const data = response.data;
-      const mappedData = data.map((food, index) => ({
+      const mappedData = data.map((exercise, index) => ({
         key: index, // Unique key cho Table
-        foodName: food.foodName,
-        description: food.description,
-        imgUrl: food.imgUrl,
-        calories: food.calories,
-        difficultyLevel: food.difficultyLevel,
-        healthBenefits: food.healthBenefits,
-        cookingTime: food.cookingTime,
-        portion: food.portion,
-        isApproved: food.isApproved,
-        isHidden: food.isHidden,
+        exerciseName: exercise.exerciseName,
+        description: exercise.description,
+        difficultyLevel: exercise.difficultyLevel,
+        numberOfReps: exercise.numberOfReps,
+        numberOfSets: exercise.numberOfSets,
+        timeBetweenSet: exercise.timeBetweenSet,
+        caloriesBurned: exercise.caloriesBurned,
+        videoUrl: exercise.videoUrl,
+        imgUrl: exercise.imgUrl,
+        isApproved: exercise.isApproved,
+        isHidden: exercise.isHidden,
       }));
 
-      setFood(mappedData);
+      setExercises(mappedData);
       setSearchedData(mappedData);
     } catch (error) {
       if (error.name === "AbortError") {
@@ -138,7 +149,7 @@ const FoodManagement = () => {
         return;
       }
       console.log(error);
-      message.error("Error fetching food: " + error.message);
+      message.error("Error fetching exercise: " + error.message);
     } finally {
       setIsLoading(false);
     }
@@ -146,10 +157,10 @@ const FoodManagement = () => {
 
   useEffect(() => {
     if (search === "") {
-      setSearchedData(food);
+      setSearchedData(exercises);
     } else {
-      const filteredData = food.filter((data) =>
-        data.foodName.toLowerCase().includes(search.toLowerCase())
+      const filteredData = exercises.filter((data) =>
+        data.exerciseName.toLowerCase().includes(search.toLowerCase())
       );
       setSearchedData(filteredData);
     }
@@ -170,7 +181,7 @@ const FoodManagement = () => {
         onSearchHandle={setSearch}
         BreadcrumbList={BreadcrumbList}
       ></TopMenu>{" "}
-      <Label className="text-xl">All Food</Label>
+      <Label className="text-xl">All Exercises</Label>
       <Table
         loading={isLoading}
         columns={columns}
@@ -193,4 +204,4 @@ const FoodManagement = () => {
   );
 };
 
-export default FoodManagement;
+export default ExerciseManagement;

@@ -9,6 +9,10 @@ import FoodManagement from "../pages/Admin/FoodManagement/FoodManagement";
 import FoodTypeManagement from "../pages/Admin/FoodManagement/FoodTypeManagement";
 import IngredientManagement from "../pages/Admin/FoodManagement/IngredientManagement";
 
+import ExerciseManagement from "../pages/Admin/ExerciseManagement/ExerciseManagement";
+import ExerciseTypeManagement from "../pages/Admin/ExerciseManagement/ExerciseTypeManagement";
+import MuscleTypeManagement from "../pages/Admin/ExerciseManagement/MuscleTypeManagement";
+
 const AllAdminRoutes = () => {
   return (
     <Routes>
@@ -19,6 +23,13 @@ const AllAdminRoutes = () => {
       <Route path="/admin/food" element={<FoodManagement />} />
       <Route path="/admin/food-types" element={<FoodTypeManagement />} />
       <Route path="/admin/ingredients" element={<IngredientManagement />} />
+
+      <Route path="/admin/exercise" element={<ExerciseManagement />} />
+      <Route
+        path="/admin/exercise-types"
+        element={<ExerciseTypeManagement />}
+      />
+      <Route path="/admin/muscle-types" element={<MuscleTypeManagement />} />
     </Routes>
   );
 };

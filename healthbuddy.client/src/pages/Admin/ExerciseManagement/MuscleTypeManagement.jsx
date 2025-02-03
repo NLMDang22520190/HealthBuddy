@@ -1,35 +1,36 @@
 import React, { useState, useEffect } from "react";
 import { Table, message } from "antd";
 import { Label } from "flowbite-react";
-import { Beef, Carrot, CircleCheck, CircleX } from "lucide-react";
+import { Dumbbell, BicepsFlexed, CircleCheck, CircleX } from "lucide-react";
 
 import api from "../../../features/AxiosInstance/AxiosInstance";
 import TopMenu from "../../../components/Admin/TopMenu/TopMenu";
 
-const IngredientManagement = () => {
-  const [ingredients, setIngredients] = useState([]);
+const MuscleTypeManagement = () => {
+  const [type, setType] = useState([]);
 
   const [search, setSearch] = useState("");
   const [searchedData, setSearchedData] = useState([]);
 
   const [isLoading, setIsLoading] = useState(false);
   const [BreadcrumbList, setBreadcrumbList] = useState([
-    { to: "/admin/food", label: "Food", icon: Beef },
-    { to: "/admin/ingredients", label: "Ingredient Managment", icon: Carrot },
+    { to: "/admin/exercise", label: "Exercise", icon: Dumbbell },
+    {
+      to: "/admin/muscle-types",
+      label: "Muscle Type Managment",
+      icon: BicepsFlexed,
+    },
   ]);
 
-  const onChange = (pagination, filters, sorter, extra) => {};
+  const onChange = (pagination, filters, sorter, extra) => {
+    console.log("params", pagination, filters, sorter, extra);
+  };
 
   const columns = [
     {
-      title: "Ingredient Name",
-      dataIndex: "ingredientName",
-      key: "ingredientName",
-    },
-    {
-      title: "Measurement Unit",
-      dataIndex: "measurementUnit",
-      key: "measurementUnit",
+      title: "Muscle Type Name",
+      dataIndex: "muscleTypeName",
+      key: "muscleTypeName",
     },
     {
       title: "Approved",
@@ -49,19 +50,18 @@ const IngredientManagement = () => {
     setIsLoading(true);
 
     try {
-      const response = await api.get("/api/Ingredient/GetAllIngredients", {
+      const response = await api.get("/api/MuscleType/GetAllMuscleTypes", {
         signal,
       });
       const data = response.data;
-      const mappedData = data.map((ingredient, index) => ({
+      const mappedData = data.map((muscleType, index) => ({
         key: index, // Unique key cho Table
-        ingredientId: ingredient.ingredientId,
-        ingredientName: ingredient.ingredientName,
-        measurementUnit: ingredient.measurementUnit,
-        isApproved: ingredient.isApproved,
+        muscleTypeId: muscleType.muscleTypeId,
+        muscleTypeName: muscleType.muscleTypeName,
+        isApproved: muscleType.isApproved,
       }));
 
-      setIngredients(mappedData);
+      setType(mappedData);
       setSearchedData(mappedData);
     } catch (error) {
       if (error.name === "AbortError") {
@@ -69,7 +69,7 @@ const IngredientManagement = () => {
         return;
       }
       console.log(error);
-      message.error("Error fetching ingredient: " + error.message);
+      message.error("Error fetching muscle type: " + error.message);
     } finally {
       setIsLoading(false);
     }
@@ -77,10 +77,10 @@ const IngredientManagement = () => {
 
   useEffect(() => {
     if (search === "") {
-      setSearchedData(ingredients);
+      setSearchedData(type);
     } else {
-      const filteredData = ingredients.filter((data) =>
-        data.ingredientName.toLowerCase().includes(search.toLowerCase())
+      const filteredData = type.filter((data) =>
+        data.muscleTypeName.toLowerCase().includes(search.toLowerCase())
       );
       setSearchedData(filteredData);
     }
@@ -101,7 +101,7 @@ const IngredientManagement = () => {
         onSearchHandle={setSearch}
         BreadcrumbList={BreadcrumbList}
       ></TopMenu>{" "}
-      <Label className="text-xl">All Ingredients</Label>
+      <Label className="text-xl">All Muscle Types</Label>
       <Table
         loading={isLoading}
         columns={columns}
@@ -119,4 +119,4 @@ const IngredientManagement = () => {
   );
 };
 
-export default IngredientManagement;
+export default MuscleTypeManagement;
