@@ -25,7 +25,7 @@ const TopMenu = ({ onSearchHandle, BreadcrumbList }) => {
           value={search}
           onChange={onSearch}
           placeholder="Search..."
-          class="block w-full text-sm h-[50px] px-4 text-slate-900 bg-bg_light dark:bg-gray-700 rounded-[8px] border border-slate-200 appearance-none focus:border-transparent focus:outline focus:outline-2 focus:outline-primary focus:ring-0 hover:border-brand-500-secondary- peer invalid:border-error-500 invalid:focus:border-error-500 overflow-ellipsis overflow-hidden text-nowrap pr-[48px]"
+          class="block w-full text-sm h-[50px] px-4 text-slate-900 bg-bg_light dark:bg-gray-700 rounded-[16px] border border-slate-200 appearance-none focus:border-transparent focus:outline focus:outline-2 focus:outline-primary focus:ring-0 hover:border-brand-500-secondary- peer invalid:border-error-500 invalid:focus:border-error-500 overflow-ellipsis overflow-hidden text-nowrap pr-[48px]"
           id="floating_outlined"
           type="text"
         />
