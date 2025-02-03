@@ -62,6 +62,7 @@ function App() {
           Table: {
             rowHoverBg: themeColors.rowHoverBg,
             bodySortBg: themeColors.bodySortBg,
+            headerBorderRadius: 16,
           },
         },
       }}
