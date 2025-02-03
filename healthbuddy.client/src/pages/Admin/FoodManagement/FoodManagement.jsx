@@ -126,6 +126,8 @@ const FoodManagement = () => {
         healthBenefits: food.healthBenefits,
         cookingTime: food.cookingTime,
         portion: food.portion,
+        isApproved: food.isApproved,
+        isHidden: food.isHidden,
       }));
 
       setFood(mappedData);

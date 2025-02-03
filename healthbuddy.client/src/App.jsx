@@ -71,7 +71,7 @@ function App() {
           {userRole === "admin" ? (
             <Router>
               <div className="flex w-screen relative min-h-screen">
-                <div className="bg-secondary-light dark:bg-secondary-dark">
+                <div className="dark:bg-secondary-light bg-secondary-dark">
                   <SideMenu
                     onToggleTheme={toggleDarkMode}
                     isDarkTheme={darkMode}

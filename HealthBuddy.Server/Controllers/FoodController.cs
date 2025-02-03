@@ -31,7 +31,7 @@ namespace HealthBuddy.Server.Controllers
             try
             {
                 var foods = await _foodRepository.GetAllAsync();
-                return Ok(_mapper.Map<List<AddFoodRequestDTO>>(foods));
+                return Ok(_mapper.Map<List<FoodDTO>>(foods));
             }
             catch (Exception)
             {

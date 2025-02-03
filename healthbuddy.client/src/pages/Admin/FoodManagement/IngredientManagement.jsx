@@ -22,11 +22,6 @@ const IngredientManagement = () => {
 
   const columns = [
     {
-      title: "Ingredient ID",
-      dataIndex: "ingredientId",
-      key: "ingredientId",
-    },
-    {
       title: "Ingredient Name",
       dataIndex: "ingredientName",
       key: "ingredientName",

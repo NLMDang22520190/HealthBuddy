@@ -31,6 +31,10 @@ namespace HealthBuddy.Server.Models.DTO.GET
 
         public DateTime UpdatedDate { get; set; }
 
+        public bool IsApproved { get; set; }
+
+        public bool IsHidden { get; set; }
+
         public virtual List<RecipeDTO> Recipes { get; set; } = new List<RecipeDTO>();
 
         public virtual List<FoodTypeDTO> FoodTypes { get; set; } = new List<FoodTypeDTO>();
