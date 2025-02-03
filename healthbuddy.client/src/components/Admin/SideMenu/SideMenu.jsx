@@ -59,7 +59,7 @@ const SideMenu = ({ isDarkTheme, onToggleTheme }) => {
 
   return (
     <div
-      className={`sticky top-10  text-white ${
+      className={`sticky top-10 h-sidebar  overflow-y-auto no-scrollbar text-white ${
         isOpen ? "w-64" : "w-16"
       } transition-width duration-300`}
     >
@@ -197,7 +197,7 @@ const SidebarItem = ({ icon: Icon, label, isOpen, to }) => {
 const Switch = ({ isDarkTheme, onToggleTheme, isOpen }) => {
   return (
     <div
-      className={`flex items-center mt-4 justify-start gap-4 ${
+      className={`flex items-center my-4 justify-start gap-4 ${
         isOpen ? " px-6" : " px-1"
       }`}
     >
