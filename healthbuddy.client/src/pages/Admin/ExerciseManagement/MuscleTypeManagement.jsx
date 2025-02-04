@@ -103,7 +103,7 @@ const MuscleTypeManagement = () => {
       ></TopMenu>{" "}
       <Label className="text-xl">All Muscle Types</Label>
       <Table
-        loading={isLoading}
+        loading={isLoading || type.length === 0}
         columns={columns}
         dataSource={searchedData}
         onChange={onChange}

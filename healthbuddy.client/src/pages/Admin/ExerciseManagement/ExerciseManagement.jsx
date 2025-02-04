@@ -183,7 +183,7 @@ const ExerciseManagement = () => {
       ></TopMenu>{" "}
       <Label className="text-xl">All Exercises</Label>
       <Table
-        loading={isLoading}
+        loading={isLoading || exercises.length === 0}
         columns={columns}
         dataSource={searchedData}
         onChange={onChange}

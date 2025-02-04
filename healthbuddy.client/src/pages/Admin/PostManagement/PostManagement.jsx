@@ -193,7 +193,7 @@ const PostManagement = () => {
       ></TopMenu>{" "}
       <Label className="text-xl">All Post</Label>
       <Table
-        loading={isPostLoading}
+        loading={isPostLoading || posts.length === 0}
         columns={columns}
         dataSource={searchedPosts}
         onChange={onChange}

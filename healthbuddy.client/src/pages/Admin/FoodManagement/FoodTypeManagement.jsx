@@ -99,7 +99,7 @@ const FoodTypeManagement = () => {
       ></TopMenu>{" "}
       <Label className="text-xl">All Food Types</Label>
       <Table
-        loading={isLoading}
+        loading={isLoading || type.length === 0}
         columns={columns}
         dataSource={searchedData}
         onChange={onChange}

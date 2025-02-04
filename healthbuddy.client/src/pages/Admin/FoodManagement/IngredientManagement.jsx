@@ -103,7 +103,7 @@ const IngredientManagement = () => {
       ></TopMenu>{" "}
       <Label className="text-xl">All Ingredients</Label>
       <Table
-        loading={isLoading}
+        loading={isLoading || ingredients.length === 0}
         columns={columns}
         dataSource={searchedData}
         onChange={onChange}
