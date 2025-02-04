@@ -147,7 +147,7 @@ const UserManagement = () => {
       ></TopMenu>{" "}
       <Label className="text-xl">All Users</Label>
       <Table
-        loading={isLoading}
+        loading={isLoading || users.length === 0}
         columns={columns}
         dataSource={searchedUsers}
         onChange={onChange}

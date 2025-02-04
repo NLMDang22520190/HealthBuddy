@@ -6,6 +6,7 @@ import { Label } from "flowbite-react";
 import api from "../../../features/AxiosInstance/AxiosInstance";
 import TopMenu from "../../../components/Admin/TopMenu/TopMenu";
 import ShowImageModal from "../../../components/ShowImageModal/ShowImageModal";
+import FoodDetailModal from "../../../components/Admin/FoodManagment/FoodDetailModal";
 
 const FoodManagement = () => {
   const [food, setFood] = useState([]);
@@ -15,6 +16,9 @@ const FoodManagement = () => {
 
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
   const [imageModalUrl, setImageModalUrl] = useState("");
+
+  const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
+  const [selectedFoodId, setSelectedFoodId] = useState("");
 
   const [isLoading, setIsLoading] = useState(false);
   const [BreadcrumbList, setBreadcrumbList] = useState([
@@ -27,9 +31,14 @@ const FoodManagement = () => {
   };
 
   const handleShowImageClick = (url) => {
-    console.log("click");
     setImageModalUrl(url);
     setIsImageModalVisible(true);
+  };
+
+  const handleShowDetailClick = (id) => {
+    console.log(id);
+    setSelectedFoodId(id);
+    setIsDetailModalVisible(true);
   };
 
   const columns = [
@@ -105,6 +114,32 @@ const FoodManagement = () => {
           <Eye className="ml-4 text-primary-dark"></Eye>
         ),
     },
+    {
+      title: "Actions",
+      key: "actions",
+      dataIndex: "id",
+      fixed: "right",
+      render: (id) => {
+        return {
+          props: {
+            style: {
+              background:
+                localStorage.getItem("displayMode") === "dark"
+                  ? "#1D1F21"
+                  : "#F9FAFB",
+            },
+          },
+          children: (
+            <button
+              className="bg-secondary-dark text-transparent bg-clip-text font-semibold"
+              onClick={() => handleShowDetailClick(id)}
+            >
+              View Detail
+            </button>
+          ),
+        };
+      },
+    },
   ];
 
   //#region fetch data
@@ -118,6 +153,7 @@ const FoodManagement = () => {
       const data = response.data;
       const mappedData = data.map((food, index) => ({
         key: index, // Unique key cho Table
+        id: food.foodId,
         foodName: food.foodName,
         description: food.description,
         imgUrl: food.imgUrl,
@@ -172,7 +208,7 @@ const FoodManagement = () => {
       ></TopMenu>{" "}
       <Label className="text-xl">All Food</Label>
       <Table
-        loading={isLoading}
+        loading={isLoading || food.length === 0}
         columns={columns}
         dataSource={searchedData}
         onChange={onChange}
@@ -189,6 +225,11 @@ const FoodManagement = () => {
         image={imageModalUrl}
         onCancel={() => setIsImageModalVisible(false)}
       ></ShowImageModal>
+      <FoodDetailModal
+        show={isDetailModalVisible}
+        onCancel={() => setIsDetailModalVisible(false)}
+        id={selectedFoodId}
+      ></FoodDetailModal>
     </div>
   );
 };
