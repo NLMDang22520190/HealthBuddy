@@ -222,7 +222,7 @@ const ExerciseDetailModal = ({ show, onCancel, id, onApprove }) => {
         xxl: "90%",
       }}
     >
-      {isDataLoading || exercise == {} ? (
+      {isDataLoading || JSON.stringify(exercise) === "{}" ? (
         <Skeleton
           avatar
           paragraph={{
@@ -233,6 +233,14 @@ const ExerciseDetailModal = ({ show, onCancel, id, onApprove }) => {
         <Descriptions
           title="Exercise Details"
           bordered
+          labelStyle={{
+            backgroundColor:
+              localStorage.getItem("displayMode") === "dark"
+                ? "#222428"
+                : "#f3f4f6",
+            color:
+              localStorage.getItem("displayMode") === "dark" ? "#fff" : "#000",
+          }}
           items={mapExerciseDataToDescriptions(exercise)}
           column={{
             xs: 1,

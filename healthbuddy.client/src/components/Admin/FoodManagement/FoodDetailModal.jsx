@@ -229,7 +229,7 @@ const FoodDetailModal = ({ show, onCancel, id, onApprove }) => {
         xxl: "90%",
       }}
     >
-      {isDataLoading || food == {} ? (
+      {isDataLoading || JSON.stringify(food) === "{}" ? (
         <Skeleton
           avatar
           paragraph={{
@@ -241,6 +241,14 @@ const FoodDetailModal = ({ show, onCancel, id, onApprove }) => {
           title="Food Details"
           bordered
           items={mapFoodDataToDescriptions(food)}
+          labelStyle={{
+            backgroundColor:
+              localStorage.getItem("displayMode") === "dark"
+                ? "#222428"
+                : "#f3f4f6",
+            color:
+              localStorage.getItem("displayMode") === "dark" ? "#fff" : "#000",
+          }}
           column={{
             xs: 1,
             sm: 2,

@@ -64,6 +64,10 @@ function App() {
             bodySortBg: themeColors.bodySortBg,
             headerBorderRadius: 16,
           },
+          Descriptions: {
+            titleColor: themeColors.titleColor,
+            contentColor: themeColors.titleColor,
+          },
         },
       }}
     >
