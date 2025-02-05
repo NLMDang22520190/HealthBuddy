@@ -63,19 +63,33 @@ namespace HealthBuddy.Server.Controllers
             }
         }
 
+        [HttpGet("GetAllUserApprovedPosts/{userId}")]
+        public async Task<ActionResult> GetAllUserApprovedPosts(int userId)
+        {
+            try
+            {
+                var foodTask = _foodRepository.GetApprovedFoodsByUserId(userId);
+                var exerciseTask = _exerciseRepository.GetApprovedExercisesByUserId(userId);
 
-        // [HttpGet]
-        // public async Task<ActionResult> GetAllUsers()
-        // {
-        //     try
-        //     {
-        //         var users = await _userRepository.GetAllAsync();
-        //         return Ok(users);
-        //     }
-        //     catch (Exception)
-        //     {
-        //         return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database");
-        //     }
-        // }
+                await Task.WhenAll(foodTask, exerciseTask);
+
+                var foodPosts = _mapper.Map<List<PostDTO>>(await foodTask);
+                var exercisePosts = _mapper.Map<List<PostDTO>>(await exerciseTask);
+
+                foreach (var post in foodPosts) post.PostType = "food";
+                foreach (var post in exercisePosts) post.PostType = "exercise";
+
+                var allPosts = foodPosts.Concat(exercisePosts)
+                                        .OrderByDescending(p => p.CreatedDate)
+                                        .ToList();
+
+                return Ok(allPosts);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data: " + e.Message);
+            }
+        }
+
     }
 }

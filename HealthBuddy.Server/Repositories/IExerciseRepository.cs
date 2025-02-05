@@ -9,5 +9,11 @@ namespace HealthBuddy.Server.Repositories
         public Task<Exercise> ApproveExercise(int exerciseId);
         public Task<List<Exercise>> GetApprovedExercises();
 
+        public Task<List<Exercise>> GetApprovedExercisesByUserId(int userId);
+
+        public Task<int> GetTotalExercisesByUserId(int userId);
+
+        public Task<Dictionary<int, int>> GetTotalExercisesByUserIds(List<int> userIds);
+
     }
 }

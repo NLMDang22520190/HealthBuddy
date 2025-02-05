@@ -22,84 +22,76 @@ const UserCard = ({ user }) => {
     navigate(`/user/${user.id}`);
   };
   return (
-    <div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.3 }}
+    <Card
+      onClick={() => handleUserClick(user)}
+      className="overflow-hidden cursor-pointer hover:shadow-md hover:shadow-secondary-light dark:hover:shadow-md dark:hover:shadow-primary-dark transition-shadow"
     >
-      <Card
-        onClick={() => handleUserClick(user)}
-        className="overflow-hidden cursor-pointer hover:shadow-md hover:shadow-secondary-light dark:hover:shadow-md dark:hover:shadow-primary-dark transition-shadow"
-      >
-        <div className="flex gap-4 items-center">
-          <div className="p-px rounded-full bg-gradient-to-tr from-primary-dark to-secondary-dark">
-            <Avatar
-              src={user.avatar}
-              className="md:block lg:hidden xl:block size-12"
-              icon={<User className="h-6 w-6" />}
-            />
+      <div className="flex gap-4 items-center">
+        <div className="p-px rounded-full bg-gradient-to-tr from-primary-dark to-secondary-dark">
+          <Avatar
+            src={user.avatar}
+            className="md:block lg:hidden xl:block size-12"
+            icon={<User className="h-6 w-6" />}
+          />
+        </div>
+
+        <div className="flex-1 flex flex-col items-start gap-2">
+          <div className="flex gap-1 items-end ">
+            <CircleUserRound className="text-bg_dark dark:text-bg_light size-4"></CircleUserRound>
+            <Label
+              className="text-sm font-bold truncate max-w-[100px]"
+              title={user.name} // Hiển thị tooltip khi hover
+            >
+              {user.name}
+            </Label>
           </div>
 
-          <div className="flex-1 flex flex-col items-start gap-2">
-            <div className="flex gap-1 items-end ">
-              <CircleUserRound className="text-bg_dark dark:text-bg_light size-4"></CircleUserRound>
-              <Label
-                className="text-sm font-bold truncate max-w-[100px]"
-                title={user.name} // Hiển thị tooltip khi hover
-              >
-                {user.name}
-              </Label>
-            </div>
-
-            <div className="flex gap-1 items-end">
-              <Mail className="text-bg_dark dark:text-bg_light size-4" />
-              <Label
-                className="text-sm font-light truncate max-w-[100px]"
-                title={user.email} // Hiển thị tooltip khi hover
-              >
-                {user.email}
-              </Label>
-            </div>
-
-            <div className="flex gap-1 items-end">
-              <Calendar className="text-bg_dark dark:text-bg_light size-4" />
-              <Label
-                className="text-xs font-extralight truncate max-w-[200px]"
-                title={`Joined ${new Date(
-                  user.JoinDated
-                ).toLocaleDateString()}`} // Tooltip
-              >
-                Joined {new Date(user.JoinDated).toLocaleDateString()}
-              </Label>
-            </div>
+          <div className="flex gap-1 items-end">
+            <Mail className="text-bg_dark dark:text-bg_light size-4" />
+            <Label
+              className="text-sm font-light truncate max-w-[100px]"
+              title={user.email} // Hiển thị tooltip khi hover
+            >
+              {user.email}
+            </Label>
           </div>
 
-          <div className="grid grid-rows-4 gap-1">
-            <Tooltip content="Number of food posts">
-              <Label className="text-sm font-semibold flex gap-2 items-center">
-                <Beef className="size-4"></Beef> {user.FoodPosted}
-              </Label>
-            </Tooltip>
-            <Tooltip content="Number of exercise posts">
-              <Label className="text-sm font-semibold flex gap-2 items-center">
-                <Dumbbell className="size-4"></Dumbbell> {user.ExercisePosted}
-              </Label>
-            </Tooltip>
-            <Tooltip content="Number of workout schedules posted">
-              <Label className="text-sm font-semibold flex gap-2 items-center">
-                <Flame className="size-4"></Flame> {user.WorkoutSchedulePosted}
-              </Label>
-            </Tooltip>
-            <Tooltip content="Number of meal schedules posted">
-              <Label className="text-sm font-semibold flex gap-2 items-center">
-                <UtensilsCrossed className="size-4"></UtensilsCrossed>{" "}
-                {user.MealSchedulePosted}
-              </Label>
-            </Tooltip>
+          <div className="flex gap-1 items-end">
+            <Calendar className="text-bg_dark dark:text-bg_light size-4" />
+            <Label
+              className="text-xs font-extralight truncate max-w-[200px]"
+              title={`Joined ${new Date(user.JoinDated).toLocaleDateString()}`} // Tooltip
+            >
+              Joined {new Date(user.JoinDated).toLocaleDateString()}
+            </Label>
           </div>
         </div>
-      </Card>
-    </div>
+
+        <div className="grid grid-rows-4 gap-1">
+          <Tooltip content="Number of food posts">
+            <Label className="text-sm font-semibold flex gap-2 items-center">
+              <Beef className="size-4"></Beef> {user.FoodPosted}
+            </Label>
+          </Tooltip>
+          <Tooltip content="Number of exercise posts">
+            <Label className="text-sm font-semibold flex gap-2 items-center">
+              <Dumbbell className="size-4"></Dumbbell> {user.ExercisePosted}
+            </Label>
+          </Tooltip>
+          <Tooltip content="Number of workout schedules posted">
+            <Label className="text-sm font-semibold flex gap-2 items-center">
+              <Flame className="size-4"></Flame> {user.WorkoutSchedulePosted}
+            </Label>
+          </Tooltip>
+          <Tooltip content="Number of meal schedules posted">
+            <Label className="text-sm font-semibold flex gap-2 items-center">
+              <UtensilsCrossed className="size-4"></UtensilsCrossed>{" "}
+              {user.MealSchedulePosted}
+            </Label>
+          </Tooltip>
+        </div>
+      </div>
+    </Card>
   );
 };
 

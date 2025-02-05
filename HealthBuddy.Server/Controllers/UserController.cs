@@ -13,18 +13,25 @@ namespace HealthBuddy.Server.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
-
         private readonly IUserDetailRepository _userDetailRepository;
-
         private readonly IUserNotificationPreferenceRepository _userNotificationPreferenceRepository;
+        private readonly IFoodRepository _foodRepository;
+        private readonly IExerciseRepository _exerciseRepository;
         private readonly IMapper _mapper;
 
-        public UserController(IUserRepository userRepository, IMapper mapper, IUserDetailRepository userDetailRepository, IUserNotificationPreferenceRepository userNotificationPreferenceRepository)
+        public UserController(IUserRepository userRepository,
+        IMapper mapper,
+        IUserDetailRepository userDetailRepository,
+        IUserNotificationPreferenceRepository userNotificationPreferenceRepository,
+        IFoodRepository foodRepository,
+        IExerciseRepository exerciseRepository)
         {
             _userRepository = userRepository;
             _mapper = mapper;
             _userDetailRepository = userDetailRepository;
             _userNotificationPreferenceRepository = userNotificationPreferenceRepository;
+            _foodRepository = foodRepository;
+            _exerciseRepository = exerciseRepository;
         }
 
 
@@ -33,8 +40,27 @@ namespace HealthBuddy.Server.Controllers
         {
             try
             {
+                // 1. Lấy tất cả người dùng một lần
                 var users = await _userRepository.GetAllAsync();
-                return Ok(_mapper.Map<List<UserProfileInfoDTO>>(users));
+                var userProfiles = _mapper.Map<List<UserProfileInfoDTO>>(users);
+                var userIds = userProfiles.Select(u => u.UserId).ToList();
+
+                // 2. Truy vấn tất cả tổng số bài viết theo UserId một lần
+                var foodCountsTask = _foodRepository.GetTotalFoodsByUserIds(userIds);
+                var exerciseCountsTask = _exerciseRepository.GetTotalExercisesByUserIds(userIds);
+                await Task.WhenAll(foodCountsTask, exerciseCountsTask);
+
+                var foodCounts = await foodCountsTask;
+                var exerciseCounts = await exerciseCountsTask;
+
+                // 3. Gán số lượng bài viết vào userProfiles
+                foreach (var u in userProfiles)
+                {
+                    u.NumberOfFoodPosts = foodCounts.TryGetValue(u.UserId, out var foodCount) ? foodCount : 0;
+                    u.NumberOfExercisePosts = exerciseCounts.TryGetValue(u.UserId, out var exerciseCount) ? exerciseCount : 0;
+                }
+
+                return Ok(userProfiles);
             }
             catch (Exception)
             {
@@ -53,7 +79,16 @@ namespace HealthBuddy.Server.Controllers
                 {
                     return BadRequest(new { error = "User not found" });
                 }
-                return Ok(_mapper.Map<UserProfileInfoDTO>(user));
+                var userProfile = _mapper.Map<UserProfileInfoDTO>(user);
+
+                var foodTask = _foodRepository.GetTotalFoodsByUserId(userId);
+                var exerciseTask = _exerciseRepository.GetTotalExercisesByUserId(userId);
+                await Task.WhenAll(foodTask, exerciseTask);
+
+                userProfile.NumberOfFoodPosts = await foodTask;
+                userProfile.NumberOfExercisePosts = await exerciseTask;
+
+                return Ok(userProfile);
             }
             catch (Exception e)
             {

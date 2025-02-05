@@ -48,12 +48,41 @@ namespace HealthBuddy.Server.Repositories.Implement
             }
         }
 
+        public async Task<List<Exercise>> GetApprovedExercisesByUserId(int userId)
+        {
+            using (var dbContext = new HealthBuddyDbContext(_dbContextOptions))
+            {
+                return await dbContext.Exercises.Where(e => e.UploaderId == userId && e.IsApproved == true && e.IsHidden == false)
+                                .Include(e => e.Uploader).ToListAsync();
+            }
+        }
+
         public async Task<Exercise> GetExerciseById(int exerciseId)
         {
             return await dbContext.Exercises
             .Include(e => e.ExerciseTypes)
             .Include(e => e.MuscleTypes)
             .FirstOrDefaultAsync(e => e.ExerciseId == exerciseId);
+        }
+
+        public async Task<int> GetTotalExercisesByUserId(int userId)
+        {
+            using (var dbContext = new HealthBuddyDbContext(_dbContextOptions))
+            {
+                return await dbContext.Exercises.Where(e => e.UploaderId == userId).CountAsync();
+            }
+        }
+
+        public async Task<Dictionary<int, int>> GetTotalExercisesByUserIds(List<int> userIds)
+        {
+            using (var dbContext = new HealthBuddyDbContext(_dbContextOptions))
+            {
+                return await dbContext.Exercises
+                            .Where(e => userIds.Contains(e.UploaderId))
+                            .GroupBy(e => e.UploaderId)
+                            .Select(g => new { UserId = g.Key, Count = g.Count() })
+                            .ToDictionaryAsync(g => g.UserId, g => g.Count);
+            }
         }
     }
 }

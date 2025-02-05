@@ -50,9 +50,15 @@ namespace HealthBuddy.Server.Repositories.Implement
             {
                 return await dbContext.Foods.Where(f => f.IsApproved == true && f.IsHidden == false).Include(f => f.Uploader).ToListAsync();
             }
-            // return await dbContext.Foods.Where(f => f.IsApproved == true && f.IsHidden == false).
-            // Include(f => f.Uploader).
-            // ToListAsync();
+        }
+
+        public async Task<List<Food>> GetApprovedFoodsByUserId(int userId)
+        {
+            using (var dbContext = new HealthBuddyDbContext(_dbContextOptions))
+            {
+                return await dbContext.Foods.Where(f => f.UploaderId == userId && f.IsApproved == true && f.IsHidden == false)
+                .Include(f => f.Uploader).ToListAsync();
+            }
         }
 
         public async Task<Food> GetFoodById(int foodId)
@@ -61,6 +67,26 @@ namespace HealthBuddy.Server.Repositories.Implement
             .Include(f => f.FoodTypes)
             .Include(f => f.Recipes).ThenInclude(r => r.Ingredient)
             .FirstOrDefaultAsync(f => f.FoodId == foodId);
+        }
+
+        public async Task<int> GetTotalFoodsByUserId(int userId)
+        {
+            using (var dbContext = new HealthBuddyDbContext(_dbContextOptions))
+            {
+                return await dbContext.Foods.Where(f => f.UploaderId == userId).CountAsync();
+            }
+        }
+
+        public async Task<Dictionary<int, int>> GetTotalFoodsByUserIds(List<int> userIds)
+        {
+            using (var dbContext = new HealthBuddyDbContext(_dbContextOptions))
+            {
+                return await dbContext.Foods
+                            .Where(f => userIds.Contains(f.UploaderId))
+                            .GroupBy(f => f.UploaderId)
+                            .Select(g => new { UserId = g.Key, Count = g.Count() })
+                            .ToDictionaryAsync(g => g.UserId, g => g.Count);
+            }
         }
     }
 }
