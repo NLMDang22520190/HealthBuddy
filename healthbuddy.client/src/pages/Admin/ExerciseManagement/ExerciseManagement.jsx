@@ -6,6 +6,7 @@ import { Label } from "flowbite-react";
 import api from "../../../features/AxiosInstance/AxiosInstance";
 import TopMenu from "../../../components/Admin/TopMenu/TopMenu";
 import ShowImageModal from "../../../components/ShowImageModal/ShowImageModal";
+import ExerciseDetailModal from "../../../components/Admin/ExerciseManagement/ExerciseDetailModal";
 
 const ExerciseManagement = () => {
   const [exercises, setExercises] = useState([]);
@@ -15,6 +16,9 @@ const ExerciseManagement = () => {
 
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
   const [imageModalUrl, setImageModalUrl] = useState("");
+
+  const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
+  const [selectedExerciseId, setSelectedExerciseId] = useState("");
 
   const [isLoading, setIsLoading] = useState(false);
   const [BreadcrumbList, setBreadcrumbList] = useState([
@@ -28,6 +32,11 @@ const ExerciseManagement = () => {
     console.log("click");
     setImageModalUrl(url);
     setIsImageModalVisible(true);
+  };
+
+  const handleShowDetailClick = (id) => {
+    setSelectedExerciseId(id);
+    setIsDetailModalVisible(true);
   };
 
   const columns = [
@@ -115,6 +124,32 @@ const ExerciseManagement = () => {
           <Eye className="ml-4 text-primary-dark"></Eye>
         ),
     },
+    {
+      title: "Actions",
+      key: "actions",
+      dataIndex: "id",
+      fixed: "right",
+      render: (id) => {
+        return {
+          props: {
+            style: {
+              background:
+                localStorage.getItem("displayMode") === "dark"
+                  ? "#1D1F21"
+                  : "#F9FAFB",
+            },
+          },
+          children: (
+            <button
+              className="bg-secondary-dark text-transparent bg-clip-text font-semibold"
+              onClick={() => handleShowDetailClick(id)}
+            >
+              View Detail
+            </button>
+          ),
+        };
+      },
+    },
   ];
 
   //#region fetch data
@@ -128,6 +163,7 @@ const ExerciseManagement = () => {
       const data = response.data;
       const mappedData = data.map((exercise, index) => ({
         key: index, // Unique key cho Table
+        id: exercise.exerciseId,
         exerciseName: exercise.exerciseName,
         description: exercise.description,
         difficultyLevel: exercise.difficultyLevel,
@@ -200,6 +236,12 @@ const ExerciseManagement = () => {
         image={imageModalUrl}
         onCancel={() => setIsImageModalVisible(false)}
       ></ShowImageModal>
+      <ExerciseDetailModal
+        show={isDetailModalVisible}
+        id={selectedExerciseId}
+        onCancel={() => setIsDetailModalVisible(false)}
+        onApprove={fetchData}
+      ></ExerciseDetailModal>
     </div>
   );
 };
