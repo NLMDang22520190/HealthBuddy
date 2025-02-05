@@ -6,7 +6,6 @@ import { message } from "antd";
 
 import UserCard from "../UserCard/UserCard";
 import api from "../../../features/AxiosInstance/AxiosInstance";
-import { set } from "date-fns";
 
 const UsersMainBar = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -69,6 +68,16 @@ const UsersMainBar = () => {
       user.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
   return (
     <div className="user-page-mainbar-content-container">
       <motion.div
@@ -91,11 +100,16 @@ const UsersMainBar = () => {
             <Spinner size="xl" color="info" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <motion.div
+            variants={container}
+            animate="show"
+            initial="hidden"
+            className="grid grid-cols-1 gap-6 lg:grid-cols-2"
+          >
             {filteredUsers.map((user) => (
               <UserCard key={user.id} user={user} />
             ))}
-          </div>
+          </motion.div>
         )}
       </motion.div>
     </div>

@@ -18,7 +18,6 @@ import UserDetailProfileCard from "./UserDetailProfileCard/UserDetailProfileCard
 import UserNotificationProfileCard from "./UserNotificationProfileCard/UserNotificationProfileCard";
 import FilterButtons from "../FilterButtons/FilterButtons";
 import api from "../../../features/AxiosInstance/AxiosInstance";
-import { ca } from "date-fns/locale";
 
 const UserProfileMainBar = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -33,14 +32,16 @@ const UserProfileMainBar = () => {
   const [userDetail, setUserDetail] = useState({});
   const [userNotification, setUserNotification] = useState({});
 
+  const [posts, setPosts] = useState([]);
+
   // const [isUserDataPending, startUserDataTransition] = useTransition();
   // const [isUserDetailPending, startUserDetailTransition] = useTransition();
 
   const [isUserDataPending, setIsUserDataPending] = useState(false);
   const [isUserDetailPending, setIsUserDetailPending] = useState(false);
 
+  //#region fetch data
   const fetchUser = async (signal) => {
-    setIsUserDataPending(true);
     try {
       const response = await api.get("/api/User/GetUserById/" + userId, {
         signal,
@@ -67,8 +68,6 @@ const UserProfileMainBar = () => {
         return;
       }
       message.error("Error fetching user data: " + error.message);
-    } finally {
-      setIsUserDataPending(false);
     }
   };
 
@@ -122,13 +121,59 @@ const UserProfileMainBar = () => {
     }
   };
 
+  const fetchUserPosts = async (signal) => {
+    try {
+      const response = await api.get(
+        "/api/Post/GetAllUserApprovedPosts/" + userId,
+        {
+          signal,
+        }
+      );
+      const data = response.data;
+      const mappedPosts = data.map((post) => ({
+        id: post.postId,
+        title: post.title,
+        content: post.description,
+        image: post.imgUrl,
+        user: {
+          id: post.uploader.userId,
+          name: post.uploader.username,
+          avatar: post.uploader.avatar,
+        },
+        numberOfLikes: post.numberOfLikes,
+        numberOfComments: post.numberOfComments,
+        postDate: post.createdDate,
+        type: post.postType,
+      }));
+
+      setPosts(mappedPosts);
+    } catch (error) {
+      if (error.name === "AbortError") {
+        console.log("Request was cancelled");
+        return;
+      }
+      console.log(error);
+      message.error("Error fetching posts: " + error.message);
+    }
+  };
+
   useEffect(() => {
     setIsCurrentUser(currentUser == userId);
   }, [currentUser, userId]);
 
   useEffect(() => {
     const controller = new AbortController();
-    fetchUser(controller.signal);
+    try {
+      setIsUserDataPending(true);
+      const userResponse = fetchUser(controller.signal);
+      const postResponse = fetchUserPosts(controller.signal);
+      Promise.all([userResponse, postResponse]);
+    } catch (error) {
+      message.error("Error fetching user and post data: " + error.message);
+    } finally {
+      setIsUserDataPending(false);
+    }
+
     if (isCurrentUser) {
       setIsUserDetailPending(true);
       try {
@@ -144,62 +189,31 @@ const UserProfileMainBar = () => {
       } finally {
         setIsUserDetailPending(false);
       }
-
-      // startUserDetailTransition(async () => {
-      //   const userDetailResponse = fetchUserDetail();
-      //   const userNotificationResponse = fetchUserNotification();
-      //   await Promise.all([userDetailResponse, userNotificationResponse]);
-      // });
     }
   }, [userId, isCurrentUser]);
-
-  // Mock posts data
-  const posts = [
-    {
-      id: 1,
-      title: "10 mẹo chăm sóc sức khỏe mỗi ngày",
-      content:
-        "Cùng khám phá những thói quen đơn giản nhưng giúp bạn cải thiện sức khỏe hàng ngày.",
-      image: "https://placehold.co/300x600.png",
-      user: {
-        id: 1,
-        name: "Nguyễn Văn A",
-        avatar: "https://placehold.co/50x50.png",
-      },
-      numberOfLikes: 120,
-      numberOfComments: 45,
-      postDate: "2023-12-01",
-      type: "food",
-    },
-    {
-      id: 2,
-      title: "Lợi ích của việc tập yoga mỗi sáng",
-      content:
-        "Tập yoga buổi sáng không chỉ giúp thư giãn mà còn cải thiện sức khỏe tinh thần và thể chất.",
-      image: "https://placehold.co/900x300.png",
-      user: {
-        id: 2,
-        name: "Lê Thị Bích",
-        avatar: "https://placehold.co/50x50.png",
-      },
-      numberOfLikes: 95,
-      numberOfComments: 30,
-      postDate: "2023-11-30",
-      type: "exercise",
-    },
-  ];
+  //#endregion
 
   const filteredPosts = posts.filter((post) => {
     const matchesSearch =
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       post.content.toLowerCase().includes(searchQuery.toLowerCase());
+
     if (activeFilter === "all") return matchesSearch;
-    return matchesSearch;
+
+    const filterMapping = {
+      dishes: "food",
+      exercises: "exercise",
+      "workout-plans": "workout",
+      "meal-plans": "meal",
+    };
+
+    return matchesSearch && post.type === filterMapping[activeFilter];
   });
 
   return (
     <div className="user-page-mainbar-content-container">
-      {isUserDataPending ? (
+      {isUserDataPending ||
+      (JSON.stringify(user) === "{}" && posts.length == 0) ? (
         <div className="flex h-full justify-center items-center">
           <Spinner size="xl" color="info" />
         </div>
