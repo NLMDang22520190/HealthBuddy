@@ -6,7 +6,7 @@ import { Label } from "flowbite-react";
 import api from "../../../features/AxiosInstance/AxiosInstance";
 import TopMenu from "../../../components/Admin/TopMenu/TopMenu";
 import ShowImageModal from "../../../components/ShowImageModal/ShowImageModal";
-import FoodDetailModal from "../../../components/Admin/FoodManagment/FoodDetailModal";
+import FoodDetailModal from "../../../components/Admin/FoodManagement/FoodDetailModal";
 
 const FoodManagement = () => {
   const [food, setFood] = useState([]);
@@ -36,7 +36,6 @@ const FoodManagement = () => {
   };
 
   const handleShowDetailClick = (id) => {
-    console.log(id);
     setSelectedFoodId(id);
     setIsDetailModalVisible(true);
   };
@@ -229,6 +228,7 @@ const FoodManagement = () => {
         show={isDetailModalVisible}
         onCancel={() => setIsDetailModalVisible(false)}
         id={selectedFoodId}
+        onApprove={fetchData}
       ></FoodDetailModal>
     </div>
   );
