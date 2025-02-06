@@ -48,7 +48,8 @@ namespace HealthBuddy.Server.Repositories.Implement
         {
             using (var dbContext = new HealthBuddyDbContext(_dbContextOptions))
             {
-                return await dbContext.Foods.Where(f => f.IsApproved == true && f.IsHidden == false).Include(f => f.Uploader).ToListAsync();
+                return await dbContext.Foods.Where(f => f.IsApproved == true && f.IsHidden == false).Include(f => f.Uploader)
+                .Include(f => f.FoodTypes).ToListAsync();
             }
         }
 
@@ -57,7 +58,8 @@ namespace HealthBuddy.Server.Repositories.Implement
             using (var dbContext = new HealthBuddyDbContext(_dbContextOptions))
             {
                 return await dbContext.Foods.Where(f => f.UploaderId == userId && f.IsApproved == true && f.IsHidden == false)
-                .Include(f => f.Uploader).ToListAsync();
+                .Include(f => f.Uploader).Include(f => f.FoodTypes)
+                .ToListAsync();
             }
         }
 

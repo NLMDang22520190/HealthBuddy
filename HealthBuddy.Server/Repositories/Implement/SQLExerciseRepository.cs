@@ -44,7 +44,9 @@ namespace HealthBuddy.Server.Repositories.Implement
         {
             using (var dbContext = new HealthBuddyDbContext(_dbContextOptions))
             {
-                return await dbContext.Exercises.Where(e => e.IsApproved == true && e.IsHidden == false).Include(e => e.Uploader).ToListAsync();
+                return await dbContext.Exercises.Where(e => e.IsApproved == true && e.IsHidden == false).Include(e => e.Uploader)
+                .Include(e => e.ExerciseTypes)
+                .Include(e => e.MuscleTypes).ToListAsync();
             }
         }
 
@@ -53,7 +55,8 @@ namespace HealthBuddy.Server.Repositories.Implement
             using (var dbContext = new HealthBuddyDbContext(_dbContextOptions))
             {
                 return await dbContext.Exercises.Where(e => e.UploaderId == userId && e.IsApproved == true && e.IsHidden == false)
-                                .Include(e => e.Uploader).ToListAsync();
+                                .Include(e => e.Uploader).Include(e => e.ExerciseTypes)
+                .Include(e => e.MuscleTypes).ToListAsync();
             }
         }
 
