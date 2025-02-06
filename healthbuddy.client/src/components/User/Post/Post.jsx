@@ -3,7 +3,7 @@ import { formatDistanceToNow } from "date-fns";
 import { Heart, MessageCircle, Send } from "lucide-react";
 import { vi } from "date-fns/locale";
 import { Avatar, message } from "antd";
-import { Label } from "flowbite-react";
+import { Badge, Label } from "flowbite-react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -92,7 +92,18 @@ const Post = ({ post }) => {
             {post.title}
           </Label>
           <Label className="text-xs cursor-pointer">{post.content}</Label>
+          <div className="flex gap-1 flex-wrap">
+            {post.tags.slice(0, 3).map((tag, index) => (
+              <Badge color="success" key={index}>
+                {tag.name}
+              </Badge>
+            ))}
+            {post.tags.length > 3 && (
+              <Badge color="success">+{post.tags.length - 3} more</Badge>
+            )}
+          </div>
         </div>
+
         <div className="rounded-xl w-fit ">
           <motion.img
             onClick={() => handlePictureClick(post.image)}

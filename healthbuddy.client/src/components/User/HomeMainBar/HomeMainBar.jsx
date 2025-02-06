@@ -73,6 +73,11 @@ const HomeMainBar = () => {
         numberOfComments: post.numberOfComments,
         postDate: post.createdDate,
         type: post.postType,
+        tags: post.tags.map((tag) => ({
+          id: tag.tagId,
+          name: tag.tagName,
+          type: tag.tagType,
+        })),
       }));
 
       setPosts(mappedPosts);
