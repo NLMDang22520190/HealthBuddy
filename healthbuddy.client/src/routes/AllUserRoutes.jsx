@@ -20,6 +20,8 @@ import NewExercise from "../pages/User/Add/NewExercise/NewExercise";
 import Food from "../pages/User/Detail/Food/Food";
 import Exercise from "../pages/User/Detail/Exercise/Exercise";
 
+import UnderConstruction from "../pages/UnderConstruction/UnderConstruction";
+
 const AllUserRoutes = () => {
   return (
     <Routes>
@@ -44,6 +46,8 @@ const AllUserRoutes = () => {
       {/* Detail */}
       <Route path="detail/food/:postId" element={<Food />} />
       <Route path="detail/exercise/:postId" element={<Exercise />} />
+
+      <Route path="*" element={<UnderConstruction />} />
     </Routes>
   );
 };
