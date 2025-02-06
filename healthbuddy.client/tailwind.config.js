@@ -90,6 +90,9 @@ export default {
         "sm-md": "700px", // Giữa sm và md
         "md-lg": "900px", // Giữa md và lg
       },
+      animation: {
+        "spin-slow": "spin 3s linear infinite",
+      },
     },
   },
   plugins: [flowbite.plugin(), require("tailwind-hamburgers")],
