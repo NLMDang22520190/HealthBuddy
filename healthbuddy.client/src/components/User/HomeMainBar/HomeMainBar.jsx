@@ -9,40 +9,6 @@ import UserAddNewPost from "../UserAddNewPost/UserAddNewPost";
 import AddNewNavigateModal from "../AddNewNavigateModal/AddNewNavigateModal";
 import api from "../../../features/AxiosInstance/AxiosInstance";
 
-// const posts = [
-//   {
-//     id: 1,
-//     title: "10 mẹo chăm sóc sức khỏe mỗi ngày",
-//     content:
-//       "Cùng khám phá những thói quen đơn giản nhưng giúp bạn cải thiện sức khỏe hàng ngày.",
-//     image: "https://placehold.co/50x50.png",
-//     user: {
-//       id: 1,
-//       name: "Nguyễn Văn A",
-//       avatar: "https://placehold.co/50x50.png",
-//     },
-//     numberOfLikes: 120,
-//     numberOfComments: 45,
-//     postDate: "2023-12-01",
-//     type: "food",
-//   },
-//   {
-//     id: 2,
-//     title: "Lợi ích của việc tập yoga mỗi sáng",
-//     content:
-//       "Tập yoga buổi sáng không chỉ giúp thư giãn mà còn cải thiện sức khỏe tinh thần và thể chất.",
-//     image: "https://placehold.co/50x50.png",
-//     user: {
-//       id: 2,
-//       name: "Lê Thị Bích",
-//       avatar: "https://placehold.co/50x50.png",
-//     },
-//     numberOfLikes: 95,
-//     numberOfComments: 30,
-//     postDate: "2023-11-30",
-//     type: "exercise",
-//   },
-
 const HomeMainBar = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
