@@ -13,6 +13,7 @@ import Home from "../pages/User/Home/Home";
 import ChatBot from "../pages/User/ChatBot/ChatBot";
 import Users from "../pages/User/Users/Users";
 import UserProfile from "../pages/User/UserProfile/UserProfile";
+import AllPost from "../pages/User/AllPost/AllPost";
 
 import NewFood from "../pages/User/Add/NewFood/NewFood";
 import NewExercise from "../pages/User/Add/NewExercise/NewExercise";
@@ -26,6 +27,7 @@ const AllUserRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="all-post" element={<AllPost />} />
       <Route path="chatBot" element={<ChatBot />} />
       <Route path="users" element={<Users />} />
       <Route path="user/:userId" element={<UserProfile />} />

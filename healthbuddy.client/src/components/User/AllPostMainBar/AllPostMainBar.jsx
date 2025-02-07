@@ -1,21 +1,13 @@
-import React, { useState, useTransition, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import React, { useState, useEffect } from "react";
 import { message } from "antd";
 import { Spinner } from "flowbite-react";
 
 import PostList from "../PostList/PostList";
-import UserAddNewPost from "../UserAddNewPost/UserAddNewPost";
-import AddNewNavigateModal from "../AddNewNavigateModal/AddNewNavigateModal";
 import api from "../../../features/AxiosInstance/AxiosInstance";
 
-const HomeMainBar = () => {
-  const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(false);
-
+const AllPostMainBar = () => {
   const [posts, setPosts] = useState([]);
   const [isPostLoading, setIsPostLoading] = useState(false);
-  // const [isPostLoading, startPostTransition] = useTransition();
 
   const fetchPosts = async (signal) => {
     setIsPostLoading(true);
@@ -61,9 +53,7 @@ const HomeMainBar = () => {
 
   useEffect(() => {
     const controller = new AbortController();
-    // startPostTransition(async () => {
-    //   await fetchPosts(controller.signal);
-    // });
+
     fetchPosts(controller.signal);
 
     return () => {
@@ -71,18 +61,10 @@ const HomeMainBar = () => {
     };
   }, []);
 
-  const user = useSelector((state) => state.auth.userId);
-
-  const handleAddClick = () => {
-    setIsOpen(true);
-    //navigate("/add/new-food");
-  };
-
   return (
     <div className="user-page-mainbar-content-container">
       {/* Content bên trong scroll */}
       <div className="min-h-screen divide-gray-400 divide-y user-page-mainbar-content-marginbottom">
-        {user && <UserAddNewPost onAddClick={handleAddClick} />}
         {isPostLoading || posts.length === 0 ? (
           <div className="flex h-96 justify-center items-center">
             <Spinner size="xl" color="info" />
@@ -91,12 +73,8 @@ const HomeMainBar = () => {
           <PostList posts={posts} />
         )}
       </div>
-      <AddNewNavigateModal
-        open={isOpen}
-        onCancel={() => setIsOpen(false)}
-      ></AddNewNavigateModal>
     </div>
   );
 };
 
-export default HomeMainBar;
+export default AllPostMainBar;
