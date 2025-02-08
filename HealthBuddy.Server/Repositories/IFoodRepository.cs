@@ -15,5 +15,7 @@ namespace HealthBuddy.Server.Repositories
 
         public Task<Dictionary<int, int>> GetTotalFoodsByUserIds(List<int> userIds);
 
+        public Task<List<Food>> GetFoodsByKeyWord(string keyWord);
+
     }
 }

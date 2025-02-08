@@ -44,7 +44,7 @@ const SortFilterBar = ({
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-6">
+    <div className="w-full max-w-4xl mx-auto px-6">
       <div className="flex flex-wrap gap-4 items-center justify-between">
         <FilterButtons
           filters={sortOptions}

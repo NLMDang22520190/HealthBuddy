@@ -15,5 +15,7 @@ namespace HealthBuddy.Server.Repositories
 
         public Task<Dictionary<int, int>> GetTotalExercisesByUserIds(List<int> userIds);
 
+        public Task<List<Exercise>> GetExercisesByKeyWord(string keyWord);
+
     }
 }
