@@ -1,12 +1,14 @@
-import { React, useState } from "react";
+import React, { useState } from "react";
 import { ChevronDown, X, Filter } from "lucide-react";
-
 import FilterButtons from "../FilterButtons/FilterButtons";
 
-const SortFilterBar = () => {
-  const [activeSort, setActiveSort] = useState("all");
+const SortFilterBar = ({
+  activeSort,
+  setActiveSort,
+  selectedFilters,
+  setSelectedFilters,
+}) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [selectedFilters, setSelectedFilters] = useState(new Set());
 
   const sortOptions = ["all", "Most Recent", "Most Likes", "Most Comments"];
 
@@ -22,18 +24,18 @@ const SortFilterBar = () => {
   };
 
   const handleFilterChange = (filter) => {
-    const newFilters = new Set(selectedFilters);
-    if (newFilters.has(filter)) {
-      newFilters.delete(filter);
-    } else {
-      newFilters.add(filter);
-    }
-    setSelectedFilters(newFilters);
+    setSelectedFilters((prevFilters) => {
+      if (prevFilters.includes(filter)) {
+        return prevFilters.filter((item) => item !== filter);
+      } else {
+        return [...prevFilters, filter];
+      }
+    });
   };
 
   const handleClearAll = () => {
     setActiveSort("all");
-    setSelectedFilters(new Set());
+    setSelectedFilters([]);
     setIsFilterOpen(false);
   };
 
@@ -48,34 +50,29 @@ const SortFilterBar = () => {
           filters={sortOptions}
           activeFilter={activeSort}
           onFilterChange={setActiveSort}
-        ></FilterButtons>
+        />
         <div className="relative">
           <div className="flex gap-2">
             <button
               onClick={toggleFilter}
-              className={`py-2.5 px-2  transition-all duration-200 text-sm font-medium
-                flex items-center rounded-xl gap-2 border border-gray-200
-                ${
-                  isFilterOpen
-                    ? "bg-primary-light dark:bg-primary-dark text-white"
-                    : " bg-transparent  border-2  border-primary-light dark:border-primary-dark shadow-lg hover:bg-primary-light dark:hover:bg-primary-dark text-primary-light dark:text-primary-dark hover:text-white dark:hover:text-white cursor-pointer "
-                }`}
+              className={`py-2.5 px-2 transition-all duration-200 text-sm font-medium flex items-center rounded-xl gap-2 border-2 border-primary-light dark:border-primary-dark shadow-lg ${
+                isFilterOpen
+                  ? "bg-primary-light dark:bg-primary-dark text-white"
+                  : "bg-transparent  hover:bg-primary-light dark:hover:bg-primary-dark text-primary-light dark:text-primary-dark hover:text-white dark:hover:text-white duration-300"
+              }`}
             >
-              {/* Filter */}
               <Filter className="w-4 h-4" />
               <ChevronDown
                 className={`w-4 h-4 transition-transform duration-200 ${
-                  isFilterOpen ? "transform rotate-180" : ""
+                  isFilterOpen ? "rotate-180" : ""
                 }`}
               />
             </button>
-            {(selectedFilters.size > 0 || activeSort !== "all") && (
+            {(selectedFilters.length > 0 || activeSort !== "all") && (
               <button
                 onClick={handleClearAll}
-                className="p-2 rounded-full transition-all duration-200 text-sm font-medium
-                   bg-transparent  border-2  border-compleprimary-light dark:border-compleprimary-dark shadow-lg hover:bg-compleprimary-light dark:hover:bg-compleprimary-dark text-compleprimary-light dark:text-compleprimary-dark hover:text-white dark:hover:text-white cursor-pointer uppercase"
+                className="p-2 rounded-full transition-all duration-200 text-sm font-medium bg-transparent border-2 border-compleprimary-light dark:border-compleprimary-dark shadow-lg hover:bg-compleprimary-light dark:hover:bg-compleprimary-dark text-compleprimary-light dark:text-compleprimary-dark hover:text-white dark:hover:text-white duration-300 cursor-pointer active:scale-[0.98]"
               >
-                {/* Clear All */}
                 <X className="w-4 h-4" />
               </button>
             )}
@@ -86,11 +83,11 @@ const SortFilterBar = () => {
                 {filterOptions.map((filter) => (
                   <label
                     key={filter.id}
-                    className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded-md transition-colors"
+                    className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded-md"
                   >
                     <input
                       type="checkbox"
-                      checked={selectedFilters.has(filter.id)}
+                      checked={selectedFilters.includes(filter.id)}
                       onChange={() => handleFilterChange(filter.id)}
                       className="w-4 h-4 rounded border-gray-300 text-primary-light dark:text-primary-dark focus:ring-primary-light dark:focus:ring-primary-dark"
                     />
