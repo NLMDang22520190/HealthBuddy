@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using HealthBuddy.Server.Models;
 using HealthBuddy.Server.Models.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -44,9 +45,14 @@ namespace HealthBuddy.Server.Repositories.Implement
         {
             using (var dbContext = new HealthBuddyDbContext(_dbContextOptions))
             {
-                return await dbContext.Exercises.Where(e => e.IsApproved == true && e.IsHidden == false).Include(e => e.Uploader)
-                .Include(e => e.ExerciseTypes)
-                .Include(e => e.MuscleTypes).ToListAsync();
+                var result = await dbContext.Exercises
+                    .Where(e => e.IsApproved == true && e.IsHidden == false)
+                    .Include(e => e.Uploader)
+                    .Include(e => e.ExerciseTypes)
+                    .Include(e => e.MuscleTypes).AsNoTracking()
+                    .ToListAsync();
+
+                return result;
             }
         }
 
@@ -56,7 +62,7 @@ namespace HealthBuddy.Server.Repositories.Implement
             {
                 return await dbContext.Exercises.Where(e => e.UploaderId == userId && e.IsApproved == true && e.IsHidden == false)
                                 .Include(e => e.Uploader).Include(e => e.ExerciseTypes)
-                .Include(e => e.MuscleTypes).ToListAsync();
+                .Include(e => e.MuscleTypes).AsNoTracking().ToListAsync();
             }
         }
 
@@ -72,7 +78,7 @@ namespace HealthBuddy.Server.Repositories.Implement
         {
             using (var dbContext = new HealthBuddyDbContext(_dbContextOptions))
             {
-                return await dbContext.Exercises.Where(e => e.UploaderId == userId).CountAsync();
+                return await dbContext.Exercises.Where(e => e.UploaderId == userId).AsNoTracking().CountAsync();
             }
         }
 
@@ -83,7 +89,7 @@ namespace HealthBuddy.Server.Repositories.Implement
                 return await dbContext.Exercises
                             .Where(e => userIds.Contains(e.UploaderId))
                             .GroupBy(e => e.UploaderId)
-                            .Select(g => new { UserId = g.Key, Count = g.Count() })
+                            .Select(g => new { UserId = g.Key, Count = g.Count() }).AsNoTracking()
                             .ToDictionaryAsync(g => g.UserId, g => g.Count);
             }
         }

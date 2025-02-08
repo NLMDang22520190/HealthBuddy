@@ -140,6 +140,11 @@ const UserProfileMainBar = () => {
           name: post.uploader.username,
           avatar: post.uploader.avatar,
         },
+        tags: post.tags.map((tag) => ({
+          id: tag.tagId,
+          name: tag.tagName,
+          type: tag.tagType,
+        })),
         numberOfLikes: post.numberOfLikes,
         numberOfComments: post.numberOfComments,
         postDate: post.createdDate,
