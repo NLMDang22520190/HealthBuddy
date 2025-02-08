@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { message } from "antd";
 import { Spinner } from "flowbite-react";
+import { Frown } from "lucide-react";
 
 import PostList from "../PostList/PostList";
 import UserAddNewPost from "../UserAddNewPost/UserAddNewPost";
@@ -78,14 +79,24 @@ const HomeMainBar = () => {
     //navigate("/add/new-food");
   };
 
+  if (isPostLoading)
+    return (
+      <div className="flex h-96 justify-center items-center">
+        <Spinner size="xl" color="info" />
+      </div>
+    );
+
   return (
     <div className="user-page-mainbar-content-container">
       {/* Content bên trong scroll */}
       <div className="min-h-screen divide-gray-400 divide-y user-page-mainbar-content-marginbottom">
         {user && <UserAddNewPost onAddClick={handleAddClick} />}
-        {isPostLoading || posts.length === 0 ? (
-          <div className="flex h-96 justify-center items-center">
-            <Spinner size="xl" color="info" />
+        {posts.length === 0 ? (
+          <div className="flex flex-col gap-12 h-96 justify-center items-center">
+            <Frown className="size-28 text-primary-light dark:text-primary-dark"></Frown>
+            <p className="text-gray-500 text-lg font-semibold">
+              No posts found
+            </p>
           </div>
         ) : (
           <PostList posts={posts} />

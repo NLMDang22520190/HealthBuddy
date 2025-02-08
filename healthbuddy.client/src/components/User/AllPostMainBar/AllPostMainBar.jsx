@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { message } from "antd";
 import { Spinner } from "flowbite-react";
+import { Frown } from "lucide-react";
 
 import PostList from "../PostList/PostList";
 import SortFilterBar from "./SortFilterBar";
@@ -83,13 +84,23 @@ const AllPostMainBar = () => {
       return 0;
     });
 
+  if (isPostLoading)
+    return (
+      <div className="flex h-96 justify-center items-center">
+        <Spinner size="xl" color="info" />
+      </div>
+    );
+
   return (
     <div className="user-page-mainbar-content-container">
       {/* Content bên trong scroll */}
       <div className="min-h-screen divide-gray-400 divide-y user-page-mainbar-content-marginbottom">
         {isPostLoading || posts.length === 0 ? (
-          <div className="flex h-96 justify-center items-center">
-            <Spinner size="xl" color="info" />
+          <div className="flex flex-col gap-12 h-96 justify-center items-center">
+            <Frown className="size-28 text-primary-light dark:text-primary-dark"></Frown>
+            <p className="text-gray-500 text-lg font-semibold">
+              No posts found
+            </p>
           </div>
         ) : (
           <div className="flex flex-col gap-4">
