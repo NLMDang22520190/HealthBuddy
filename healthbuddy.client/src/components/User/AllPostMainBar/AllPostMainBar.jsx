@@ -3,6 +3,7 @@ import { message } from "antd";
 import { Spinner } from "flowbite-react";
 
 import PostList from "../PostList/PostList";
+import SortFilterBar from "./SortFilterBar";
 import api from "../../../features/AxiosInstance/AxiosInstance";
 
 const AllPostMainBar = () => {
@@ -70,7 +71,10 @@ const AllPostMainBar = () => {
             <Spinner size="xl" color="info" />
           </div>
         ) : (
-          <PostList posts={posts} />
+          <div className="flex flex-col gap-4">
+            <SortFilterBar />
+            <PostList posts={posts} />
+          </div>
         )}
       </div>
     </div>

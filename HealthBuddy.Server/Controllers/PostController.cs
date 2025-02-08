@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using AutoMapper;
 using HealthBuddy.Server.Models.DTO.GET;
 using HealthBuddy.Server.Repositories;
@@ -26,8 +27,8 @@ namespace HealthBuddy.Server.Controllers
         {
             try
             {
-                var foodTask = Task.Run(() => _foodRepository.GetApprovedFoods());
-                var exerciseTask = Task.Run(() => _exerciseRepository.GetApprovedExercises());
+                var foodTask = _foodRepository.GetApprovedFoods();
+                var exerciseTask = _exerciseRepository.GetApprovedExercises();
 
                 await Task.WhenAll(foodTask, exerciseTask);
 
@@ -90,6 +91,8 @@ namespace HealthBuddy.Server.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data: " + e.Message);
             }
         }
+
+
 
     }
 }

@@ -49,7 +49,7 @@ namespace HealthBuddy.Server.Repositories.Implement
             using (var dbContext = new HealthBuddyDbContext(_dbContextOptions))
             {
                 return await dbContext.Foods.Where(f => f.IsApproved == true && f.IsHidden == false).Include(f => f.Uploader)
-                .Include(f => f.FoodTypes).ToListAsync();
+                .Include(f => f.FoodTypes).AsNoTracking().ToListAsync();
             }
         }
 
@@ -58,7 +58,7 @@ namespace HealthBuddy.Server.Repositories.Implement
             using (var dbContext = new HealthBuddyDbContext(_dbContextOptions))
             {
                 return await dbContext.Foods.Where(f => f.UploaderId == userId && f.IsApproved == true && f.IsHidden == false)
-                .Include(f => f.Uploader).Include(f => f.FoodTypes)
+                .Include(f => f.Uploader).Include(f => f.FoodTypes).AsNoTracking()
                 .ToListAsync();
             }
         }
@@ -75,7 +75,7 @@ namespace HealthBuddy.Server.Repositories.Implement
         {
             using (var dbContext = new HealthBuddyDbContext(_dbContextOptions))
             {
-                return await dbContext.Foods.Where(f => f.UploaderId == userId).CountAsync();
+                return await dbContext.Foods.Where(f => f.UploaderId == userId).AsNoTracking().CountAsync();
             }
         }
 
@@ -86,7 +86,7 @@ namespace HealthBuddy.Server.Repositories.Implement
                 return await dbContext.Foods
                             .Where(f => userIds.Contains(f.UploaderId))
                             .GroupBy(f => f.UploaderId)
-                            .Select(g => new { UserId = g.Key, Count = g.Count() })
+                            .Select(g => new { UserId = g.Key, Count = g.Count() }).AsNoTracking()
                             .ToDictionaryAsync(g => g.UserId, g => g.Count);
             }
         }
