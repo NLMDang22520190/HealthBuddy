@@ -9,6 +9,8 @@ import api from "../../../features/AxiosInstance/AxiosInstance";
 const AllPostMainBar = () => {
   const [posts, setPosts] = useState([]);
   const [isPostLoading, setIsPostLoading] = useState(false);
+  const [activeSort, setActiveSort] = useState("all");
+  const [selectedFilters, setSelectedFilters] = useState([]);
 
   const fetchPosts = async (signal) => {
     setIsPostLoading(true);
@@ -62,6 +64,25 @@ const AllPostMainBar = () => {
     };
   }, []);
 
+  // 🔹 **Lọc bài viết dựa trên selectedFilters và activeSort**
+  const filteredPosts = posts
+    .filter((post) => {
+      if (selectedFilters.length === 0) return true;
+      return selectedFilters.includes(post.type);
+    })
+    .sort((a, b) => {
+      if (activeSort === "Most Recent") {
+        return new Date(b.postDate) - new Date(a.postDate);
+      }
+      if (activeSort === "Most Likes") {
+        return b.numberOfLikes - a.numberOfLikes;
+      }
+      if (activeSort === "Most Comments") {
+        return b.numberOfComments - a.numberOfComments;
+      }
+      return 0;
+    });
+
   return (
     <div className="user-page-mainbar-content-container">
       {/* Content bên trong scroll */}
@@ -72,8 +93,13 @@ const AllPostMainBar = () => {
           </div>
         ) : (
           <div className="flex flex-col gap-4">
-            <SortFilterBar />
-            <PostList posts={posts} />
+            <SortFilterBar
+              activeSort={activeSort}
+              setActiveSort={setActiveSort}
+              selectedFilters={selectedFilters}
+              setSelectedFilters={setSelectedFilters}
+            />
+            <PostList posts={filteredPosts} />
           </div>
         )}
       </div>
