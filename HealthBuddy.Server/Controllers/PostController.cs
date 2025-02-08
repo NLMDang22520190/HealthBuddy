@@ -93,6 +93,46 @@ namespace HealthBuddy.Server.Controllers
         }
 
 
+        [HttpGet("SearchByKeyword")]
+        public async Task<ActionResult> SearchByKeyword(string keyword)
+        {
+            try
+            {
+                var foodTask = _foodRepository.GetFoodsByKeyWord(keyword);
+                var exerciseTask = _exerciseRepository.GetExercisesByKeyWord(keyword);
 
+                await Task.WhenAll(foodTask, exerciseTask);
+
+                // Lấy kết quả từ các task
+                var foods = await foodTask;
+                var exercises = await exerciseTask;
+
+                // Map từ Food và Exercise sang PostDTO
+                var foodPosts = _mapper.Map<List<PostDTO>>(foods);
+                var exercisePosts = _mapper.Map<List<PostDTO>>(exercises);
+
+                // Gán loại bài post (food hoặc exercise)
+                foreach (var post in foodPosts)
+                {
+                    post.PostType = "food";
+                }
+
+                foreach (var post in exercisePosts)
+                {
+                    post.PostType = "exercise";
+                }
+
+                // Gộp cả hai danh sách lại
+                var allPosts = new List<PostDTO>();
+                allPosts.AddRange(foodPosts);
+                allPosts.AddRange(exercisePosts);
+
+                return Ok(allPosts.OrderByDescending(p => p.CreatedDate));
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database:" + e.Message);
+            }
+        }
     }
 }

@@ -71,6 +71,18 @@ namespace HealthBuddy.Server.Repositories.Implement
             .FirstOrDefaultAsync(f => f.FoodId == foodId);
         }
 
+        public async Task<List<Food>> GetFoodsByKeyWord(string keyWord)
+        {
+            using (var dbContext = new HealthBuddyDbContext(_dbContextOptions))
+            {
+                return await dbContext.Foods.Where(f => (f.Description.Contains(keyWord) || f.FoodName.Contains(keyWord) || f.HealthBenefits.Contains(keyWord))
+                && f.IsApproved == true && f.IsHidden == false)
+                .Include(f => f.Uploader)
+                .Include(f => f.FoodTypes)
+                .AsNoTracking().ToListAsync();
+            }
+        }
+
         public async Task<int> GetTotalFoodsByUserId(int userId)
         {
             using (var dbContext = new HealthBuddyDbContext(_dbContextOptions))

@@ -74,6 +74,21 @@ namespace HealthBuddy.Server.Repositories.Implement
             .FirstOrDefaultAsync(e => e.ExerciseId == exerciseId);
         }
 
+        public async Task<List<Exercise>> GetExercisesByKeyWord(string keyWord)
+        {
+            using (var dbContext = new HealthBuddyDbContext(_dbContextOptions))
+            {
+                var result = await dbContext.Exercises
+                    .Where(e => (e.ExerciseName.Contains(keyWord) || e.Description.Contains(keyWord))
+                    && e.IsApproved == true && e.IsHidden == false)
+                    .Include(e => e.Uploader)
+                    .Include(e => e.ExerciseTypes)
+                    .Include(e => e.MuscleTypes).AsNoTracking()
+                    .ToListAsync();
+                return result;
+            }
+        }
+
         public async Task<int> GetTotalExercisesByUserId(int userId)
         {
             using (var dbContext = new HealthBuddyDbContext(_dbContextOptions))
