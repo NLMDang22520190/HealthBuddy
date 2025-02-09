@@ -15,6 +15,7 @@ import Users from "../pages/User/Users/Users";
 import UserProfile from "../pages/User/UserProfile/UserProfile";
 import AllPost from "../pages/User/AllPost/AllPost";
 import PostByKeyword from "../pages/User/PostByKeyword/PostByKeyword";
+import Schedule from "../pages/User/Schedule/Schedule";
 
 import NewFood from "../pages/User/Add/NewFood/NewFood";
 import NewExercise from "../pages/User/Add/NewExercise/NewExercise";
@@ -31,6 +32,7 @@ const AllUserRoutes = () => {
       <Route path="all-post" element={<AllPost />} />
       <Route path="all-post/keyword/:keyword" element={<PostByKeyword />} />
       <Route path="chatBot" element={<ChatBot />} />
+      <Route path="schedule" element={<Schedule />} />
       <Route path="users" element={<Users />} />
       <Route path="user/:userId" element={<UserProfile />} />
 

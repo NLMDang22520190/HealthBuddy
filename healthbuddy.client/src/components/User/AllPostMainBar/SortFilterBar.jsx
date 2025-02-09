@@ -7,17 +7,24 @@ const SortFilterBar = ({
   setActiveSort,
   selectedFilters,
   setSelectedFilters,
-}) => {
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-
-  const sortOptions = ["all", "Most Recent", "Most Likes", "Most Comments"];
-
-  const filterOptions = [
+  sortOptions = ["all", "Most Recent", "Most Likes", "Most Comments"],
+  filterOptions = [
     { id: "food", label: "Food" },
     { id: "exercise", label: "Exercise" },
     { id: "workout", label: "Workout" },
     { id: "meal", label: "Meal" },
-  ];
+  ],
+}) => {
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  // const sortOptions = ["all", "Most Recent", "Most Likes", "Most Comments"];
+
+  // const filterOptions = [
+  //   { id: "food", label: "Food" },
+  //   { id: "exercise", label: "Exercise" },
+  //   { id: "workout", label: "Workout" },
+  //   { id: "meal", label: "Meal" },
+  // ];
 
   const handleSortClick = (sort) => {
     setActiveSort(sort);
