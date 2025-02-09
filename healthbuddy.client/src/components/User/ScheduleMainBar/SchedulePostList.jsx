@@ -16,7 +16,7 @@ const container = {
 const SchedulePostList = ({ posts }) => {
   return (
     <motion.div
-      className="grid gap-6 grid-cols-2"
+      className="grid px-6 gap-6 grid-cols-2"
       variants={container}
       initial="hidden"
       animate="show"
