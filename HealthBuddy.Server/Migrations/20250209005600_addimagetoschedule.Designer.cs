@@ -4,6 +4,7 @@ using HealthBuddy.Server.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthBuddy.Server.Migrations
 {
     [DbContext(typeof(HealthBuddyDbContext))]
-    partial class HealthBuddyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250209005600_addimagetoschedule")]
+    partial class addimagetoschedule
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -815,9 +818,6 @@ namespace HealthBuddy.Server.Migrations
                         .HasDefaultValueSql("(getdate())");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ImgUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsApproved")

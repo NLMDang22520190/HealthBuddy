@@ -10,6 +10,13 @@ public partial class MealSchedule
     public int UploaderId { get; set; }
 
     public string MealName { get; set; } = null!;
+    public string? Description { get; set; }
+
+    public int NumberOfLikes { get; set; }
+
+    public int NumberOfComments { get; set; }
+
+    public string? ImgUrl { get; set; }
 
     public int TotalDays { get; set; }
 
