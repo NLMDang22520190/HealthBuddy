@@ -103,7 +103,7 @@ const AllPostMainBar = () => {
             </p>
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 pt-6">
             <SortFilterBar
               activeSort={activeSort}
               setActiveSort={setActiveSort}

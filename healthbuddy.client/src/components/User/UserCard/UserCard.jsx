@@ -68,7 +68,7 @@ const UserCard = ({ user }) => {
         </div>
 
         <div className="grid grid-rows-4 gap-1">
-          <Tooltip content="Number of food posts">
+          {/* <Tooltip content="Number of food posts">
             <Label className="text-sm font-semibold flex gap-2 items-center">
               <Beef className="size-4"></Beef> {user.FoodPosted}
             </Label>
@@ -88,7 +88,21 @@ const UserCard = ({ user }) => {
               <UtensilsCrossed className="size-4"></UtensilsCrossed>{" "}
               {user.MealSchedulePosted}
             </Label>
-          </Tooltip>
+          </Tooltip> */}
+
+          <Label className="text-sm font-semibold flex gap-2 items-center">
+            <Beef className="size-4"></Beef> {user.FoodPosted}
+          </Label>
+          <Label className="text-sm font-semibold flex gap-2 items-center">
+            <Dumbbell className="size-4"></Dumbbell> {user.ExercisePosted}
+          </Label>
+          <Label className="text-sm font-semibold flex gap-2 items-center">
+            <Flame className="size-4"></Flame> {user.WorkoutSchedulePosted}
+          </Label>
+          <Label className="text-sm font-semibold flex gap-2 items-center">
+            <UtensilsCrossed className="size-4"></UtensilsCrossed>{" "}
+            {user.MealSchedulePosted}
+          </Label>
         </div>
       </div>
     </Card>
