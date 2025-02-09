@@ -2,7 +2,9 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { TextInput, Spinner, Label } from "flowbite-react";
 import { Search } from "lucide-react";
+
 import SchedulePostList from "./SchedulePostList";
+import SortFilterBar from "../AllPostMainBar/SortFilterBar";
 
 const samplePosts = [
   {
@@ -55,7 +57,7 @@ const samplePosts = [
     numberOfLikes: 150,
     numberOfComments: 40,
     postDate: "2024-02-03",
-    type: "Food",
+    type: "Meal",
     totalDays: 7,
   },
   {
@@ -72,7 +74,7 @@ const samplePosts = [
     numberOfLikes: 110,
     numberOfComments: 18,
     postDate: "2024-02-04",
-    type: "Exercise",
+    type: "Workout",
     totalDays: 4,
   },
   {
@@ -123,7 +125,7 @@ const samplePosts = [
     numberOfLikes: 140,
     numberOfComments: 35,
     postDate: "2024-02-07",
-    type: "Exercise",
+    type: "Workout",
     totalDays: 8,
   },
   {
@@ -140,7 +142,7 @@ const samplePosts = [
     numberOfLikes: 105,
     numberOfComments: 20,
     postDate: "2024-02-08",
-    type: "Food",
+    type: "Meal",
     totalDays: 5,
   },
   {
@@ -174,13 +176,43 @@ const samplePosts = [
     numberOfLikes: 90,
     numberOfComments: 17,
     postDate: "2024-02-10",
-    type: "Exercise",
+    type: "Workout",
     totalDays: 3,
   },
 ];
 
 const ScheduleMainBar = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeSort, setActiveSort] = useState("all");
+  const [selectedFilters, setSelectedFilters] = useState([]);
+
+  const filteredPosts = samplePosts
+    .filter((post) => {
+      // 🔹 Lọc theo danh mục (selectedFilters)
+      const matchesFilter =
+        selectedFilters.length === 0 ||
+        selectedFilters.includes(post.type.toLowerCase());
+
+      // 🔹 Lọc theo search query (tìm trong title và content)
+      const matchesSearch =
+        searchQuery.trim() === "" ||
+        post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        post.content.toLowerCase().includes(searchQuery.toLowerCase());
+
+      return matchesFilter && matchesSearch;
+    })
+    .sort((a, b) => {
+      if (activeSort === "Most Recent") {
+        return new Date(b.postDate) - new Date(a.postDate);
+      }
+      if (activeSort === "Most Likes") {
+        return b.numberOfLikes - a.numberOfLikes;
+      }
+      if (activeSort === "Most Comments") {
+        return b.numberOfComments - a.numberOfComments;
+      }
+      return 0;
+    });
 
   return (
     <div className="user-page-mainbar-content-container">
@@ -188,9 +220,9 @@ const ScheduleMainBar = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="flex flex-col p-3 md:p-6 gap-4 user-page-mainbar-content-marginbottom"
+        className="flex flex-col py-6 gap-4 user-page-mainbar-content-marginbottom"
       >
-        <div className="flex">
+        <div className="flex px-6">
           <TextInput
             className="flex-1 "
             icon={Search}
@@ -200,7 +232,19 @@ const ScheduleMainBar = () => {
           ></TextInput>
         </div>
 
-        <SchedulePostList posts={samplePosts} />
+        <SortFilterBar
+          activeSort={activeSort}
+          setActiveSort={setActiveSort}
+          selectedFilters={selectedFilters}
+          setSelectedFilters={setSelectedFilters}
+          filterOptions={[
+            { id: "workout", label: "Workout" },
+            { id: "meal", label: "Meal" },
+          ]}
+          onClearClick={() => setSearchQuery("")}
+        />
+
+        <SchedulePostList posts={filteredPosts} />
 
         {/* {isPending || users.length === 0 ? ( // Hiển thị spinner khi đang tải dữ liệu
         <div className="flex justify-center items-center">

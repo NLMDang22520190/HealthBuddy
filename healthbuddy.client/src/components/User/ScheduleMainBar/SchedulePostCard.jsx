@@ -5,15 +5,26 @@ import { Avatar } from "antd";
 import { Heart, MessageCircle, MoreVertical } from "lucide-react";
 import { motion } from "framer-motion";
 
+import ShowImageModal from "../../ShowImageModal/ShowImageModal";
+
 const SchedulePostCard = ({ post }) => {
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState("");
+
+  const handleImageClick = (image) => {
+    setSelectedImage(image);
+    setShowImageModal(true);
+  };
+
   return (
-    <div className="bg-white shadow-lg rounded-lg w-full relative aspect-[3/4] overflow-hidden hover:shadow-md hover:shadow-secondary-light dark:hover:shadow-sm dark:hover:shadow-primary-dark transition-shadow">
+    <div className="bg-white dark:bg-card_dark shadow-lg rounded-lg w-full relative aspect-[3/4] overflow-hidden hover:shadow-md hover:shadow-secondary-light dark:hover:shadow-sm dark:hover:shadow-primary-dark transition-shadow">
       {/* Image Section (50% height) */}
       <div className="relative h-1/2 overflow-hidden">
         <img
           src={post.image}
           alt={post.title}
-          className={`w-full h-full hover:scale-105 object-cover transition-transform duration-300 `}
+          onClick={() => handleImageClick(post.image)}
+          className={`cursor-pointer w-full h-full hover:scale-105 object-cover transition-transform duration-300 `}
         />
         <Badge color="info" className="absolute top-3 right-3 ">
           {post.type}
@@ -70,9 +81,16 @@ const SchedulePostCard = ({ post }) => {
               <Label className="text-xs">{post.numberOfComments}</Label>
             </motion.div>
           </div>
-          <Badge className="text-xs">{post.totalDays} days</Badge>
+          <Badge color="success" className="text-xs">
+            {post.totalDays} days
+          </Badge>
         </div>
       </div>
+      <ShowImageModal
+        image={selectedImage}
+        show={showImageModal}
+        onCancel={() => setShowImageModal(false)}
+      ></ShowImageModal>
     </div>
   );
 };
