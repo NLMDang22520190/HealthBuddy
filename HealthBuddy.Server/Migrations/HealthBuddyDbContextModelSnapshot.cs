@@ -405,6 +405,12 @@ namespace HealthBuddy.Server.Migrations
                         .HasColumnType("datetime")
                         .HasDefaultValueSql("(getdate())");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImgUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsApproved")
                         .HasColumnType("bit");
 
@@ -415,6 +421,12 @@ namespace HealthBuddy.Server.Migrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("NumberOfComments")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NumberOfLikes")
+                        .HasColumnType("int");
 
                     b.Property<int>("TotalDays")
                         .HasColumnType("int");
@@ -803,6 +815,9 @@ namespace HealthBuddy.Server.Migrations
                         .HasDefaultValueSql("(getdate())");
 
                     b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImgUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsApproved")

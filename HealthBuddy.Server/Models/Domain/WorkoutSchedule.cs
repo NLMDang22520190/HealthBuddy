@@ -17,6 +17,8 @@ public partial class WorkoutSchedule
 
     public int NumberOfComments { get; set; }
 
+    public string? ImgUrl { get; set; }
+
     public int TotalDays { get; set; }
 
     public bool IsApproved { get; set; }
