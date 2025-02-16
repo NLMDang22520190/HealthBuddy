@@ -10,7 +10,7 @@ const UserComment = ({ comment }) => {
   const navigate = useNavigate();
 
   const handleUserNavigate = (user) => {
-    navigate(`/profile/${user.id}`);
+    navigate(`/user/${user.id}`);
   };
 
   return (

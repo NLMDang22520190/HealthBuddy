@@ -200,6 +200,8 @@ const ExerciseMainBar = () => {
           isLiked={isLiked}
           numberOfLikes={exerciseDetail.numberOfLikes}
           numberOfComments={exerciseDetail.numberOfComments}
+          postType="exercise"
+          postId={postId}
         ></CommentCard>
       </motion.div>
 
