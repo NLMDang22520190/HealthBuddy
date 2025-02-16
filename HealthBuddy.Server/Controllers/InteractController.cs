@@ -7,12 +7,12 @@ namespace HealthBuddy.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TemplateController : ControllerBase
+    public class InteractController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
 
-        public TemplateController(IUserRepository userRepository, IMapper mapper)
+        public InteractController(IUserRepository userRepository, IMapper mapper)
         {
             _userRepository = userRepository;
             _mapper = mapper;

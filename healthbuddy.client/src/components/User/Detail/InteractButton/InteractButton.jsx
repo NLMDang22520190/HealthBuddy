@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Heart, Flag } from "lucide-react";
 import { Label } from "flowbite-react";
 import { motion } from "framer-motion";
@@ -6,12 +6,13 @@ import { MessageCircle } from "lucide-react";
 import { message } from "antd";
 import SharePopover from "../../../SharePopover/SharePopover";
 
-const InteractButton = ({
-  liked,
-  onLikeClick,
-  numberOfLikes,
-  numberOfComments,
-}) => {
+const InteractButton = ({ liked, numberOfLikes, numberOfComments }) => {
+  const [isLiked, setIsLiked] = useState(liked);
+
+  const onLikeClick = () => {
+    setIsLiked(!isLiked);
+  };
+
   const onShareClick = () => {
     const currentUrl = window.location.href; // Lấy URL hiện tại
     navigator.clipboard
@@ -35,10 +36,10 @@ const InteractButton = ({
         <button
           onClick={onLikeClick}
           className={`text-primary-light dark:text-primary-dark ${
-            liked ? "text-red-500 dark:text-red-500" : ""
+            isLiked ? "text-red-500 dark:text-red-500" : ""
           }`}
         >
-          <Heart className={`size-7 ${liked ? "fill-current" : ""}`} />
+          <Heart className={`size-7 ${isLiked ? "fill-current" : ""}`} />
         </button>
         <Label className="text-sm cursor-pointer">{numberOfLikes} Likes</Label>
       </motion.div>

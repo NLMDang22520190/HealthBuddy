@@ -88,6 +88,9 @@ builder.Services.AddScoped<IIngredientRepository, SQLIngredientRepository>();
 builder.Services.AddScoped<IMuscleTypeRepository, SQLMuscleTypeRepository>();
 builder.Services.AddScoped<IExerciseTypeRepository, SQLExerciseTypeRepository>();
 builder.Services.AddScoped<IExerciseRepository, SQLExerciseRepository>();
+builder.Services.AddScoped<ILikeRepository, SQLLikeRepository>();
+builder.Services.AddScoped<ICommentRepository, SQLCommentRepository>();
+builder.Services.AddScoped<IReportRepository, SQLReportRepository>();
 
 
 builder.Services.AddScoped(typeof(IHealthBuddyRepository<>), typeof(HealthBuddyRepository<>));

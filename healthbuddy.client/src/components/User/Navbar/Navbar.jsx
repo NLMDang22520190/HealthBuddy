@@ -109,14 +109,19 @@ const Navbar = ({ onToggleTheme, isDarkTheme }) => {
       <div className=" md-lg:mx-auto bg-white dark:bg-bg_content_dark flex items-center justify-between w-full md-lg:w-10/12 xl:w-8/12 2xl:w-7/12 mt-2 rounded-2xl p-4">
         <div
           onClick={() => navigate("/")}
-          className=" flex text-center items-center gap-4 cursor-pointer"
+          className="flex text-center items-center gap-4 cursor-pointer"
         >
           <img className="size-12" src={logo} alt="logo" />
-          {/* <label className="cursor-pointer hidden sm:block bg-gradient-to-br from-primary-dark to-secondary-dark font-bold text-transparent bg-clip-text text-2xl">
-            health buddy
-          </label> */}
-          <BreakPoint />
+
+          {process.env.NODE_ENV === "development" ? (
+            <BreakPoint />
+          ) : (
+            <label className="cursor-pointer hidden sm:block bg-gradient-to-br from-primary-dark to-secondary-dark font-bold text-transparent bg-clip-text text-2xl">
+              health buddy
+            </label>
+          )}
         </div>
+
         <div className="flex gap-4 items-center">
           <SearchBar />
           {/* <div className="hidden lg:flex gap-2">

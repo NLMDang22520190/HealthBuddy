@@ -60,9 +60,13 @@ import api from "../../../../features/AxiosInstance/AxiosInstance";
 
 const FoodMainBar = () => {
   const [showImageModal, setShowImageModal] = useState(false);
+
   const [foodDetail, setFoodDetail] = useState(null);
   const [isDataLoading, startDataTransition] = useTransition();
+
   const { postId } = useParams();
+
+  const [isLiked, setIsLiked] = useState(false);
 
   const fetchFoodDetail = async () => {
     try {
@@ -229,6 +233,7 @@ const FoodMainBar = () => {
         </Accordion>
 
         <CommentCard
+          isLiked={isLiked}
           numberOfLikes={foodDetail.numberOfLikes}
           numberOfComments={foodDetail.numberOfComments}
         ></CommentCard>

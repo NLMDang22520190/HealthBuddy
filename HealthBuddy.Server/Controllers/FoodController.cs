@@ -4,6 +4,7 @@ using HealthBuddy.Server.Models.Domain;
 using HealthBuddy.Server.Models.DTO.ADD;
 using HealthBuddy.Server.Models.DTO.GET;
 using HealthBuddy.Server.Repositories;
+using HealthBuddy.Server.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,12 +17,23 @@ namespace HealthBuddy.Server.Controllers
         private readonly IFoodRepository _foodRepository;
         private readonly IFoodTypeRepository _foodTypeRepository;
 
+        private readonly IUserRepository _userRepository;
+        private readonly IUserNotificationPreferenceRepository _userNotificationPreferenceRepository;
+
+        private readonly EmailService _emailService = new EmailService();
+
         private readonly IMapper _mapper;
 
-        public FoodController(IFoodRepository foodRepository, IFoodTypeRepository foodTypeRepository, IMapper mapper)
+        public FoodController(IFoodRepository foodRepository,
+        IFoodTypeRepository foodTypeRepository,
+        IUserRepository userRepository,
+        IUserNotificationPreferenceRepository userNotificationPreferenceRepository,
+        IMapper mapper)
         {
             _foodRepository = foodRepository;
             _foodTypeRepository = foodTypeRepository;
+            _userRepository = userRepository;
+            _userNotificationPreferenceRepository = userNotificationPreferenceRepository;
             _mapper = mapper;
         }
 
@@ -103,6 +115,14 @@ namespace HealthBuddy.Server.Controllers
                 {
                     return NotFound("Food not found");
                 }
+
+                // var userNotiDomain = await _userNotificationPreferenceRepository.GetUserNotificationPreferenceByUserIdAsync(updatedFood.UploaderId);
+
+                // if (userNotiDomain.FoodNoti)
+                // {
+                //     var user = await _userRepository.GetUserByIdAsync(updatedFood.UploaderId);
+                //     await _emailService.SendPostApprovedMail(user.Email);
+                // }
 
                 return Ok(_mapper.Map<FoodDTO>(updatedFood));
             }

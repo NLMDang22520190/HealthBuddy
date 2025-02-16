@@ -38,9 +38,13 @@ import api from "../../../../features/AxiosInstance/AxiosInstance";
 
 const ExerciseMainBar = () => {
   const [showImageModal, setShowImageModal] = useState(false);
+
   const [exerciseDetail, setExerciseDetail] = useState(null);
   const [isDataLoading, startDataTransition] = useTransition();
+
   const { postId } = useParams();
+
+  const [isLiked, setIsLiked] = useState(false);
 
   const fetchExerciseDetail = async () => {
     try {
@@ -64,6 +68,8 @@ const ExerciseMainBar = () => {
         muscleTypes: apiResponse.muscleTypes.map(
           (muscle) => muscle.muscleTypeName
         ), // Extract muscle types' names
+        numberOfLikes: response.data.numberOfLikes,
+        numberOfComments: response.data.numberOfComments,
       };
       setExerciseDetail(mappedData);
     } catch (error) {
@@ -190,7 +196,11 @@ const ExerciseMainBar = () => {
           </Accordion.Panel>
         </Accordion>
 
-        <CommentCard></CommentCard>
+        <CommentCard
+          isLiked={isLiked}
+          numberOfLikes={exerciseDetail.numberOfLikes}
+          numberOfComments={exerciseDetail.numberOfComments}
+        ></CommentCard>
       </motion.div>
 
       <CommentAccordition></CommentAccordition>
