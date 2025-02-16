@@ -1,6 +1,6 @@
 import React from "react";
 import { formatDistanceToNow } from "date-fns";
-import { vi } from "date-fns/locale";
+import { enUS, vi } from "date-fns/locale";
 import { Label } from "flowbite-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -38,7 +38,8 @@ const UserComment = ({ comment }) => {
           </Label>
           <Label className="text-sm font-extralight text-gray-500">
             {formatDistanceToNow(new Date(comment.commentDate), {
-              locale: vi,
+              addSuffix: true,
+              locale: enUS,
             })}
           </Label>
         </div>

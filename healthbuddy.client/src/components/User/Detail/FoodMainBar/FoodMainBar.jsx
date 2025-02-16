@@ -28,36 +28,6 @@ import CommentAccordition from "../CommentAccordition/CommentAccordition";
 import ShowImageModal from "../../../ShowImageModal/ShowImageModal";
 import api from "../../../../features/AxiosInstance/AxiosInstance";
 
-// const foodDetail = {
-//   id: 1,
-//   title: "Caesar Salad",
-//   image: "https://placehold.co/50x50.png",
-//   description:
-//     "A classic Caesar salad with crisp romaine lettuce, homemade croutons, parmesan cheese, and a creamy Caesar dressing. Perfect as a side dish or light main course.",
-//   healthBenefits: [
-//     "Rich in vitamins A and K from fresh romaine lettuce",
-//     "Good source of protein from eggs and cheese",
-//     "Heart-healthy fats from olive oil",
-//     "Low in calories and high in fiber",
-//   ],
-//   ingredients: [
-//     { name: "Lettuce", amount: "2", unit: "cups" },
-//     { name: "Tomato", amount: "1", unit: "pieces" },
-//     { name: "Black Pepper", amount: "0.25", unit: "teaspoons" },
-//     { name: "Eggs", amount: "1", unit: "pieces" },
-//     { name: "Onion", amount: "0.5", unit: "pieces" },
-//     { name: "Olive Oil", amount: "10", unit: "ml" },
-//     { name: "Salt", amount: "0.5", unit: "teaspoons" },
-//   ],
-//   stats: {
-//     time: 20,
-//     servings: 2,
-//     calories: 200,
-//     difficulty: "Easy",
-//   },
-//   foodTypes: ["Salad", "Vegetarian", "Low-Calorie"], // Thêm thông tin loại món ăn
-// };
-
 const FoodMainBar = () => {
   const [showImageModal, setShowImageModal] = useState(false);
 
@@ -67,6 +37,12 @@ const FoodMainBar = () => {
   const { postId } = useParams();
 
   const [isLiked, setIsLiked] = useState(false);
+
+  const [commentAdded, setCommentAdded] = useState(false);
+
+  const handleCommentAdded = () => {
+    setCommentAdded((prev) => !prev);
+  };
 
   const fetchFoodDetail = async () => {
     try {
@@ -238,10 +214,15 @@ const FoodMainBar = () => {
           numberOfComments={foodDetail.numberOfComments}
           postType="food"
           postId={postId}
+          onCommentAdded={commentAdded}
         ></CommentCard>
       </motion.div>
 
-      <CommentAccordition></CommentAccordition>
+      <CommentAccordition
+        postType="food"
+        postId={postId}
+        onCommentAdded={handleCommentAdded}
+      ></CommentAccordition>
       <ShowImageModal
         image={foodDetail.image}
         show={showImageModal}
