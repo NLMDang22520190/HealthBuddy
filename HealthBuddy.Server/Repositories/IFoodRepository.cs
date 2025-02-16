@@ -17,5 +17,9 @@ namespace HealthBuddy.Server.Repositories
 
         public Task<List<Food>> GetFoodsByKeyWord(string keyWord);
 
+        public Task UpdateFoodLikes(int foodId, int newLikes);
+
+        public Task UpdateFoodComments(int foodId, int newComments);
+
     }
 }

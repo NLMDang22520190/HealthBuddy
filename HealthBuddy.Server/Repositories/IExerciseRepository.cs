@@ -17,5 +17,9 @@ namespace HealthBuddy.Server.Repositories
 
         public Task<List<Exercise>> GetExercisesByKeyWord(string keyWord);
 
+        public Task UpdateExerciseLikes(int exerciseId, int newLikes);
+
+        public Task UpdateExerciseComments(int exerciseId, int newComments);
+
     }
 }
