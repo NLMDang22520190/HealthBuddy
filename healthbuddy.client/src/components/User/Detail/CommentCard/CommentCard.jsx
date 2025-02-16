@@ -8,14 +8,7 @@ import UserComment from "../UserComment/UserComment";
 import InteractButton from "../InteractButton/InteractButton";
 import api from "../../../../features/AxiosInstance/AxiosInstance";
 
-const CommentCard = ({
-  isLiked = false,
-  numberOfLikes,
-  numberOfComments,
-  postType,
-  postId,
-  onCommentAdded,
-}) => {
+const CommentCard = ({ numberOfLikes, postType, postId, onCommentAdded }) => {
   const [comments, setComments] = useState([]);
 
   const [isLoading, startTransition] = useTransition();
@@ -60,8 +53,9 @@ const CommentCard = ({
     <div className="flex flex-col border rounded-lg mb-6 dark:border-bg_divide_dark border-bg_divide_light">
       <InteractButton
         numberOfLikes={numberOfLikes}
-        numberOfComments={numberOfComments}
-        liked={isLiked}
+        numberOfComments={comments.length}
+        postId={postId}
+        postType={postType}
       ></InteractButton>
       <Accordion className="flex-1 dark:border-transparent border-transparent">
         <Accordion.Panel>
