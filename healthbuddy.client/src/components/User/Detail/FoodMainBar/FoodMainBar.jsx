@@ -236,6 +236,8 @@ const FoodMainBar = () => {
           isLiked={isLiked}
           numberOfLikes={foodDetail.numberOfLikes}
           numberOfComments={foodDetail.numberOfComments}
+          postType="food"
+          postId={postId}
         ></CommentCard>
       </motion.div>
 

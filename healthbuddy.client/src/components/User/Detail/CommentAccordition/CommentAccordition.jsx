@@ -2,9 +2,15 @@ import React, { useState } from "react";
 import { Accordion, Label, Textarea } from "flowbite-react";
 import { Avatar } from "antd";
 import { ArrowUp, ArrowDown, Ellipsis } from "lucide-react";
+import { useSelector } from "react-redux";
 
 const CommentAccordition = () => {
   const [newMessage, setNewMessage] = useState("");
+  const auth = useSelector((state) => state.auth);
+
+  if (!auth.isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="flex sticky bottom-40 md-lg:bottom-24 bg-bg_light dark:bg-bg_content_dark ">
@@ -17,12 +23,6 @@ const CommentAccordition = () => {
           </Accordion.Title>
           <Accordion.Content className="bg-transparent dark:bg-transparent divide-y dark:divide-bg_divide_dark divide-bg_divide_light p-0">
             <div className="px-4 flex items-start gap-2 mt-2 mb-2 md-lg:mb-3">
-              <div className="p-px rounded-full bg-gradient-to-tr from-primary-dark to-secondary-dark">
-                <Avatar
-                  src="https://placehold.co/50x50.png"
-                  className="size-16"
-                ></Avatar>
-              </div>
               <div className="flex-1 p-0.5 rounded-lg bg-gradient-to-tr from-primary-dark to-secondary-dark ">
                 <Textarea
                   className="focus:ring-transparent dark:focus:ring-transparent rounded-lg  dark:bg-bg_content_dark bg-bg_light dark:border-transparent border-transparent"

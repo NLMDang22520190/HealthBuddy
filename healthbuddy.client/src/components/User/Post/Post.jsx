@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { Heart, MessageCircle, Send } from "lucide-react";
-import { vi } from "date-fns/locale";
+import { enUS, vi } from "date-fns/locale";
 import { Avatar, message } from "antd";
 import { Badge, Label } from "flowbite-react";
 import { motion } from "framer-motion";
@@ -80,7 +80,7 @@ const Post = ({ post }) => {
           <Label className="text-sm font-extralight ">
             {formatDistanceToNow(new Date(post.postDate), {
               addSuffix: true,
-              locale: vi,
+              locale: enUS,
             })}
           </Label>
         </div>
