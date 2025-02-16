@@ -108,5 +108,25 @@ namespace HealthBuddy.Server.Repositories.Implement
                             .ToDictionaryAsync(g => g.UserId, g => g.Count);
             }
         }
+
+        public async Task UpdateExerciseComments(int exerciseId, int newComments)
+        {
+            var exercise = await dbContext.Exercises.FirstOrDefaultAsync(e => e.ExerciseId == exerciseId);
+            if (exercise != null)
+            {
+                exercise.NumberOfComments += newComments;
+                await dbContext.SaveChangesAsync();
+            }
+        }
+
+        public async Task UpdateExerciseLikes(int exerciseId, int newLikes)
+        {
+            var exercise = await dbContext.Exercises.FirstOrDefaultAsync(e => e.ExerciseId == exerciseId);
+            if (exercise != null)
+            {
+                exercise.NumberOfLikes += newLikes;
+                await dbContext.SaveChangesAsync();
+            }
+        }
     }
 }
