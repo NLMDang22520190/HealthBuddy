@@ -44,8 +44,6 @@ const ExerciseMainBar = () => {
 
   const { postId } = useParams();
 
-  const [isLiked, setIsLiked] = useState(false);
-
   const [commentAdded, setCommentAdded] = useState(false);
 
   const handleCommentAdded = () => {
@@ -203,7 +201,6 @@ const ExerciseMainBar = () => {
         </Accordion>
 
         <CommentCard
-          isLiked={isLiked}
           numberOfLikes={exerciseDetail.numberOfLikes}
           numberOfComments={exerciseDetail.numberOfComments}
           postType="exercise"

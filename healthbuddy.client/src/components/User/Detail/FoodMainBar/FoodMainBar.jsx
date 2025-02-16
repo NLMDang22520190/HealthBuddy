@@ -36,8 +36,6 @@ const FoodMainBar = () => {
 
   const { postId } = useParams();
 
-  const [isLiked, setIsLiked] = useState(false);
-
   const [commentAdded, setCommentAdded] = useState(false);
 
   const handleCommentAdded = () => {
@@ -209,7 +207,6 @@ const FoodMainBar = () => {
         </Accordion>
 
         <CommentCard
-          isLiked={isLiked}
           numberOfLikes={foodDetail.numberOfLikes}
           numberOfComments={foodDetail.numberOfComments}
           postType="food"

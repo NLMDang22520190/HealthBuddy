@@ -44,11 +44,11 @@ namespace HealthBuddy.Server.Controllers
 
         #region like
         [HttpGet("GetPostLikeByUserId")]
-        public async Task<IActionResult> GetPostLikeByUserId(AddLikeRequestDTO requestDTO)
+        public async Task<IActionResult> GetPostLikeByUserId(int targetId, int userId, string targetType)
         {
             try
             {
-                var like = await _likeRepository.GetPostLikeByUserId(requestDTO.TargetId, requestDTO.UserId, requestDTO.TargetType);
+                var like = await _likeRepository.GetPostLikeByUserId(targetId, userId, targetType);
                 return Ok(like);
             }
             catch (Exception e)
@@ -56,6 +56,7 @@ namespace HealthBuddy.Server.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database " + e.Message);
             }
         }
+
 
         [HttpPost("like")]
         public async Task<IActionResult> Like(AddLikeRequestDTO requestDTO)
@@ -90,6 +91,10 @@ namespace HealthBuddy.Server.Controllers
             try
             {
                 var likeDomain = _mapper.Map<Like>(requestDTO);
+                if (!await _likeRepository.GetPostLikeByUserId(likeDomain.TargetId, likeDomain.UserId, likeDomain.TargetType))
+                {
+                    return BadRequest("You have not liked this post yet");
+                }
                 await _likeRepository.DeleteAsync(l => l.TargetId == likeDomain.TargetId && l.UserId == likeDomain.UserId && l.TargetType == likeDomain.TargetType);
                 if (likeDomain.TargetType == "food")
                 {

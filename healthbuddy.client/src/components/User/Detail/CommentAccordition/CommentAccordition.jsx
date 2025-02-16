@@ -39,7 +39,10 @@ const CommentAccordition = ({ postType, postId, onCommentAdded }) => {
 
   return (
     <div className="flex sticky bottom-40 md-lg:bottom-24 bg-bg_light dark:bg-bg_content_dark ">
-      <Accordion className="flex-1 dark:border-transparent border-transparent">
+      <Accordion
+        collapseAll
+        className="flex-1 dark:border-transparent border-transparent"
+      >
         <Accordion.Panel>
           <Accordion.Title className="dark:focus:ring-transparent focus:ring-transparent rounded-lg hover:rounded-lg hover:bg-transparent focus:bg-transparent  dark:hover:bg-transparent dark:bg-transparent">
             <Label className="flex gap-2 items-center text-xl font-semibold mb-1">
