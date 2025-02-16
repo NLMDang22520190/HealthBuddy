@@ -4,5 +4,6 @@ namespace HealthBuddy.Server.Repositories
 {
     public interface ILikeRepository : IHealthBuddyRepository<Like>
     {
+        public Task<bool> GetPostLikeByUserId(int postId, int userId, string postType);
     }
 }
