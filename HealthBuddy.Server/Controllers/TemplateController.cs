@@ -18,18 +18,6 @@ namespace HealthBuddy.Server.Controllers
             _mapper = mapper;
         }
 
-        // [HttpGet]
-        // public async Task<ActionResult> GetAllUsers()
-        // {
-        //     try
-        //     {
-        //         var users = await _userRepository.GetAllAsync();
-        //         return Ok(users);
-        //     }
-        //     catch (Exception)
-        //     {
-        //         return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database");
-        //     }
-        // }
+
     }
 }
