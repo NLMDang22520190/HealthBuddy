@@ -1,16 +1,41 @@
-import React, { useState } from "react";
+import React, { startTransition, useState, useTransition } from "react";
 import { Accordion, Label, Textarea } from "flowbite-react";
 import { Avatar } from "antd";
 import { ArrowUp, ArrowDown, Ellipsis } from "lucide-react";
 import { useSelector } from "react-redux";
+import { message } from "antd";
 
-const CommentAccordition = () => {
+import api from "../../../../features/AxiosInstance/AxiosInstance";
+
+const CommentAccordition = ({ postType, postId, onCommentAdded }) => {
   const [newMessage, setNewMessage] = useState("");
+  const [isCommentLoading, startCommentTransition] = useTransition();
   const auth = useSelector((state) => state.auth);
+  const userId = auth.userId;
 
   if (!auth.isAuthenticated) {
     return null;
   }
+
+  const handleCommentSubmit = () => {
+    if (!newMessage.trim() || isCommentLoading) return;
+    setNewMessage("");
+    startTransition(async () => {
+      try {
+        await api.post("/api/Interact/comment", {
+          targetId: postId,
+          targetType: postType,
+          userId: userId,
+          content: newMessage,
+        });
+        setNewMessage("");
+        onCommentAdded();
+      } catch (error) {
+        console.error(error);
+        message.error("Failed to add comment: " + error.message);
+      }
+    });
+  };
 
   return (
     <div className="flex sticky bottom-40 md-lg:bottom-24 bg-bg_light dark:bg-bg_content_dark ">
@@ -28,6 +53,7 @@ const CommentAccordition = () => {
                   className="focus:ring-transparent dark:focus:ring-transparent rounded-lg  dark:bg-bg_content_dark bg-bg_light dark:border-transparent border-transparent"
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleCommentSubmit()}
                   placeholder="Write your comment here"
                 />
               </div>
@@ -37,9 +63,10 @@ const CommentAccordition = () => {
                     ? "bg-primary-dark hover:bg-gradient-to-br hover:from-secondary-dark hover:to-primary-dark"
                     : "bg-gray-400 cursor-not-allowed"
                 }`}
-                disabled={!newMessage.trim()} // Disable button when there's no input
+                disabled={!newMessage.trim() || isCommentLoading} // Disable button when there's no input
+                onClick={() => handleCommentSubmit()}
               >
-                {newMessage.trim() ? (
+                {newMessage.trim() || isCommentLoading ? (
                   <ArrowUp className="size-6" />
                 ) : (
                   <Ellipsis className="size-6" />

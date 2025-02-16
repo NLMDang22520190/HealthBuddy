@@ -46,6 +46,12 @@ const ExerciseMainBar = () => {
 
   const [isLiked, setIsLiked] = useState(false);
 
+  const [commentAdded, setCommentAdded] = useState(false);
+
+  const handleCommentAdded = () => {
+    setCommentAdded((prev) => !prev);
+  };
+
   const fetchExerciseDetail = async () => {
     try {
       const response = await api.get(`/api/Exercise/GetExerciseById/${postId}`);
@@ -202,10 +208,15 @@ const ExerciseMainBar = () => {
           numberOfComments={exerciseDetail.numberOfComments}
           postType="exercise"
           postId={postId}
+          onCommentAdded={commentAdded}
         ></CommentCard>
       </motion.div>
 
-      <CommentAccordition></CommentAccordition>
+      <CommentAccordition
+        postType="exercise"
+        postId={postId}
+        onCommentAdded={handleCommentAdded}
+      ></CommentAccordition>
       <ShowImageModal
         image={exerciseDetail.image}
         show={showImageModal}
