@@ -3,19 +3,13 @@ import { motion } from "framer-motion";
 import { Label, Spinner, Button, TextInput } from "flowbite-react";
 import { Image, Trash2, PlusCircle } from "lucide-react";
 import { Select, message } from "antd";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 import NameTextInput from "../FormComponent/NameTextInput";
 import TextAreaInput from "../FormComponent/TextAreaInput";
 import DeleteButton from "../FormComponent/DeleteButton";
 import api from "../../../../features/AxiosInstance/AxiosInstance";
-
-// const sampleExercises = [
-//   { id: 1, name: "Push Ups" },
-//   { id: 2, name: "Squats" },
-//   { id: 3, name: "Lunges" },
-//   { id: 4, name: "Plank" },
-//   { id: 5, name: "Burpees" },
-// ];
 
 const NewWorkoutMainbar = () => {
   const [formData, setFormData] = useState({
@@ -25,14 +19,14 @@ const NewWorkoutMainbar = () => {
     details: [
       {
         id: "",
-        day: "",
+        day: 1,
         exerciseId: "",
       },
     ],
   });
   const [exercises, setExercises] = useState([]);
 
-  const [isFormSubmitting, setIsFormSubmitting] = useState(false);
+  const [isFormSubmitting, startFormSubmitTransition] = useTransition();
   const [isFetchingDataPending, startFetchingDataTransition] = useTransition();
 
   const [formDataValidationError, setFormDataValidationError] = useState({
@@ -41,6 +35,51 @@ const NewWorkoutMainbar = () => {
     imageUrl: null,
     details: null,
   });
+
+  const navigate = useNavigate();
+  const userId = useSelector((state) => state.auth.userId);
+
+  //#region add data
+  const handleAddSchedule = async () => {
+    try {
+      const mappedWorkoutDetails = formData.details.map((d) => ({
+        exerciseId: d.exerciseId,
+        dayNumber: d.day,
+      }));
+
+      const payload = {
+        uploaderId: userId,
+        workOutName: formData.name,
+        description: formData.description,
+        imgUrl: formData.imageUrl,
+        totalDays: mappedWorkoutDetails.length,
+        workoutDetails: mappedWorkoutDetails,
+      };
+
+      const { data } = await api.post(
+        "/api/Workout/AddWorkoutSchedule",
+        payload
+      );
+      console.log("Workout schedule created:", data);
+      message.success("Workout schedule successfully");
+      setTimeout(() => {
+        navigate("/");
+      }, 250);
+      // Optional: reset form, hiển thị thông báo thành công
+    } catch (error) {
+      console.error(
+        "Error creating workout schedule:",
+        error.response?.data || error.message
+      );
+      message.error(
+        "Error creating workout schedule: " + error.response?.data ||
+          error.message
+      );
+      // Optional: hiển thị thông báo lỗi cho người dùng
+    }
+  };
+
+  //#endregion
 
   //#region fetch data
   useEffect(() => {
@@ -153,6 +192,10 @@ const NewWorkoutMainbar = () => {
       message.error("Form contains errors. Please check again!");
       return;
     }
+
+    startFormSubmitTransition(async () => {
+      await handleAddSchedule();
+    });
   };
   //#endregion
 
