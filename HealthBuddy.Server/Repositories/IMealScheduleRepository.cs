@@ -7,5 +7,7 @@ namespace HealthBuddy.Server.Repositories
         Task<MealSchedule> GetMealScheduleByIdAsync(int id);
 
         Task<MealSchedule> ApproveMealScheduleAsync(int id);
+
+        Task<List<MealSchedule>> GetApprovedMealSchedules();
     }
 }
