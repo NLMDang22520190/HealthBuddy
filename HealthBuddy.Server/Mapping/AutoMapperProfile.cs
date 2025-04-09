@@ -11,7 +11,6 @@ namespace HealthBuddy.Server.Mapping
     {
         public AutoMapperProfile()
         {
-            //CreateMap<SignUpRequestDTO, SignUpRequest>();
             CreateMap<User, UserProfileInfoDTO>().ReverseMap();
             CreateMap<UserDetail, UserDetailDTO>().ReverseMap();
             CreateMap<UserNotificationPreference, UserNotiPrefDTO>().ReverseMap();
@@ -57,6 +56,17 @@ namespace HealthBuddy.Server.Mapping
                         TagType = "MuscleType"
                     }))
                 .ToList())); // Chuyển ExerciseType và MuscleType thành TagDTO
+            CreateMap<PostDTO, WorkoutSchedule>()
+               .ForMember(dest => dest.WorkoutScheduleId, opt => opt.MapFrom(src => src.PostId)) // Map PostId sang WorkoutScheduleId
+               .ForMember(dest => dest.WorkOutName, opt => opt.MapFrom(src => src.Title)).ReverseMap()
+               .ForMember(dest => dest.PostId, opt => opt.MapFrom(src => src.WorkoutScheduleId)) // Map WorkoutScheduleId sang PostId
+               .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.WorkOutName)); // Map WorkoutScheduleName sang Title
+
+            CreateMap<PostDTO, MealSchedule>()
+               .ForMember(dest => dest.MealScheduleId, opt => opt.MapFrom(src => src.PostId)) // Map PostId sang MealScheduleId
+               .ForMember(dest => dest.MealName, opt => opt.MapFrom(src => src.Title)).ReverseMap()
+               .ForMember(dest => dest.PostId, opt => opt.MapFrom(src => src.MealScheduleId)) // Map MealScheduleId sang PostId
+               .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.MealName)); // Map MealScheduleName sang Title
 
             CreateMap<MuscleType, MuscleTypeDTO>().ReverseMap();
             CreateMap<ExerciseType, ExerciseTypeDTO>().ReverseMap();

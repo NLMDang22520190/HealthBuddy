@@ -13,14 +13,22 @@ namespace HealthBuddy.Server.Controllers
     {
         private readonly IFoodRepository _foodRepository;
         private readonly IExerciseRepository _exerciseRepository;
+
+        private readonly IWorkoutScheduleRepository _workoutScheduleRepository;
+
+        private readonly IMealScheduleRepository _mealScheduleRepository;
         private readonly IMapper _mapper;
 
-        public PostController(IFoodRepository foodRepository, IMapper mapper, IExerciseRepository exerciseRepository)
+        public PostController(IFoodRepository foodRepository, IMapper mapper, IExerciseRepository exerciseRepository,
+            IWorkoutScheduleRepository workoutScheduleRepository, IMealScheduleRepository mealScheduleRepository)
         {
             _foodRepository = foodRepository;
             _mapper = mapper;
             _exerciseRepository = exerciseRepository;
+            _workoutScheduleRepository = workoutScheduleRepository;
+            _mealScheduleRepository = mealScheduleRepository;
         }
+
 
         [HttpGet("GetAllHomeApprovedPosts")]
         public async Task<ActionResult> GetAllHomeApprovedPosts()
@@ -29,16 +37,22 @@ namespace HealthBuddy.Server.Controllers
             {
                 var foodTask = _foodRepository.GetApprovedFoods();
                 var exerciseTask = _exerciseRepository.GetApprovedExercises();
+                var workoutScheduleTask = _workoutScheduleRepository.GetApprovedWorkoutSchedules();
+                var mealScheduleTask = _mealScheduleRepository.GetApprovedMealSchedules();
 
-                await Task.WhenAll(foodTask, exerciseTask);
+                await Task.WhenAll(foodTask, exerciseTask, workoutScheduleTask, mealScheduleTask);
 
                 // Lấy kết quả từ các task
                 var foods = await foodTask;
                 var exercises = await exerciseTask;
+                var workoutSchedules = await workoutScheduleTask;
+                var mealSchedules = await mealScheduleTask;
 
                 // Map từ Food và Exercise sang PostDTO
                 var foodPosts = _mapper.Map<List<PostDTO>>(foods);
                 var exercisePosts = _mapper.Map<List<PostDTO>>(exercises);
+                var workoutSchedulePosts = _mapper.Map<List<PostDTO>>(workoutSchedules);
+                var mealSchedulePosts = _mapper.Map<List<PostDTO>>(mealSchedules);
 
                 // Gán loại bài post (food hoặc exercise)
                 foreach (var post in foodPosts)
@@ -51,10 +65,22 @@ namespace HealthBuddy.Server.Controllers
                     post.PostType = "exercise";
                 }
 
+                foreach (var post in workoutSchedulePosts)
+                {
+                    post.PostType = "workoutSchedule";
+                }
+
+                foreach (var post in mealSchedulePosts)
+                {
+                    post.PostType = "mealSchedule";
+                }
+
                 // Gộp cả hai danh sách lại
                 var allPosts = new List<PostDTO>();
                 allPosts.AddRange(foodPosts);
                 allPosts.AddRange(exercisePosts);
+                allPosts.AddRange(workoutSchedulePosts);
+                allPosts.AddRange(mealSchedulePosts);
 
                 return Ok(allPosts.OrderByDescending(p => p.CreatedDate));
             }

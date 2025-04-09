@@ -7,5 +7,7 @@ namespace HealthBuddy.Server.Repositories
         Task<WorkoutSchedule> GetWorkoutScheduleByIdAsync(int id);
 
         Task<WorkoutSchedule> ApproveWorkoutScheduleAsync(int id);
+
+        Task<List<WorkoutSchedule>> GetApprovedWorkoutSchedules();
     }
 }

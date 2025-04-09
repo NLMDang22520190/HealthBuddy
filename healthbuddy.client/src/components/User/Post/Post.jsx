@@ -27,6 +27,12 @@ const Post = ({ post }) => {
     if (post.type === "exercise") {
       path = "/detail/exercise";
     }
+    if (post.type === "mealSchedule") {
+      path = "/detail/mealSchedule";
+    }
+    if (post.type === "workoutSchedule") {
+      path = "/detail/workoutSchedule";
+    }
     path += `/${post.id}`;
     return path;
   };
