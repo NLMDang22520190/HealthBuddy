@@ -79,6 +79,24 @@ namespace HealthBuddy.Server.Controllers
             }
         }
 
+        [HttpPut("ApproveWorkoutSchedule/{id}")]
+        public async Task<ActionResult> ApproveWorkoutSchedule(int id)
+        {
+            try
+            {
+                var workoutSchedule = await _workoutScheduleRepository.ApproveWorkoutScheduleAsync(id);
+                if (workoutSchedule == null)
+                {
+                    return NotFound($"Workout schedule with ID {id} not found.");
+                }
+                return Ok(_mapper.Map<WorkoutScheduleDTO>(workoutSchedule));
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error approving data in the database: " + e.Message);
+            }
+        }
+
 
     }
 }

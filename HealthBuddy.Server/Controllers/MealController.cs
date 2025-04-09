@@ -80,6 +80,24 @@ namespace HealthBuddy.Server.Controllers
             }
         }
 
+        [HttpPut("ApproveMealSchedule/{mealId}")]
+        public async Task<ActionResult> ApproveMealSchedule(int mealId)
+        {
+            try
+            {
+                var updatedMeal = await _mealScheduleRepository.ApproveMealScheduleAsync(mealId);
+                if (updatedMeal == null)
+                {
+                    return NotFound($"Meal schedule with ID {mealId} not found.");
+                }
+                return Ok(_mapper.Map<MealScheduleDTO>(updatedMeal));
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error updating data in the database: " + e.Message);
+            }
+        }
+
 
     }
 
