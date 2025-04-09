@@ -73,6 +73,10 @@ namespace HealthBuddy.Server.Mapping
             CreateMap<MealSchedule, AddMealScheduleRequestDTO>().ReverseMap();
             CreateMap<MealDetail, MealDetailDTO>().ReverseMap();
             CreateMap<MealDetail, AddMealDetailRequestDTO>().ReverseMap();
+            CreateMap<WorkoutSchedule, WorkoutScheduleDTO>().ReverseMap();
+            CreateMap<WorkoutSchedule, AddWorkoutScheduleRequestDTO>().ReverseMap();
+            CreateMap<WorkoutDetail, WorkoutDetailDTO>().ReverseMap();
+            CreateMap<WorkoutDetail, AddWorkoutDetailRequestDTO>().ReverseMap();
         }
     }
 }
