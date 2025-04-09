@@ -10,6 +10,19 @@ namespace HealthBuddy.Server.Repositories.Implement
         {
         }
 
+        public async Task<MealSchedule> ApproveMealScheduleAsync(int id)
+        {
+            var mealSchedule = await dbContext.MealSchedules
+                .FirstOrDefaultAsync(ms => ms.MealScheduleId == id);
+            if (mealSchedule == null)
+            {
+                return null; // Return null if not found
+            }
+            mealSchedule.IsApproved = true;
+            await dbContext.SaveChangesAsync();
+            return mealSchedule;
+        }
+
         public async Task<MealSchedule> GetMealScheduleByIdAsync(int id)
         {
             return await dbContext.MealSchedules

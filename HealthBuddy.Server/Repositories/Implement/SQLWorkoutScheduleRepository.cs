@@ -10,6 +10,19 @@ namespace HealthBuddy.Server.Repositories.Implement
         {
         }
 
+        public async Task<WorkoutSchedule> ApproveWorkoutScheduleAsync(int id)
+        {
+            var workoutSchedule = await dbContext.WorkoutSchedules
+                .FirstOrDefaultAsync(ws => ws.WorkoutScheduleId == id);
+            if (workoutSchedule == null)
+            {
+                return null; // Return null if not found
+            }
+            workoutSchedule.IsApproved = true;
+            await dbContext.SaveChangesAsync();
+            return workoutSchedule;
+        }
+
         public async Task<WorkoutSchedule> GetWorkoutScheduleByIdAsync(int id)
         {
             return await dbContext.WorkoutSchedules
