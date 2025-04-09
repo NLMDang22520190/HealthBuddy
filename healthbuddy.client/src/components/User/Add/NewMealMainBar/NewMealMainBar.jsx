@@ -2,7 +2,9 @@ import React, { useState, useEffect, useTransition } from "react";
 import { motion } from "framer-motion";
 import { Label, Spinner, Button, TextInput } from "flowbite-react";
 import { Image, PlusCircle } from "lucide-react";
-import { Select } from "antd";
+import { Select, message } from "antd";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 import DeleteButton from "../FormComponent/DeleteButton";
 import NameTextInput from "../FormComponent/NameTextInput";
@@ -36,7 +38,7 @@ const NewMealMainBar = () => {
 
   const [food, setFood] = useState([]);
 
-  const [isFormSubmitting, setIsFormSubmitting] = useState(false);
+  const [isFormSubmitting, startFormSubmitTransition] = useTransition();
   const [isFetchingDataPending, startFetchingDataTransition] = useTransition();
 
   const [formDataValidationError, setFormDataValidationError] = useState({
@@ -45,6 +47,52 @@ const NewMealMainBar = () => {
     imageUrl: null,
     details: null,
   });
+
+  const navigate = useNavigate();
+  const userId = useSelector((state) => state.auth.userId);
+
+  //#region add data
+  const handleAddSchedule = async () => {
+    try {
+      // Bước 1: Map dữ liệu chi tiết meals
+      const mappedMealDetails = formData.details.map((d) => ({
+        dayNumber: d.day,
+        mealTime: d.mealTime,
+        foodId: d.mealId,
+      }));
+
+      // Bước 2: Tính ngày cao nhất trong danh sách
+      const maxDay = Math.max(...formData.details.map((d) => d.day));
+
+      // Bước 3: Tạo payload để gửi
+      const payload = {
+        uploaderId: userId,
+        mealName: formData.name,
+        description: formData.description,
+        imgUrl: formData.imageUrl,
+        totalDays: maxDay,
+        mealDetails: mappedMealDetails,
+      };
+
+      // Bước 4: Gọi API
+      const { data } = await api.post("/api/Meal/AddMealSchedule", payload);
+      console.log("Meal schedule created successfully:", data);
+      message.success("Meal schedule successfully");
+      setTimeout(() => {
+        navigate("/");
+      }, 250);
+
+      // Optional: reset form hoặc hiển thị thông báo thành công
+    } catch (error) {
+      console.error(
+        "Error creating meal schedule:",
+        error.response?.data || error.message
+      );
+      message.error("Error creating meal schedule: " + error.message);
+      // Optional: hiển thị thông báo lỗi cho người dùng
+    }
+  };
+  //#endregion
 
   //#region fethch data
   useEffect(() => {
@@ -167,6 +215,10 @@ const NewMealMainBar = () => {
       message.error("Form contains errors. Please check again!");
       return;
     }
+
+    startFormSubmitTransition(async () => {
+      await handleAddSchedule();
+    });
   };
   //#endregion
 
@@ -199,7 +251,7 @@ const NewMealMainBar = () => {
         initial="hidden"
         animate="visible"
         variants={containerVariants}
-        className="flex flex-col p-3 md:p-6"
+        className="flex flex-col p-3 md:p-6 user-page-mainbar-content-marginbottom"
       >
         <Label className="text-2xl font-bold mb-8">Add New Meal Schedule</Label>
         <form onSubmit={handleSubmit} className="space-y-8">
