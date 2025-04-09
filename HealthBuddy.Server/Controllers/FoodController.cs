@@ -51,6 +51,20 @@ namespace HealthBuddy.Server.Controllers
             }
         }
 
+        [HttpGet("GetAllFoodForSchedule")]
+        public async Task<ActionResult> GetAllFoodForSchedule()
+        {
+            try
+            {
+                var foods = await _foodRepository.GetAllAsync();
+                return Ok(_mapper.Map<List<FoodForScheduleDTO>>(foods));
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database");
+            }
+        }
+
         [HttpGet("GetFoodById/{foodId}")]
         public async Task<ActionResult> GetFoodById(int foodId)
         {

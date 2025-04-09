@@ -40,6 +40,20 @@ namespace HealthBuddy.Server.Controllers
             }
         }
 
+        [HttpGet("GetAllExercisesForSchedule")]
+        public async Task<ActionResult> GetAllExercisesForSchedule()
+        {
+            try
+            {
+                var exercises = await _exerciseRepository.GetAllAsync();
+                return Ok(_mapper.Map<List<ExerciseForScheduleDTO>>(exercises));
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database: " + e.Message);
+            }
+        }
+
         [HttpGet("GetExerciseById/{exerciseId}")]
         public async Task<ActionResult> GetExerciseById(int exerciseId)
         {

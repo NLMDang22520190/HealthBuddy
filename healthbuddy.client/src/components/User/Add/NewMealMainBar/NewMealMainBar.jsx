@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useTransition } from "react";
 import { motion } from "framer-motion";
 import { Label, Spinner, Button, TextInput } from "flowbite-react";
 import { Image, PlusCircle } from "lucide-react";
@@ -7,14 +7,15 @@ import { Select } from "antd";
 import DeleteButton from "../FormComponent/DeleteButton";
 import NameTextInput from "../FormComponent/NameTextInput";
 import TextAreaInput from "../FormComponent/TextAreaInput";
+import api from "../../../../features/AxiosInstance/AxiosInstance";
 
-const sampleMeals = [
-  { id: 1, name: "Grilled Chicken Salad" },
-  { id: 2, name: "Beef Stir Fry" },
-  { id: 3, name: "Oatmeal with Fruits" },
-  { id: 4, name: "Vegetable Soup" },
-  { id: 5, name: "Spaghetti" },
-];
+// const sampleMeals = [
+//   { id: 1, name: "Grilled Chicken Salad" },
+//   { id: 2, name: "Beef Stir Fry" },
+//   { id: 3, name: "Oatmeal with Fruits" },
+//   { id: 4, name: "Vegetable Soup" },
+//   { id: 5, name: "Spaghetti" },
+// ];
 
 const mealTimes = ["Breakfast", "Lunch", "Dinner"];
 
@@ -33,7 +34,37 @@ const NewMealMainBar = () => {
     ],
   });
 
+  const [food, setFood] = useState([]);
+
   const [isFormSubmitting, setIsFormSubmitting] = useState(false);
+  const [isFetchingDataPending, startFetchingDataTransition] = useTransition();
+
+  const [formDataValidationError, setFormDataValidationError] = useState({
+    name: null,
+    description: null,
+    imageUrl: null,
+    details: null,
+  });
+
+  //#region fethch data
+  useEffect(() => {
+    const fetchFood = async () => {
+      try {
+        const response = await api.get("/api/Food/GetAllFoodForSchedule");
+        const mappedData = response.data.map((food) => ({
+          id: food.foodId,
+          name: food.foodName,
+        }));
+        setFood(mappedData);
+      } catch (error) {
+        message.error("Error fetching exercises: " + error.message);
+      }
+    };
+    startFetchingDataTransition(async () => {
+      await fetchFood();
+    });
+  }, []);
+  //#endregion
 
   //#region form data
   const handleChange = (e) => {
@@ -42,6 +73,12 @@ const NewMealMainBar = () => {
       ...formData,
       [name]: value,
     });
+
+    // Cập nhật lỗi của field đó
+    setFormDataValidationError((prevErrors) => ({
+      ...prevErrors,
+      [name]: validateField(name, value),
+    }));
   };
 
   const handleAddDetail = () => {
@@ -87,14 +124,49 @@ const NewMealMainBar = () => {
     }));
   };
 
+  const validateField = (name, value) => {
+    switch (name) {
+      case "name":
+        return value.trim().length < 5
+          ? "Name must be at least 5 characters"
+          : null;
+      case "description":
+        return value.trim().length < 10
+          ? "Description must be at least 10 characters"
+          : null;
+
+      default:
+        return null;
+    }
+  };
+
+  const validateForm = () => {
+    const errors = {
+      name: validateField("name", formData.name),
+      description: validateField("description", formData.description),
+      details:
+        formData.details.length === 0
+          ? "Please add at least one food!"
+          : formData.details.map((detail) =>
+              !detail.mealId ? "Invalid food" : null
+            ),
+    };
+
+    setFormDataValidationError(errors);
+    return Object.values(errors).every(
+      (error) =>
+        error === null ||
+        (Array.isArray(error) && error.every((e) => e === null))
+    );
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    setIsFormSubmitting(true);
-    console.log("Form data submitted:", formData);
-    // Fake submit delay
-    setTimeout(() => {
-      setIsFormSubmitting(false);
-    }, 1500);
+
+    if (!validateForm()) {
+      message.error("Form contains errors. Please check again!");
+      return;
+    }
   };
   //#endregion
 
@@ -150,32 +222,42 @@ const NewMealMainBar = () => {
 
           <motion.div variants={itemVariants}>
             <Label className="block mb-2 text-sm font-medium">Details</Label>
-            {formData.details.map((detail, index) => (
-              <div
-                key={detail.id}
-                className="flex items-center gap-4 rounded-lg p-2 mb-2"
-              >
-                <Label className="w-40 font-semibold">
-                  {`Day ${detail.day} - ${detail.mealTime}`}
-                </Label>
-
-                <Select
-                  showSearch
-                  style={{ width: "100%" }}
-                  placeholder="Select meal"
-                  optionFilterProp="label"
-                  value={detail.mealId || undefined}
-                  onChange={(value) => handleEditDetail(index, "mealId", value)}
-                  options={sampleMeals.map((meal) => ({
-                    label: meal.name,
-                    value: meal.id,
-                  }))}
-                  className="flex-1 h-10"
-                />
-
-                <DeleteButton onClick={() => handleDeleteDetail(index)} />
+            {isFetchingDataPending ? (
+              <div className="flex justify-center">
+                <Spinner color="info"></Spinner>
               </div>
-            ))}
+            ) : (
+              <>
+                {formData.details.map((detail, index) => (
+                  <div
+                    key={detail.id}
+                    className="flex items-center gap-4 rounded-lg p-2 mb-2"
+                  >
+                    <Label className="w-40 font-semibold">
+                      {`Day ${detail.day} - ${detail.mealTime}`}
+                    </Label>
+
+                    <Select
+                      showSearch
+                      style={{ width: "100%" }}
+                      placeholder="Select meal"
+                      optionFilterProp="label"
+                      value={detail.mealId || undefined}
+                      onChange={(value) =>
+                        handleEditDetail(index, "mealId", value)
+                      }
+                      options={food.map((meal) => ({
+                        label: meal.name,
+                        value: meal.id,
+                      }))}
+                      className="flex-1 h-10"
+                    />
+
+                    <DeleteButton onClick={() => handleDeleteDetail(index)} />
+                  </div>
+                ))}
+              </>
+            )}
 
             <Button
               type="button"
