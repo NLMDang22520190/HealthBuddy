@@ -1,20 +1,21 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useTransition } from "react";
 import { motion } from "framer-motion";
 import { Label, Spinner, Button, TextInput } from "flowbite-react";
 import { Image, Trash2, PlusCircle } from "lucide-react";
-import { Select } from "antd";
+import { Select, message } from "antd";
 
 import NameTextInput from "../FormComponent/NameTextInput";
 import TextAreaInput from "../FormComponent/TextAreaInput";
 import DeleteButton from "../FormComponent/DeleteButton";
+import api from "../../../../features/AxiosInstance/AxiosInstance";
 
-const sampleExercises = [
-  { id: 1, name: "Push Ups" },
-  { id: 2, name: "Squats" },
-  { id: 3, name: "Lunges" },
-  { id: 4, name: "Plank" },
-  { id: 5, name: "Burpees" },
-];
+// const sampleExercises = [
+//   { id: 1, name: "Push Ups" },
+//   { id: 2, name: "Squats" },
+//   { id: 3, name: "Lunges" },
+//   { id: 4, name: "Plank" },
+//   { id: 5, name: "Burpees" },
+// ];
 
 const NewWorkoutMainbar = () => {
   const [formData, setFormData] = useState({
@@ -29,8 +30,39 @@ const NewWorkoutMainbar = () => {
       },
     ],
   });
+  const [exercises, setExercises] = useState([]);
 
   const [isFormSubmitting, setIsFormSubmitting] = useState(false);
+  const [isFetchingDataPending, startFetchingDataTransition] = useTransition();
+
+  const [formDataValidationError, setFormDataValidationError] = useState({
+    name: null,
+    description: null,
+    imageUrl: null,
+    details: null,
+  });
+
+  //#region fetch data
+  useEffect(() => {
+    const fetchExercises = async () => {
+      try {
+        const response = await api.get(
+          "/api/Exercise/GetAllExercisesForSchedule"
+        );
+        const mappedData = response.data.map((exercise) => ({
+          id: exercise.exerciseId,
+          name: exercise.exerciseName,
+        }));
+        setExercises(mappedData);
+      } catch (error) {
+        message.error("Error fetching exercises: " + error.message);
+      }
+    };
+    startFetchingDataTransition(async () => {
+      await fetchExercises();
+    });
+  }, []);
+  //#endregion
 
   //#region form data
   const handleChange = (e) => {
@@ -88,12 +120,40 @@ const NewWorkoutMainbar = () => {
         return value.trim().length < 10
           ? "Description must be at least 10 characters"
           : null;
+
       default:
         return null;
     }
   };
 
-  const handleSubmit = (e) => {};
+  const validateForm = () => {
+    const errors = {
+      name: validateField("name", formData.name),
+      description: validateField("description", formData.description),
+      details:
+        formData.details.length === 0
+          ? "Please add at least one exercise!"
+          : formData.details.map((detail) =>
+              !detail.exerciseId ? "Invalid exercise" : null
+            ),
+    };
+
+    setFormDataValidationError(errors);
+    return Object.values(errors).every(
+      (error) =>
+        error === null ||
+        (Array.isArray(error) && error.every((e) => e === null))
+    );
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      message.error("Form contains errors. Please check again!");
+      return;
+    }
+  };
   //#endregion
 
   //#region motion
@@ -137,6 +197,7 @@ const NewWorkoutMainbar = () => {
             placeholder="Enter workout name"
             name={formData.name}
             itemVariants={itemVariants}
+            error={formDataValidationError.name}
           ></NameTextInput>
 
           <TextAreaInput
@@ -146,52 +207,68 @@ const NewWorkoutMainbar = () => {
             name="description"
             onChange={handleChange}
             itemVariants={itemVariants}
+            error={formDataValidationError.description}
           ></TextAreaInput>
 
           <motion.div variants={itemVariants}>
             <Label className="block mb-2 text-sm font-medium">Details</Label>
-            {formData.details.map((detail, index) => (
-              <div
-                key={detail.id || index} // Sử dụng id nếu có, nếu không thì dùng index
-                className="flex items-center gap-4 rounded-lg p-2 mb-2"
-              >
-                {/* Label ngày cố định chiều rộng */}
-                <Label className="w-24 shrink-0 font-lg font-semibold">
-                  {`Day ${index + 1}`}
-                </Label>
 
-                {/* Dropdown chọn bài tập */}
-                <Select
-                  showSearch
-                  style={{ width: "100%" }}
-                  placeholder="Select exercise"
-                  optionFilterProp="label"
-                  value={detail.exerciseId || undefined}
-                  onChange={(value) =>
-                    handleEditDetail(index, "exerciseId", value)
-                  }
-                  options={sampleExercises.map((exercise) => ({
-                    label: exercise.name,
-                    value: exercise.id,
-                  }))}
-                  className="flex-1 h-10" // Giúp select chiếm không gian còn lại
-                />
+            {formDataValidationError.details && (
+              <p className="text-red-500 text-xs italic">
+                {formDataValidationError.details}
+              </p>
+            )}
 
-                {/* Nút xóa với icon */}
-                <DeleteButton
-                  onClick={() => handleDeleteDetail(index)}
-                ></DeleteButton>
+            {isFetchingDataPending ? (
+              <div className="flex justify-center">
+                <Spinner color="info"></Spinner>
               </div>
-            ))}
+            ) : (
+              <>
+                {formData.details.map((detail, index) => (
+                  <div
+                    key={detail.id || index} // Sử dụng id nếu có, nếu không thì dùng index
+                    className="flex items-center gap-4 rounded-lg p-2 mb-2"
+                  >
+                    {/* Label ngày cố định chiều rộng */}
+                    <Label className="w-24 shrink-0 font-lg font-semibold">
+                      {`Day ${index + 1}`}
+                    </Label>
 
-            <Button
-              type="button"
-              className="self-start mt-2"
-              onClick={handleAddDetail}
-            >
-              <PlusCircle className="mr-2" size={18} />
-              Add Exercise
-            </Button>
+                    {/* Dropdown chọn bài tập */}
+                    <Select
+                      showSearch
+                      style={{ width: "100%" }}
+                      placeholder="Select exercise"
+                      optionFilterProp="label"
+                      value={detail.exerciseId || undefined}
+                      onChange={(value) =>
+                        handleEditDetail(index, "exerciseId", value)
+                      }
+                      options={exercises.map((exercise) => ({
+                        label: exercise.name,
+                        value: exercise.id,
+                      }))}
+                      className="flex-1 h-10" // Giúp select chiếm không gian còn lại
+                    />
+
+                    {/* Nút xóa với icon */}
+                    <DeleteButton
+                      onClick={() => handleDeleteDetail(index)}
+                    ></DeleteButton>
+                  </div>
+                ))}
+
+                <Button
+                  type="button"
+                  className="self-start mt-2"
+                  onClick={handleAddDetail}
+                >
+                  <PlusCircle className="mr-2" size={18} />
+                  Add Exercise
+                </Button>
+              </>
+            )}
           </motion.div>
           {/* 
       <motion.div variants={itemVariants}>
