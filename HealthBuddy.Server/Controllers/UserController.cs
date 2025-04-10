@@ -17,6 +17,8 @@ namespace HealthBuddy.Server.Controllers
         private readonly IUserNotificationPreferenceRepository _userNotificationPreferenceRepository;
         private readonly IFoodRepository _foodRepository;
         private readonly IExerciseRepository _exerciseRepository;
+        private readonly IWorkoutScheduleRepository _workoutScheduleRepository;
+        private readonly IMealScheduleRepository _mealScheduleRepository;
         private readonly IMapper _mapper;
 
         public UserController(IUserRepository userRepository,
@@ -24,7 +26,9 @@ namespace HealthBuddy.Server.Controllers
         IUserDetailRepository userDetailRepository,
         IUserNotificationPreferenceRepository userNotificationPreferenceRepository,
         IFoodRepository foodRepository,
-        IExerciseRepository exerciseRepository)
+        IExerciseRepository exerciseRepository,
+        IWorkoutScheduleRepository workoutScheduleRepository,
+        IMealScheduleRepository mealScheduleRepository)
         {
             _userRepository = userRepository;
             _mapper = mapper;
@@ -32,6 +36,8 @@ namespace HealthBuddy.Server.Controllers
             _userNotificationPreferenceRepository = userNotificationPreferenceRepository;
             _foodRepository = foodRepository;
             _exerciseRepository = exerciseRepository;
+            _workoutScheduleRepository = workoutScheduleRepository;
+            _mealScheduleRepository = mealScheduleRepository;
         }
 
 
@@ -48,16 +54,22 @@ namespace HealthBuddy.Server.Controllers
                 // 2. Truy vấn tất cả tổng số bài viết theo UserId một lần
                 var foodCountsTask = _foodRepository.GetTotalFoodsByUserIds(userIds);
                 var exerciseCountsTask = _exerciseRepository.GetTotalExercisesByUserIds(userIds);
-                await Task.WhenAll(foodCountsTask, exerciseCountsTask);
+                var workoutScheduleCountsTask = _workoutScheduleRepository.GetTotalWorkoutsByUserIds(userIds);
+                var mealScheduleCountsTask = _mealScheduleRepository.GetTotalMealsByUserIds(userIds);
+                await Task.WhenAll(foodCountsTask, exerciseCountsTask, workoutScheduleCountsTask, mealScheduleCountsTask);
 
                 var foodCounts = await foodCountsTask;
                 var exerciseCounts = await exerciseCountsTask;
+                var workoutScheduleCounts = await workoutScheduleCountsTask;
+                var mealScheduleCounts = await mealScheduleCountsTask;
 
                 // 3. Gán số lượng bài viết vào userProfiles
                 foreach (var u in userProfiles)
                 {
                     u.NumberOfFoodPosts = foodCounts.TryGetValue(u.UserId, out var foodCount) ? foodCount : 0;
                     u.NumberOfExercisePosts = exerciseCounts.TryGetValue(u.UserId, out var exerciseCount) ? exerciseCount : 0;
+                    u.NumberOfWorkoutPosts = workoutScheduleCounts.TryGetValue(u.UserId, out var workoutCount) ? workoutCount : 0;
+                    u.NumberOfMealPosts = mealScheduleCounts.TryGetValue(u.UserId, out var mealCount) ? mealCount : 0;
                 }
 
                 return Ok(userProfiles);
@@ -83,10 +95,14 @@ namespace HealthBuddy.Server.Controllers
 
                 var foodTask = _foodRepository.GetTotalFoodsByUserId(userId);
                 var exerciseTask = _exerciseRepository.GetTotalExercisesByUserId(userId);
-                await Task.WhenAll(foodTask, exerciseTask);
+                var workoutScheduleTask = _workoutScheduleRepository.GetTotalWorkoutsByUserId(userId);
+                var mealScheduleTask = _mealScheduleRepository.GetTotalMealsByUserId(userId);
+                await Task.WhenAll(foodTask, exerciseTask, workoutScheduleTask, mealScheduleTask);
 
                 userProfile.NumberOfFoodPosts = await foodTask;
                 userProfile.NumberOfExercisePosts = await exerciseTask;
+                userProfile.NumberOfWorkoutPosts = await workoutScheduleTask;
+                userProfile.NumberOfMealPosts = await mealScheduleTask;
 
                 return Ok(userProfile);
             }

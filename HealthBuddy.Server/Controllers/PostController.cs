@@ -97,16 +97,22 @@ namespace HealthBuddy.Server.Controllers
             {
                 var foodTask = _foodRepository.GetApprovedFoodsByUserId(userId);
                 var exerciseTask = _exerciseRepository.GetApprovedExercisesByUserId(userId);
+                var workoutScheduleTask = _workoutScheduleRepository.GetApprovedWorkoutsByUserId(userId);
+                var mealScheduleTask = _mealScheduleRepository.GetApprovedMealsByUserId(userId);
 
-                await Task.WhenAll(foodTask, exerciseTask);
+                await Task.WhenAll(foodTask, exerciseTask, workoutScheduleTask, mealScheduleTask);
 
                 var foodPosts = _mapper.Map<List<PostDTO>>(await foodTask);
                 var exercisePosts = _mapper.Map<List<PostDTO>>(await exerciseTask);
+                var workoutSchedulePosts = _mapper.Map<List<PostDTO>>(await workoutScheduleTask);
+                var mealSchedulePosts = _mapper.Map<List<PostDTO>>(await mealScheduleTask);
 
                 foreach (var post in foodPosts) post.PostType = "food";
                 foreach (var post in exercisePosts) post.PostType = "exercise";
+                foreach (var post in workoutSchedulePosts) post.PostType = "workout";
+                foreach (var post in mealSchedulePosts) post.PostType = "meal";
 
-                var allPosts = foodPosts.Concat(exercisePosts)
+                var allPosts = foodPosts.Concat(exercisePosts).Concat(workoutSchedulePosts).Concat(mealSchedulePosts)
                                         .OrderByDescending(p => p.CreatedDate)
                                         .ToList();
 

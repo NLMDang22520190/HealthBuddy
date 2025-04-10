@@ -15,5 +15,11 @@ namespace HealthBuddy.Server.Repositories
         Task UpdateWorkoutComments(int id, int newComments);
 
         Task<List<WorkoutSchedule>> GetWorkoutSchedulesByKeyWord(string keyword);
+
+        Task<Dictionary<int, int>> GetTotalWorkoutsByUserIds(List<int> userIds);
+
+        Task<int> GetTotalWorkoutsByUserId(int userId);
+
+        Task<List<WorkoutSchedule>> GetApprovedWorkoutsByUserId(int userId);
     }
 }
