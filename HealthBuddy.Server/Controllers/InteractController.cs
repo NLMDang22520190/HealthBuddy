@@ -18,6 +18,10 @@ namespace HealthBuddy.Server.Controllers
 
         private readonly IExerciseRepository _exerciseRepository;
 
+        private readonly IWorkoutScheduleRepository _workoutScheduleRepository;
+
+        private readonly IMealScheduleRepository _mealScheduleRepository;
+
         private readonly ILikeRepository _likeRepository;
 
         private readonly ICommentRepository _commentRepository;
@@ -31,11 +35,15 @@ namespace HealthBuddy.Server.Controllers
         ILikeRepository likeRepository,
         ICommentRepository commentRepository,
         IReportRepository reportRepository,
+        IWorkoutScheduleRepository workoutScheduleRepository,
+        IMealScheduleRepository mealScheduleRepository,
          IMapper mapper)
         {
             _userRepository = userRepository;
             _foodRepository = foodRepository;
             _exerciseRepository = exerciseRepository;
+            _workoutScheduleRepository = workoutScheduleRepository;
+            _mealScheduleRepository = mealScheduleRepository;
             _likeRepository = likeRepository;
             _commentRepository = commentRepository;
             _reportRepository = reportRepository;
@@ -77,6 +85,15 @@ namespace HealthBuddy.Server.Controllers
                 {
                     await _exerciseRepository.UpdateExerciseLikes(requestDTO.TargetId, 1);
                 }
+                else if (likeDomain.TargetType == "workout")
+                {
+                    await _workoutScheduleRepository.UpdateWorkoutLikes(requestDTO.TargetId, 1);
+                }
+                else if (likeDomain.TargetType == "meal")
+                {
+                    await _mealScheduleRepository.UpdateMealLikes(requestDTO.TargetId, 1);
+                }
+
                 return Ok("Like added successfully");
             }
             catch (Exception e)
@@ -103,6 +120,14 @@ namespace HealthBuddy.Server.Controllers
                 else if (likeDomain.TargetType == "exercise")
                 {
                     await _exerciseRepository.UpdateExerciseLikes(requestDTO.TargetId, -1);
+                }
+                else if (likeDomain.TargetType == "workout")
+                {
+                    await _workoutScheduleRepository.UpdateWorkoutLikes(requestDTO.TargetId, -1);
+                }
+                else if (likeDomain.TargetType == "meal")
+                {
+                    await _mealScheduleRepository.UpdateMealLikes(requestDTO.TargetId, -1);
                 }
                 return Ok("Like removed successfully");
             }
@@ -145,6 +170,14 @@ namespace HealthBuddy.Server.Controllers
                 {
                     await _exerciseRepository.UpdateExerciseComments(requestDTO.TargetId, 1);
                 }
+                else if (commentDomain.TargetType == "workout")
+                {
+                    await _workoutScheduleRepository.UpdateWorkoutComments(requestDTO.TargetId, 1);
+                }
+                else if (commentDomain.TargetType == "meal")
+                {
+                    await _mealScheduleRepository.UpdateMealComments(requestDTO.TargetId, 1);
+                }
                 return Ok("Comment added successfully");
             }
             catch (Exception e)
@@ -166,6 +199,14 @@ namespace HealthBuddy.Server.Controllers
                 else if (postType == "exercise")
                 {
                     await _exerciseRepository.UpdateExerciseComments(commentId, -1);
+                }
+                else if (postType == "workout")
+                {
+                    await _workoutScheduleRepository.UpdateWorkoutComments(commentId, -1);
+                }
+                else if (postType == "meal")
+                {
+                    await _mealScheduleRepository.UpdateMealComments(commentId, -1);
                 }
                 return Ok("Comment removed successfully");
             }

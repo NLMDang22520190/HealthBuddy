@@ -67,12 +67,12 @@ namespace HealthBuddy.Server.Controllers
 
                 foreach (var post in workoutSchedulePosts)
                 {
-                    post.PostType = "workoutSchedule";
+                    post.PostType = "workout";
                 }
 
                 foreach (var post in mealSchedulePosts)
                 {
-                    post.PostType = "mealSchedule";
+                    post.PostType = "meal";
                 }
 
                 // Gộp cả hai danh sách lại
@@ -126,16 +126,22 @@ namespace HealthBuddy.Server.Controllers
             {
                 var foodTask = _foodRepository.GetFoodsByKeyWord(keyword);
                 var exerciseTask = _exerciseRepository.GetExercisesByKeyWord(keyword);
+                var workoutScheduleTask = _workoutScheduleRepository.GetWorkoutSchedulesByKeyWord(keyword);
+                var mealScheduleTask = _mealScheduleRepository.GetMealSchedulesByKeyWord(keyword);
 
-                await Task.WhenAll(foodTask, exerciseTask);
+                await Task.WhenAll(foodTask, exerciseTask, workoutScheduleTask, mealScheduleTask);
 
                 // Lấy kết quả từ các task
                 var foods = await foodTask;
                 var exercises = await exerciseTask;
+                var workoutSchedules = await workoutScheduleTask;
+                var mealSchedules = await mealScheduleTask;
 
                 // Map từ Food và Exercise sang PostDTO
                 var foodPosts = _mapper.Map<List<PostDTO>>(foods);
                 var exercisePosts = _mapper.Map<List<PostDTO>>(exercises);
+                var workoutSchedulePosts = _mapper.Map<List<PostDTO>>(workoutSchedules);
+                var mealSchedulePosts = _mapper.Map<List<PostDTO>>(mealSchedules);
 
                 // Gán loại bài post (food hoặc exercise)
                 foreach (var post in foodPosts)
@@ -147,11 +153,21 @@ namespace HealthBuddy.Server.Controllers
                 {
                     post.PostType = "exercise";
                 }
+                foreach (var post in workoutSchedulePosts)
+                {
+                    post.PostType = "workout";
+                }
+                foreach (var post in mealSchedulePosts)
+                {
+                    post.PostType = "meal";
+                }
 
                 // Gộp cả hai danh sách lại
                 var allPosts = new List<PostDTO>();
                 allPosts.AddRange(foodPosts);
                 allPosts.AddRange(exercisePosts);
+                allPosts.AddRange(workoutSchedulePosts);
+                allPosts.AddRange(mealSchedulePosts);
 
                 return Ok(allPosts.OrderByDescending(p => p.CreatedDate));
             }
