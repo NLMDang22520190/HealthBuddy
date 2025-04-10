@@ -95,6 +95,10 @@ builder.Services.AddScoped<IMealScheduleRepository, SQLMealScheduleRepository>()
 builder.Services.AddScoped<IMealDetailRepository, SQLMealDetailRepository>();
 builder.Services.AddScoped<IWorkoutScheduleRepository, SQLWorkoutScheduleRepository>();
 builder.Services.AddScoped<IWorkoutDetailRepository, SQLWorkoutDetailRepository>();
+builder.Services.AddScoped<IUserWorkoutScheduleRepository, SQLUserWorkoutScheduleRepository>();
+builder.Services.AddScoped<IUserMealScheduleRepository, SQLUserMealScheduleRepository>();
+builder.Services.AddScoped<IUserWorkoutTrackingRepository, SQLUserWorkoutTrackingRepository>();
+builder.Services.AddScoped<IUserMealTrackingRepository, SQLUserMealTrackingRepository>();
 
 
 builder.Services.AddScoped(typeof(IHealthBuddyRepository<>), typeof(HealthBuddyRepository<>));
