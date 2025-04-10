@@ -13,7 +13,7 @@ const container = {
   },
 };
 
-const SchedulePostList = ({ posts }) => {
+const SchedulePostList = ({ type, posts }) => {
   return (
     <motion.div
       className="grid px-6 gap-6 grid-cols-2"
@@ -22,7 +22,7 @@ const SchedulePostList = ({ posts }) => {
       animate="show"
     >
       {posts.map((post) => (
-        <SchedulePostCard key={post.id} post={post} />
+        <SchedulePostCard type={type} key={post.id} post={post} />
       ))}
     </motion.div>
   );

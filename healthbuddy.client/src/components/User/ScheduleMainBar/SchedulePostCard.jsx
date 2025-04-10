@@ -4,16 +4,35 @@ import { Badge, Label } from "flowbite-react";
 import { Avatar } from "antd";
 import { Heart, MessageCircle, MoreVertical } from "lucide-react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 import ShowImageModal from "../../ShowImageModal/ShowImageModal";
 
-const SchedulePostCard = ({ post }) => {
+const SchedulePostCard = ({ type, post }) => {
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState("");
+
+  const navigate = useNavigate();
 
   const handleImageClick = (image) => {
     setSelectedImage(image);
     setShowImageModal(true);
+  };
+
+  const handleTitleClick = (post) => {
+    let path = "";
+    console.log(type);
+    if (type === "all") {
+      if (post.type.toLowerCase() === "meal") {
+        path = "/detail/mealSchedule";
+      }
+      if (post.type.toLowerCase() === "workout") {
+        path = "/detail/workoutSchedule";
+      }
+    }
+
+    path += `/${post.id}`;
+    navigate(path);
   };
 
   return (
@@ -51,7 +70,12 @@ const SchedulePostCard = ({ post }) => {
           </div>
         </div>
         {/* Title */}
-        <Label className="font-bold text-base truncate">{post.title}</Label>
+        <Label
+          onClick={() => handleTitleClick(post)}
+          className="font-bold text-base truncate cursor-pointer"
+        >
+          {post.title}
+        </Label>
         {/* Description */}
         <Label className="text-sm font-normal text-muted-foreground line-clamp-1 sm:line-clamp-2 ">
           {post.content}
