@@ -46,5 +46,39 @@ namespace HealthBuddy.Server.Repositories.Implement
                 .ThenInclude(md => md.Food)
                 .FirstOrDefaultAsync(ms => ms.MealScheduleId == id);
         }
+
+        public async Task<List<MealSchedule>> GetMealSchedulesByKeyWord(string keyword)
+        {
+            using (var dbContext = new HealthBuddyDbContext(_dbContextOptions))
+            {
+                var result = await dbContext.MealSchedules
+                    .Where(e => (e.MealName.Contains(keyword) || e.Description.Contains(keyword)) && e.IsApproved == true && e.IsHidden == false)
+                    .Include(e => e.Uploader)
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                return result;
+            }
+        }
+
+        public async Task UpdateMealComments(int id, int newComments)
+        {
+            var schedule = await dbContext.MealSchedules.FirstOrDefaultAsync(s => s.MealScheduleId == id);
+            if (schedule != null)
+            {
+                schedule.NumberOfComments += newComments;
+                await dbContext.SaveChangesAsync();
+            }
+        }
+
+        public async Task UpdateMealLikes(int id, int newLikes)
+        {
+            var schedule = await dbContext.MealSchedules.FirstOrDefaultAsync(s => s.MealScheduleId == id);
+            if (schedule != null)
+            {
+                schedule.NumberOfLikes += newLikes;
+                await dbContext.SaveChangesAsync();
+            }
+        }
     }
 }

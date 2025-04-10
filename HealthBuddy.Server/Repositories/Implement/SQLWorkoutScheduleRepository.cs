@@ -46,5 +46,39 @@ namespace HealthBuddy.Server.Repositories.Implement
                 .ThenInclude(wd => wd.Exercise)
             .FirstOrDefaultAsync(ws => ws.WorkoutScheduleId == id);
         }
+
+        public async Task<List<WorkoutSchedule>> GetWorkoutSchedulesByKeyWord(string keyword)
+        {
+            using (var dbContext = new HealthBuddyDbContext(_dbContextOptions))
+            {
+                var result = await dbContext.WorkoutSchedules
+                    .Where(e => (e.WorkOutName.Contains(keyword) || e.Description.Contains(keyword)) && e.IsApproved == true && e.IsHidden == false)
+                    .Include(e => e.Uploader)
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                return result;
+            }
+        }
+
+        public async Task UpdateWorkoutComments(int id, int newComments)
+        {
+            var schedule = await dbContext.WorkoutSchedules.FirstOrDefaultAsync(s => s.WorkoutScheduleId == id);
+            if (schedule != null)
+            {
+                schedule.NumberOfComments += newComments;
+                await dbContext.SaveChangesAsync();
+            }
+        }
+
+        public async Task UpdateWorkoutLikes(int id, int newLikes)
+        {
+            var schedule = await dbContext.WorkoutSchedules.FirstOrDefaultAsync(s => s.WorkoutScheduleId == id);
+            if (schedule != null)
+            {
+                schedule.NumberOfLikes += newLikes;
+                await dbContext.SaveChangesAsync();
+            }
+        }
     }
 }
