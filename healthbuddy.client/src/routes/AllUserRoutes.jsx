@@ -24,6 +24,8 @@ import NewMeal from "../pages/User/Add/NewMeal/NewMeal";
 
 import Food from "../pages/User/Detail/Food/Food";
 import Exercise from "../pages/User/Detail/Exercise/Exercise";
+import Workout from "../pages/User/Detail/Workout/Workout";
+import Meal from "../pages/User/Detail/Meal/Meal";
 
 import UnderConstruction from "../pages/UnderConstruction/UnderConstruction";
 
@@ -56,6 +58,10 @@ const AllUserRoutes = () => {
       {/* Detail */}
       <Route path="detail/food/:postId" element={<Food />} />
       <Route path="detail/exercise/:postId" element={<Exercise />} />
+      <Route path="detail/workoutSchedule/:postId" element={<Workout />} />
+      <Route path="detail/mealSchedule/:postId" element={<Meal />} />
+
+      {/* Under Construction */}
 
       <Route path="*" element={<UnderConstruction />} />
     </Routes>
