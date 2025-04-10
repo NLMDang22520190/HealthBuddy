@@ -1,4 +1,5 @@
 using AutoMapper;
+using HealthBuddy.Server.Models.DTO.GET;
 using HealthBuddy.Server.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -42,6 +43,48 @@ namespace HealthBuddy.Server.Controllers
             _userWorkoutTrackingRepository = userWorkoutTrackingRepository;
             _userMealTrackingRepository = userMealTrackingRepository;
             _mapper = mapper;
+        }
+
+        [HttpGet("GetAllSchedules")]
+        public async Task<ActionResult> GetAllSchedules()
+        {
+            try
+            {
+                var workoutScheduleTask = _workoutScheduleRepository.GetApprovedWorkoutSchedules();
+                var mealScheduleTask = _mealScheduleRepository.GetApprovedMealSchedules();
+
+                await Task.WhenAll(workoutScheduleTask, mealScheduleTask);
+
+                // Lấy kết quả từ các task
+                var workoutSchedules = await workoutScheduleTask;
+                var mealSchedules = await mealScheduleTask;
+
+                // Map từ Food và Exercise sang PostDTO
+                var workoutSchedulePosts = _mapper.Map<List<PostDTO>>(workoutSchedules);
+                var mealSchedulePosts = _mapper.Map<List<PostDTO>>(mealSchedules);
+
+                // Gán loại bài post (food hoặc exercise)
+                foreach (var post in workoutSchedulePosts)
+                {
+                    post.PostType = "workout";
+                }
+
+                foreach (var post in mealSchedulePosts)
+                {
+                    post.PostType = "meal";
+                }
+
+                // Gộp cả hai danh sách lại
+                var allPosts = new List<PostDTO>();
+                allPosts.AddRange(workoutSchedulePosts);
+                allPosts.AddRange(mealSchedulePosts);
+
+                return Ok(allPosts.OrderByDescending(p => p.CreatedDate));
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database:" + e.Message);
+            }
         }
 
 

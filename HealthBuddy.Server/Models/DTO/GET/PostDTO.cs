@@ -17,6 +17,8 @@ namespace HealthBuddy.Server.Models.DTO.GET
         public bool IsHidden { get; set; }
         public string PostType { get; set; }
 
+        public int TotalDays { get; set; } = 0;
+
         public List<TagDTO> Tags { get; set; } = new List<TagDTO>();
         public virtual UserPostedDTO Uploader { get; set; } = null!;
     }

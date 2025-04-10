@@ -187,19 +187,43 @@ const AllSchedule = ({ type }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeSort, setActiveSort] = useState("all");
   const [selectedFilters, setSelectedFilters] = useState([]);
+  const [schedule, setSchedule] = useState([]);
 
-  const [isDataFethching, startTransition] = useTransition();
+  const [isDataFetching, startTransition] = useTransition();
 
   const fetchSchedule = async () => {
     try {
-      const response = await api.get("/schedule/allSchedule");
-      const mappedData = response.data.map((item) => ({}));
+      const response = await api.get("/api/Schedule/GetAllSchedules");
+      const mappedData = response.data.map((item) => ({
+        id: item.postId,
+        title: item.title,
+        content: item.description,
+        image: item.imgUrl,
+        user: {
+          id: item.uploader.userId,
+          name: item.uploader.username,
+          avatar: item.uploader.avatar,
+        },
+        numberOfLikes: item.numberOfLikes,
+        numberOfComments: item.numberOfComments,
+        postDate: item.createdDate,
+        type: item.postType.toUpperCase(),
+        totalDays: item.totalDays,
+      }));
+      setSchedule(mappedData);
     } catch (error) {
       console.error("Error fetching schedule:", error);
+      message.error("Error fetching schedule: " + error.message);
     }
   };
 
-  const filteredPosts = samplePosts
+  useEffect(() => {
+    startTransition(async () => {
+      await fetchSchedule();
+    });
+  }, []);
+
+  const filteredPosts = schedule
     .filter((post) => {
       // 🔹 Lọc theo danh mục (selectedFilters)
       const matchesFilter =
@@ -234,46 +258,37 @@ const AllSchedule = ({ type }) => {
       transition={{ duration: 0.5 }}
       className="flex flex-col py-6 gap-4 user-page-mainbar-content-marginbottom"
     >
-      <div className="flex px-6">
-        <TextInput
-          className="flex-1 "
-          icon={Search}
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search schedule..."
-        ></TextInput>
-      </div>
-
-      <SortFilterBar
-        activeSort={activeSort}
-        setActiveSort={setActiveSort}
-        selectedFilters={selectedFilters}
-        setSelectedFilters={setSelectedFilters}
-        filterOptions={[
-          { id: "workout", label: "Workout" },
-          { id: "meal", label: "Meal" },
-        ]}
-        onClearClick={() => setSearchQuery("")}
-      />
-
-      <SchedulePostList posts={filteredPosts} />
-
-      {/* {isPending || users.length === 0 ? ( // Hiển thị spinner khi đang tải dữ liệu
-          <div className="flex justify-center items-center">
-            <Spinner size="xl" color="info" />
+      {isDataFetching || schedule.length === 0 ? ( // Hiển thị spinner khi đang tải dữ liệu
+        <div className="flex justify-center items-center">
+          <Spinner size="xl" color="info" />
+        </div>
+      ) : (
+        <>
+          <div className="flex px-6">
+            <TextInput
+              className="flex-1 "
+              icon={Search}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search schedule..."
+            ></TextInput>
           </div>
-        ) : (
-          <motion.div
-            variants={container}
-            animate="show"
-            initial="hidden"
-            className="grid grid-cols-1 gap-6 lg:grid-cols-2"
-          >
-            {filteredUsers.map((user) => (
-              <UserCard key={user.id} user={user} />
-            ))}
-          </motion.div>
-        )} */}
+
+          <SortFilterBar
+            activeSort={activeSort}
+            setActiveSort={setActiveSort}
+            selectedFilters={selectedFilters}
+            setSelectedFilters={setSelectedFilters}
+            filterOptions={[
+              { id: "workout", label: "Workout" },
+              { id: "meal", label: "Meal" },
+            ]}
+            onClearClick={() => setSearchQuery("")}
+          />
+
+          <SchedulePostList type={type} posts={filteredPosts} />
+        </>
+      )}
     </motion.div>
   );
 };
