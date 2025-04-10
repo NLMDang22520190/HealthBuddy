@@ -17,6 +17,11 @@ const lightTheme = {
   bodySortBg: "#F9FAFB",
   selectBorder: "#000",
   selectBg: "#F9FAFB",
+  tabItemColor: "#000",
+  tabItemSelectedColor: "#006043",
+  tabItemHoverColor: "#006043",
+  tabItemActiveColor: "#006043",
+  tabInkBarColor: "#006043",
 };
 
 const darkTheme = {
@@ -26,6 +31,11 @@ const darkTheme = {
   bodySortBg: "#1D1F21",
   selectBorder: "#fff",
   selectBg: "#1D1F21",
+  tabItemColor: "#fff",
+  tabItemSelectedColor: "#09FFB5",
+  tabItemHoverColor: "#09FFB5",
+  tabItemActiveColor: "#09FFB5",
+  tabInkBarColor: "#09FFB5",
 };
 
 function App() {
@@ -67,6 +77,13 @@ function App() {
           Descriptions: {
             titleColor: themeColors.titleColor,
             contentColor: themeColors.titleColor,
+          },
+          Tabs: {
+            itemColor: themeColors.tabItemColor,
+            itemSelectedColor: themeColors.tabItemSelectedColor,
+            itemHoverColor: themeColors.tabItemHoverColor,
+            itemActiveColor: themeColors.tabItemActiveColor,
+            inkBarColor: themeColors.tabInkBarColor,
           },
         },
       }}
