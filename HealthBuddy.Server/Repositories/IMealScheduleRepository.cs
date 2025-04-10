@@ -15,5 +15,11 @@ namespace HealthBuddy.Server.Repositories
         Task UpdateMealComments(int id, int newComments);
 
         Task<List<MealSchedule>> GetMealSchedulesByKeyWord(string keyword);
+
+        Task<Dictionary<int, int>> GetTotalMealsByUserIds(List<int> userIds);
+
+        Task<int> GetTotalMealsByUserId(int userId);
+
+        Task<List<MealSchedule>> GetApprovedMealsByUserId(int userId);
     }
 }

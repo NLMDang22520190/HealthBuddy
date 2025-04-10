@@ -25,6 +25,17 @@ namespace HealthBuddy.Server.Repositories.Implement
             return mealSchedule;
         }
 
+        public async Task<List<MealSchedule>> GetApprovedMealsByUserId(int userId)
+        {
+            using (var dbContext = new HealthBuddyDbContext(_dbContextOptions))
+            {
+                return await dbContext.MealSchedules.Where(f => f.UploaderId == userId && f.IsApproved == true && f.IsHidden == false)
+                .Include(e => e.Uploader)
+                .AsNoTracking()
+                .ToListAsync();
+            }
+        }
+
         public async Task<List<MealSchedule>> GetApprovedMealSchedules()
         {
             using (var dbContext = new HealthBuddyDbContext(_dbContextOptions))
@@ -58,6 +69,26 @@ namespace HealthBuddy.Server.Repositories.Implement
                     .ToListAsync();
 
                 return result;
+            }
+        }
+
+        public async Task<int> GetTotalMealsByUserId(int userId)
+        {
+            using (var dbContext = new HealthBuddyDbContext(_dbContextOptions))
+            {
+                return await dbContext.MealSchedules.Where(f => f.UploaderId == userId).AsNoTracking().CountAsync();
+            }
+        }
+
+        public async Task<Dictionary<int, int>> GetTotalMealsByUserIds(List<int> userIds)
+        {
+            using (var dbContext = new HealthBuddyDbContext(_dbContextOptions))
+            {
+                return await dbContext.MealSchedules
+                            .Where(f => userIds.Contains(f.UploaderId))
+                            .GroupBy(f => f.UploaderId)
+                            .Select(g => new { UserId = g.Key, Count = g.Count() }).AsNoTracking()
+                            .ToDictionaryAsync(g => g.UserId, g => g.Count);
             }
         }
 
