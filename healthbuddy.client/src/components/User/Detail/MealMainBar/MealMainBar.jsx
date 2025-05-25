@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Image, message } from "antd";
 import { useParams } from "react-router-dom";
 import { Accordion, Label, Spinner, Button } from "flowbite-react";
-import { Flag, Heart } from "lucide-react";
+import { Flag, Heart, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
@@ -18,10 +18,12 @@ import FollowMealScheduleModal from "../FollowMealScheduleModal/FollowMealSchedu
 const MealMainBar = () => {
   const [showImageModal, setShowImageModal] = useState(false);
   const [showFollowModal, setShowFollowModal] = useState(false);
+  const [isFollowLoading, setIsFollowLoading] = useState(false);
+  const [isAlreadyFollowing, setIsAlreadyFollowing] = useState(false);
+  const [isCheckingFollowStatus, setIsCheckingFollowStatus] = useState(false);
 
   const [scheduleDetail, setScheduleDetail] = useState(null);
   const [isDataLoading, startDataTransition] = useTransition();
-  const [isFollowLoading, setIsFollowLoading] = useState(false);
 
   const { postId } = useParams();
   const navigate = useNavigate();
@@ -46,6 +48,22 @@ const MealMainBar = () => {
     setShowFollowModal(true);
   };
 
+  const checkFollowStatus = async () => {
+    if (!userId) return;
+
+    try {
+      setIsCheckingFollowStatus(true);
+      // Sử dụng API có sẵn để kiểm tra user đã follow chưa
+      await api.get(`/api/Schedule/GetUserScheduleTrackingDetail/${userId}/${postId}/meal`);
+      setIsAlreadyFollowing(true);
+    } catch (error) {
+      // Nếu API trả về 404 hoặc lỗi, có nghĩa là user chưa follow
+      setIsAlreadyFollowing(false);
+    } finally {
+      setIsCheckingFollowStatus(false);
+    }
+  };
+
   const handleFollowSchedule = async (startDate) => {
     try {
       setIsFollowLoading(true);
@@ -61,6 +79,7 @@ const MealMainBar = () => {
 
       message.success(`Successfully followed meal schedule! ${response.data.totalDays} days tracking created.`);
       setShowFollowModal(false);
+      setIsAlreadyFollowing(true); // Cập nhật trạng thái sau khi follow thành công
     } catch (error) {
       console.error("Error following meal schedule:", error);
       message.error("Failed to follow meal schedule: " + (error.response?.data?.detail || error.message));
@@ -99,8 +118,9 @@ const MealMainBar = () => {
   useEffect(() => {
     startDataTransition(async () => {
       await fetchScheduleDetail();
+      await checkFollowStatus();
     });
-  }, []);
+  }, [userId, postId]);
 
   if (isDataLoading || !scheduleDetail) {
     return (
@@ -133,14 +153,26 @@ const MealMainBar = () => {
         <div className="flex justify-between items-center mb-6">
           <Label className="text-3xl font-bold">{scheduleDetail.title}</Label>
           <div className="flex items-center gap-3">
-            <Button
-              onClick={handleFollowClick}
-              className="bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
-              size="sm"
-            >
-              <Heart className="size-4 mr-2" />
-              Follow
-            </Button>
+            {isAlreadyFollowing ? (
+              <Button
+                className="bg-green-500 hover:bg-green-600 text-white"
+                size="sm"
+                disabled
+              >
+                <Check className="size-4 mr-2" />
+                Following
+              </Button>
+            ) : (
+              <Button
+                onClick={handleFollowClick}
+                className="bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
+                size="sm"
+                disabled={isCheckingFollowStatus}
+              >
+                <Heart className="size-4 mr-2" />
+                Follow
+              </Button>
+            )}
             <button className="text-primary-light dark:text-primary-dark">
               <Flag className="size-7" />
             </button>

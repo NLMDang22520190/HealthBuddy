@@ -13,14 +13,18 @@ namespace HealthBuddy.Server.Controllers
     public class WorkoutController : ControllerBase
     {
         private readonly IWorkoutScheduleRepository _workoutScheduleRepository;
-
         private readonly IWorkoutDetailRepository _workoutDetailRepository;
+        private readonly IUserWorkoutTrackingRepository _userWorkoutTrackingRepository;
+        private readonly IUserWorkoutScheduleRepository _userWorkoutScheduleRepository;
         private readonly IMapper _mapper;
 
-        public WorkoutController(IWorkoutScheduleRepository workoutScheduleRepository, IWorkoutDetailRepository workoutDetailRepository, IMapper mapper)
+        public WorkoutController(IWorkoutScheduleRepository workoutScheduleRepository, IWorkoutDetailRepository workoutDetailRepository,
+            IUserWorkoutTrackingRepository userWorkoutTrackingRepository, IUserWorkoutScheduleRepository userWorkoutScheduleRepository, IMapper mapper)
         {
             _workoutScheduleRepository = workoutScheduleRepository;
             _workoutDetailRepository = workoutDetailRepository;
+            _userWorkoutTrackingRepository = userWorkoutTrackingRepository;
+            _userWorkoutScheduleRepository = userWorkoutScheduleRepository;
             _mapper = mapper;
         }
 
@@ -97,6 +101,48 @@ namespace HealthBuddy.Server.Controllers
             }
         }
 
+        [HttpPost("FollowWorkoutSchedule")]
+        public async Task<ActionResult> FollowWorkoutSchedule(FollowWorkoutScheduleRequestDTO requestDTO)
+        {
+            try
+            {
+                // Kiểm tra workout schedule có tồn tại không
+                var workoutSchedule = await _workoutScheduleRepository.GetWorkoutScheduleByIdAsync(requestDTO.WorkoutScheduleId);
+                if (workoutSchedule == null)
+                {
+                    return NotFound($"Workout schedule with ID {requestDTO.WorkoutScheduleId} not found.");
+                }
+
+                // Tạo UserWorkoutTracking record
+                var userWorkoutTracking = _mapper.Map<UserWorkoutTracking>(requestDTO);
+                var createdTracking = await _userWorkoutTrackingRepository.CreateAsync(userWorkoutTracking);
+
+                // Tự động tạo các UserWorkoutSchedule records dựa trên TotalDays
+                for (int day = 1; day <= workoutSchedule.TotalDays; day++)
+                {
+                    var userWorkoutSchedule = new UserWorkoutSchedule
+                    {
+                        UserId = requestDTO.UserId,
+                        WorkoutScheduleId = requestDTO.WorkoutScheduleId,
+                        DayNumber = day,
+                        IsCompleted = false,
+                        CompletionDate = null
+                    };
+
+                    await _userWorkoutScheduleRepository.CreateAsync(userWorkoutSchedule);
+                }
+
+                return Ok(new {
+                    Message = "Successfully followed workout schedule",
+                    TrackingId = createdTracking.UserWorkoutTrackingId,
+                    TotalDays = workoutSchedule.TotalDays
+                });
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error following workout schedule: " + e.Message);
+            }
+        }
 
     }
 }
