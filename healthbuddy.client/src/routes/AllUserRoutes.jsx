@@ -27,6 +27,8 @@ import Exercise from "../pages/User/Detail/Exercise/Exercise";
 import Workout from "../pages/User/Detail/Workout/Workout";
 import Meal from "../pages/User/Detail/Meal/Meal";
 
+import ScheduleTrackingDetail from "../components/User/ScheduleTracking/ScheduleTrackingDetail";
+
 import UnderConstruction from "../pages/UnderConstruction/UnderConstruction";
 
 const AllUserRoutes = () => {
@@ -60,6 +62,9 @@ const AllUserRoutes = () => {
       <Route path="detail/exercise/:postId" element={<Exercise />} />
       <Route path="detail/workoutSchedule/:postId" element={<Workout />} />
       <Route path="detail/mealSchedule/:postId" element={<Meal />} />
+
+      {/* Schedule Tracking */}
+      <Route path="schedule-tracking/:scheduleId/:scheduleType" element={<ScheduleTrackingDetail />} />
 
       {/* Under Construction */}
 

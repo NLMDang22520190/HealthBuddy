@@ -22,6 +22,7 @@ const SchedulePostCard = ({ type, post }) => {
   const handleTitleClick = (post) => {
     let path = "";
     console.log(type);
+
     if (type === "all") {
       if (post.type.toLowerCase() === "meal") {
         path = "/detail/mealSchedule";
@@ -29,9 +30,12 @@ const SchedulePostCard = ({ type, post }) => {
       if (post.type.toLowerCase() === "workout") {
         path = "/detail/workoutSchedule";
       }
+      path += `/${post.id}`;
+    } else if (type === "tracking") {
+      // Navigate to tracking detail page
+      path = `/schedule-tracking/${post.id}/${post.type.toLowerCase()}`;
     }
 
-    path += `/${post.id}`;
     navigate(path);
   };
 

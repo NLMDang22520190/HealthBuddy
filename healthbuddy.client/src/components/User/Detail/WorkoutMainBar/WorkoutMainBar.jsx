@@ -3,18 +3,24 @@ import { useEffect, useState, useTransition } from "react";
 import { motion } from "framer-motion";
 import { Image, message } from "antd";
 import { useParams } from "react-router-dom";
-import { Accordion, Label, Spinner } from "flowbite-react";
-import { Flag } from "lucide-react";
+import { Accordion, Label, Spinner, Button } from "flowbite-react";
+import { Flag, Heart, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 import api from "../../../../features/AxiosInstance/AxiosInstance";
 import DescriptionCard from "../DescriptionCard/DescriptionCard";
 import CommentCard from "../CommentCard/CommentCard";
 import CommentAccordition from "../CommentAccordition/CommentAccordition";
 import ShowImageModal from "../../../ShowImageModal/ShowImageModal";
+import FollowWorkoutScheduleModal from "../FollowWorkoutScheduleModal/FollowWorkoutScheduleModal";
 
 const WorkoutMainBar = () => {
   const [showImageModal, setShowImageModal] = useState(false);
+  const [showFollowModal, setShowFollowModal] = useState(false);
+  const [isFollowLoading, setIsFollowLoading] = useState(false);
+  const [isAlreadyFollowing, setIsAlreadyFollowing] = useState(false);
+  const [isCheckingFollowStatus, setIsCheckingFollowStatus] = useState(false);
 
   const [scheduleDetail, setScheduleDetail] = useState(null);
   const [isDataLoading, startDataTransition] = useTransition();
@@ -24,8 +30,59 @@ const WorkoutMainBar = () => {
 
   const [commentAdded, setCommentAdded] = useState(false);
 
+  // Get userId from Redux store (similar to MealMainBar)
+  const userId = useSelector((state) => state.auth.userId);
+
   const handleCommentAdded = () => {
     setCommentAdded((prev) => !prev);
+  };
+
+  const handleFollowClick = () => {
+    if (!userId) {
+      message.error("Please login to follow workout schedule");
+      return;
+    }
+    setShowFollowModal(true);
+  };
+
+  const checkFollowStatus = async () => {
+    if (!userId) return;
+
+    try {
+      setIsCheckingFollowStatus(true);
+      // Sử dụng API có sẵn để kiểm tra user đã follow chưa
+      await api.get(`/api/Schedule/GetUserScheduleTrackingDetail/${userId}/${postId}/workout`);
+      setIsAlreadyFollowing(true);
+    } catch (error) {
+      // Nếu API trả về 404 hoặc lỗi, có nghĩa là user chưa follow
+      setIsAlreadyFollowing(false);
+    } finally {
+      setIsCheckingFollowStatus(false);
+    }
+  };
+
+  const handleFollowSchedule = async (startDate) => {
+    try {
+      setIsFollowLoading(true);
+
+      const requestData = {
+        userId: parseInt(userId),
+        workoutScheduleId: parseInt(postId),
+        startDate: startDate,
+        trackingDate: startDate
+      };
+
+      const response = await api.post("/api/Workout/FollowWorkoutSchedule", requestData);
+
+      message.success(`Successfully followed workout schedule! ${response.data.totalDays} days tracking created.`);
+      setShowFollowModal(false);
+      setIsAlreadyFollowing(true); // Cập nhật trạng thái sau khi follow thành công
+    } catch (error) {
+      console.error("Error following workout schedule:", error);
+      message.error("Failed to follow workout schedule: " + (error.response?.data?.detail || error.message));
+    } finally {
+      setIsFollowLoading(false);
+    }
   };
 
   const handleDetailClick = (detail) => {
@@ -64,8 +121,9 @@ const WorkoutMainBar = () => {
   useEffect(() => {
     startDataTransition(async () => {
       await fetchScheduleDetail();
+      await checkFollowStatus();
     });
-  }, []);
+  }, [userId, postId]);
 
   if (isDataLoading || !scheduleDetail) {
     return (
@@ -97,9 +155,31 @@ const WorkoutMainBar = () => {
         {/* Title and actions */}
         <div className="flex justify-between items-center mb-6">
           <Label className="text-3xl font-bold">{scheduleDetail.title}</Label>
-          <button className="text-primary-light dark:text-primary-dark">
-            <Flag className="size-7" />
-          </button>
+          <div className="flex items-center gap-3">
+            {isAlreadyFollowing ? (
+              <Button
+                className="bg-green-500 hover:bg-green-600 text-white"
+                size="sm"
+                disabled
+              >
+                <Check className="size-4 mr-2" />
+                Following
+              </Button>
+            ) : (
+              <Button
+                onClick={handleFollowClick}
+                className="bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
+                size="sm"
+                disabled={isCheckingFollowStatus}
+              >
+                <Heart className="size-4 mr-2" />
+                Follow
+              </Button>
+            )}
+            <button className="text-primary-light dark:text-primary-dark">
+              <Flag className="size-7" />
+            </button>
+          </div>
         </div>
 
         {/* Food Types */}
@@ -186,6 +266,14 @@ const WorkoutMainBar = () => {
         show={showImageModal}
         onCancel={() => setShowImageModal(false)}
       ></ShowImageModal>
+
+      <FollowWorkoutScheduleModal
+        open={showFollowModal}
+        onCancel={() => setShowFollowModal(false)}
+        onFollow={handleFollowSchedule}
+        isLoading={isFollowLoading}
+        workoutScheduleName={scheduleDetail.title}
+      />
     </div>
   );
 };
