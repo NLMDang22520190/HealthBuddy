@@ -87,6 +87,48 @@ namespace HealthBuddy.Server.Controllers
             }
         }
 
+        [HttpGet("GetUserTrackingSchedules/{userId}")]
+        public async Task<ActionResult> GetUserTrackingSchedules(int userId)
+        {
+            try
+            {
+                var userMealTrackingTask = _mealScheduleRepository.GetUserTrackingMealSchedules(userId);
+                var userWorkoutTrackingTask = _workoutScheduleRepository.GetUserTrackingWorkoutSchedules(userId);
+
+                await Task.WhenAll(userMealTrackingTask, userWorkoutTrackingTask);
+
+                // Lấy kết quả từ các task
+                var userMealSchedules = await userMealTrackingTask;
+                var userWorkoutSchedules = await userWorkoutTrackingTask;
+
+                // Map sang PostDTO
+                var mealSchedulePosts = _mapper.Map<List<PostDTO>>(userMealSchedules);
+                var workoutSchedulePosts = _mapper.Map<List<PostDTO>>(userWorkoutSchedules);
+
+                // Gán loại bài post
+                foreach (var post in mealSchedulePosts)
+                {
+                    post.PostType = "meal";
+                }
+
+                foreach (var post in workoutSchedulePosts)
+                {
+                    post.PostType = "workout";
+                }
+
+                // Gộp cả hai danh sách lại
+                var allTrackingPosts = new List<PostDTO>();
+                allTrackingPosts.AddRange(mealSchedulePosts);
+                allTrackingPosts.AddRange(workoutSchedulePosts);
+
+                return Ok(allTrackingPosts.OrderByDescending(p => p.CreatedDate));
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving user tracking schedules: " + e.Message);
+            }
+        }
+
 
     }
 }

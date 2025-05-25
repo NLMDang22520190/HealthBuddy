@@ -21,5 +21,7 @@ namespace HealthBuddy.Server.Repositories
         Task<int> GetTotalWorkoutsByUserId(int userId);
 
         Task<List<WorkoutSchedule>> GetApprovedWorkoutsByUserId(int userId);
+
+        Task<List<WorkoutSchedule>> GetUserTrackingWorkoutSchedules(int userId);
     }
 }

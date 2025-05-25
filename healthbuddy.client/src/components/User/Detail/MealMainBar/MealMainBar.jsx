@@ -3,24 +3,29 @@ import { useEffect, useState, useTransition } from "react";
 import { motion } from "framer-motion";
 import { Image, message } from "antd";
 import { useParams } from "react-router-dom";
-import { Accordion, Label, Spinner } from "flowbite-react";
-import { Flag } from "lucide-react";
+import { Accordion, Label, Spinner, Button } from "flowbite-react";
+import { Flag, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 import api from "../../../../features/AxiosInstance/AxiosInstance";
 import DescriptionCard from "../DescriptionCard/DescriptionCard";
 import CommentCard from "../CommentCard/CommentCard";
 import CommentAccordition from "../CommentAccordition/CommentAccordition";
 import ShowImageModal from "../../../ShowImageModal/ShowImageModal";
+import FollowMealScheduleModal from "../FollowMealScheduleModal/FollowMealScheduleModal";
 
 const MealMainBar = () => {
   const [showImageModal, setShowImageModal] = useState(false);
+  const [showFollowModal, setShowFollowModal] = useState(false);
 
   const [scheduleDetail, setScheduleDetail] = useState(null);
   const [isDataLoading, startDataTransition] = useTransition();
+  const [isFollowLoading, setIsFollowLoading] = useState(false);
 
   const { postId } = useParams();
   const navigate = useNavigate();
+  const userId = useSelector((state) => state.auth.userId);
 
   const [commentAdded, setCommentAdded] = useState(false);
 
@@ -31,6 +36,37 @@ const MealMainBar = () => {
   const handleDetailClick = (detail) => {
     console.log(detail);
     navigate(`/detail/food/${detail.foodId}`);
+  };
+
+  const handleFollowClick = () => {
+    if (!userId) {
+      message.error("Please login to follow meal schedule");
+      return;
+    }
+    setShowFollowModal(true);
+  };
+
+  const handleFollowSchedule = async (startDate) => {
+    try {
+      setIsFollowLoading(true);
+
+      const requestData = {
+        userId: parseInt(userId),
+        mealScheduleId: parseInt(postId),
+        startDate: startDate,
+        trackingDate: startDate
+      };
+
+      const response = await api.post("/api/Meal/FollowMealSchedule", requestData);
+
+      message.success(`Successfully followed meal schedule! ${response.data.totalDays} days tracking created.`);
+      setShowFollowModal(false);
+    } catch (error) {
+      console.error("Error following meal schedule:", error);
+      message.error("Failed to follow meal schedule: " + (error.response?.data?.detail || error.message));
+    } finally {
+      setIsFollowLoading(false);
+    }
   };
 
   const fetchScheduleDetail = async () => {
@@ -96,9 +132,19 @@ const MealMainBar = () => {
         {/* Title and actions */}
         <div className="flex justify-between items-center mb-6">
           <Label className="text-3xl font-bold">{scheduleDetail.title}</Label>
-          <button className="text-primary-light dark:text-primary-dark">
-            <Flag className="size-7" />
-          </button>
+          <div className="flex items-center gap-3">
+            <Button
+              onClick={handleFollowClick}
+              className="bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
+              size="sm"
+            >
+              <Heart className="size-4 mr-2" />
+              Follow
+            </Button>
+            <button className="text-primary-light dark:text-primary-dark">
+              <Flag className="size-7" />
+            </button>
+          </div>
         </div>
 
         {/* Food Types */}
@@ -188,6 +234,14 @@ const MealMainBar = () => {
         show={showImageModal}
         onCancel={() => setShowImageModal(false)}
       ></ShowImageModal>
+
+      <FollowMealScheduleModal
+        open={showFollowModal}
+        onCancel={() => setShowFollowModal(false)}
+        onFollow={handleFollowSchedule}
+        isLoading={isFollowLoading}
+        mealScheduleName={scheduleDetail?.title || "Meal Schedule"}
+      />
     </div>
   );
 };

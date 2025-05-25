@@ -92,6 +92,20 @@ namespace HealthBuddy.Server.Repositories.Implement
             }
         }
 
+        public async Task<List<MealSchedule>> GetUserTrackingMealSchedules(int userId)
+        {
+            using (var dbContext = new HealthBuddyDbContext(_dbContextOptions))
+            {
+                return await dbContext.UserMealTrackings
+                    .Where(umt => umt.UserId == userId)
+                    .Include(umt => umt.MealSchedule)
+                        .ThenInclude(ms => ms.Uploader)
+                    .Select(umt => umt.MealSchedule)
+                    .AsNoTracking()
+                    .ToListAsync();
+            }
+        }
+
         public async Task UpdateMealComments(int id, int newComments)
         {
             var schedule = await dbContext.MealSchedules.FirstOrDefaultAsync(s => s.MealScheduleId == id);
