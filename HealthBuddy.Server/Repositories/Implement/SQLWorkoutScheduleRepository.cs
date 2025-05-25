@@ -69,6 +69,20 @@ namespace HealthBuddy.Server.Repositories.Implement
             }
         }
 
+        public async Task<List<WorkoutSchedule>> GetUserTrackingWorkoutSchedules(int userId)
+        {
+            using (var dbContext = new HealthBuddyDbContext(_dbContextOptions))
+            {
+                return await dbContext.UserWorkoutTrackings
+                    .Where(uwt => uwt.UserId == userId)
+                    .Include(uwt => uwt.WorkoutSchedule)
+                        .ThenInclude(ws => ws.Uploader)
+                    .Select(uwt => uwt.WorkoutSchedule)
+                    .AsNoTracking()
+                    .ToListAsync();
+            }
+        }
+
         public async Task<WorkoutSchedule> GetWorkoutScheduleByIdAsync(int id)
         {
             return await dbContext.WorkoutSchedules

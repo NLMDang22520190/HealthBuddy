@@ -16,12 +16,19 @@ namespace HealthBuddy.Server.Controllers
 
         private readonly IMealDetailRepository _mealDetailRepository;
 
+        private readonly IUserMealTrackingRepository _userMealTrackingRepository;
+
+        private readonly IUserMealScheduleRepository _userMealScheduleRepository;
+
         private readonly IMapper _mapper;
 
-        public MealController(IMealScheduleRepository mealScheduleRepository, IMealDetailRepository mealDetailRepository, IMapper mapper)
+        public MealController(IMealScheduleRepository mealScheduleRepository, IMealDetailRepository mealDetailRepository,
+            IUserMealTrackingRepository userMealTrackingRepository, IUserMealScheduleRepository userMealScheduleRepository, IMapper mapper)
         {
             _mealScheduleRepository = mealScheduleRepository;
             _mealDetailRepository = mealDetailRepository;
+            _userMealTrackingRepository = userMealTrackingRepository;
+            _userMealScheduleRepository = userMealScheduleRepository;
             _mapper = mapper;
         }
 
@@ -95,6 +102,49 @@ namespace HealthBuddy.Server.Controllers
             catch (Exception e)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error updating data in the database: " + e.Message);
+            }
+        }
+
+        [HttpPost("FollowMealSchedule")]
+        public async Task<ActionResult> FollowMealSchedule(FollowMealScheduleRequestDTO requestDTO)
+        {
+            try
+            {
+                // Kiểm tra meal schedule có tồn tại không
+                var mealSchedule = await _mealScheduleRepository.GetMealScheduleByIdAsync(requestDTO.MealScheduleId);
+                if (mealSchedule == null)
+                {
+                    return NotFound($"Meal schedule with ID {requestDTO.MealScheduleId} not found.");
+                }
+
+                // Tạo UserMealTracking record
+                var userMealTracking = _mapper.Map<UserMealTracking>(requestDTO);
+                var createdTracking = await _userMealTrackingRepository.CreateAsync(userMealTracking);
+
+                // Tự động tạo các UserMealSchedule records dựa trên TotalDays
+                for (int day = 1; day <= mealSchedule.TotalDays; day++)
+                {
+                    var userMealSchedule = new UserMealSchedule
+                    {
+                        UserId = requestDTO.UserId,
+                        MealScheduleId = requestDTO.MealScheduleId,
+                        DayNumber = day,
+                        IsCompleted = false,
+                        CompletionDate = null
+                    };
+
+                    await _userMealScheduleRepository.CreateAsync(userMealSchedule);
+                }
+
+                return Ok(new {
+                    Message = "Successfully followed meal schedule",
+                    TrackingId = createdTracking.UserMealTrackingId,
+                    TotalDays = mealSchedule.TotalDays
+                });
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error following meal schedule: " + e.Message);
             }
         }
 

@@ -21,5 +21,7 @@ namespace HealthBuddy.Server.Repositories
         Task<int> GetTotalMealsByUserId(int userId);
 
         Task<List<MealSchedule>> GetApprovedMealsByUserId(int userId);
+
+        Task<List<MealSchedule>> GetUserTrackingMealSchedules(int userId);
     }
 }
