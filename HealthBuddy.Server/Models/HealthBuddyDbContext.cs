@@ -50,6 +50,8 @@ public partial class HealthBuddyDbContext : DbContext
 
     public virtual DbSet<UserNotificationPreference> UserNotificationPreferences { get; set; }
 
+    public virtual DbSet<UserPreference> UserPreferences { get; set; }
+
     public virtual DbSet<UserWorkoutSchedule> UserWorkoutSchedules { get; set; }
 
     public virtual DbSet<UserWorkoutTracking> UserWorkoutTrackings { get; set; }

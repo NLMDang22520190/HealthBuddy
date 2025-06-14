@@ -8,6 +8,7 @@ import { Frown } from "lucide-react";
 import PostList from "../PostList/PostList";
 import UserAddNewPost from "../UserAddNewPost/UserAddNewPost";
 import AddNewNavigateModal from "../AddNewNavigateModal/AddNewNavigateModal";
+import RecommendationsSection from "../RecommendationsSection/RecommendationsSection";
 import api from "../../../features/AxiosInstance/AxiosInstance";
 
 const HomeMainBar = () => {
@@ -91,6 +92,12 @@ const HomeMainBar = () => {
       {/* Content bên trong scroll */}
       <div className="min-h-screen divide-gray-400 divide-y user-page-mainbar-content-marginbottom">
         {user && <UserAddNewPost onAddClick={handleAddClick} />}
+
+        {/* Recommendations Section */}
+        <div className="py-6">
+          <RecommendationsSection />
+        </div>
+
         {posts.length === 0 ? (
           <div className="flex flex-col gap-12 h-96 justify-center items-center">
             <Frown className="size-28 text-primary-light dark:text-primary-dark"></Frown>

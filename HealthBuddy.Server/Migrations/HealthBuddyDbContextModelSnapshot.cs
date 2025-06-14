@@ -701,6 +701,79 @@ namespace HealthBuddy.Server.Migrations
                     b.ToTable("UserNotificationPreferences");
                 });
 
+            modelBuilder.Entity("HealthBuddy.Server.Models.Domain.UserPreference", b =>
+                {
+                    b.Property<int>("UserPreferenceId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserPreferenceId"));
+
+                    b.Property<string>("ActivityLevel")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DietaryRestrictions")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DislikedIngredients")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FitnessGoals")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("FitnessLevel")
+                        .HasColumnType("int");
+
+                    b.Property<string>("HealthGoals")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("MaxCookingTime")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("MaxWorkoutDuration")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PreferredCuisines")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PreferredDifficultyLevel")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PreferredExerciseTypes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PreferredMuscleGroups")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PreferredWorkoutTime")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("TargetCaloriesPerDay")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TargetCaloriesPerMeal")
+                        .HasColumnType("int");
+
+                    b.Property<double?>("TargetWeight")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserPreferenceId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("UserPreferences");
+                });
+
             modelBuilder.Entity("HealthBuddy.Server.Models.Domain.UserWorkoutSchedule", b =>
                 {
                     b.Property<int>("UserWorkoutScheduleId")
@@ -1066,6 +1139,17 @@ namespace HealthBuddy.Server.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("HealthBuddy.Server.Models.Domain.UserPreference", b =>
+                {
+                    b.HasOne("HealthBuddy.Server.Models.Domain.User", "User")
+                        .WithOne("UserPreference")
+                        .HasForeignKey("HealthBuddy.Server.Models.Domain.UserPreference", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("HealthBuddy.Server.Models.Domain.UserWorkoutSchedule", b =>
                 {
                     b.HasOne("HealthBuddy.Server.Models.Domain.User", "User")
@@ -1181,6 +1265,8 @@ namespace HealthBuddy.Server.Migrations
                     b.Navigation("UserMealTrackings");
 
                     b.Navigation("UserNotificationPreference");
+
+                    b.Navigation("UserPreference");
 
                     b.Navigation("UserWorkoutSchedules");
 
