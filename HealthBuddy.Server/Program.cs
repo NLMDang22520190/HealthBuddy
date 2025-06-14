@@ -82,6 +82,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<IUserRepository, SQLUserRepository>();
 builder.Services.AddScoped<IUserDetailRepository, SQLUserDetailRepository>();
 builder.Services.AddScoped<IUserNotificationPreferenceRepository, SQLUserNotificationPreferenceRepository>();
+builder.Services.AddScoped<IUserPreferenceRepository, SQLUserPreferenceRepository>();
 builder.Services.AddScoped<IFoodTypeRepository, SQLFoodTypeRepository>();
 builder.Services.AddScoped<IFoodRepository, SQLFoodRepository>();
 builder.Services.AddScoped<IIngredientRepository, SQLIngredientRepository>();
@@ -104,6 +105,7 @@ builder.Services.AddScoped<IUserMealTrackingRepository, SQLUserMealTrackingRepos
 builder.Services.AddScoped(typeof(IHealthBuddyRepository<>), typeof(HealthBuddyRepository<>));
 builder.Services.AddHttpClient();  // Đăng ký IHttpClientFactory
 builder.Services.AddScoped<Auth0Service>();
+builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 

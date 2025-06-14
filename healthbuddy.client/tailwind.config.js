@@ -92,8 +92,46 @@ export default {
       },
       animation: {
         "spin-slow": "spin 3s linear infinite",
+        fadeIn: "fadeIn 0.6s ease-out",
+        slideUp: "slideUp 0.5s ease-out",
+        "pulse-slow": "pulse 3s infinite",
+      },
+      keyframes: {
+        fadeIn: {
+          "0%": { opacity: "0", transform: "translateY(20px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        slideUp: {
+          "0%": { opacity: "0", transform: "translateY(30px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
       },
     },
   },
-  plugins: [flowbite.plugin(), require("tailwind-hamburgers")],
+  plugins: [
+    flowbite.plugin(),
+    require("tailwind-hamburgers"),
+    function ({ addUtilities }) {
+      addUtilities({
+        ".line-clamp-1": {
+          overflow: "hidden",
+          display: "-webkit-box",
+          "-webkit-box-orient": "vertical",
+          "-webkit-line-clamp": "1",
+        },
+        ".line-clamp-2": {
+          overflow: "hidden",
+          display: "-webkit-box",
+          "-webkit-box-orient": "vertical",
+          "-webkit-line-clamp": "2",
+        },
+        ".line-clamp-3": {
+          overflow: "hidden",
+          display: "-webkit-box",
+          "-webkit-box-orient": "vertical",
+          "-webkit-line-clamp": "3",
+        },
+      });
+    },
+  ],
 };

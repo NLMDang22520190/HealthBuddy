@@ -43,6 +43,8 @@ public partial class User
 
     public virtual UserNotificationPreference? UserNotificationPreference { get; set; }
 
+    public virtual UserPreference? UserPreference { get; set; }
+
     public virtual ICollection<UserWorkoutSchedule> UserWorkoutSchedules { get; set; } = new List<UserWorkoutSchedule>();
 
     public virtual ICollection<UserWorkoutTracking> UserWorkoutTrackings { get; set; } = new List<UserWorkoutTracking>();
