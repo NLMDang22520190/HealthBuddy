@@ -131,5 +131,13 @@ UI/UX: Horizontal card layout with dark/light theme support
 - ✅ Frontend build successful
 - ✅ Horizontal card layout implemented
 - ✅ Dark/Light theme support added
-- ✅ Health summary UI improved
+- ✅ Health summary UI improved with gradient header
 - ✅ Icon colors fixed
+- ✅ "Why recommended" moved to top of cards
+- ✅ Health summary removed per user request
+- ✅ Recommendation cards completely redesigned with modern UX/UI
+- ✅ Improved visual hierarchy and information flow
+- ✅ Better typography and spacing
+- ✅ Card restructured to 2-row layout: Why recommended + Image/Content
+- ✅ Row 1 (Why recommended) with rounded top corners
+- ✅ Row 2 (Image + Content) with rounded bottom corners
