@@ -10,13 +10,24 @@ import {
 } from "@ant-design/icons";
 import { recommendationAPI } from "../../../features/RecommendationAPI/RecommendationAPI";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const RecommendationCard = ({ recommendation, type = "food" }) => {
   const [isLiked, setIsLiked] = useState(recommendation.isLikedByUser);
   const [loading, setLoading] = useState(false);
   const userId = useSelector((state) => state.auth.userId);
+  const navigate = useNavigate();
 
-  const handleFeedback = async (feedbackType) => {
+  const handleCardClick = () => {
+    const itemId = recommendation[type === "food" ? "foodId" : "exerciseId"];
+    const detailPath = `/detail/${type}/${itemId}`;
+    navigate(detailPath);
+  };
+
+  const handleFeedback = async (feedbackType, event) => {
+    // Prevent card click when clicking action buttons
+    event.stopPropagation();
+
     if (!userId) {
       message.warning("Please login to provide feedback");
       return;
@@ -52,7 +63,10 @@ const RecommendationCard = ({ recommendation, type = "food" }) => {
   };
 
   const renderFoodCard = () => (
-    <Card className="border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800 hover:shadow-xl transition-all duration-300 group">
+    <Card
+      className="border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800 hover:shadow-xl transition-all duration-300 group cursor-pointer"
+      onClick={handleCardClick}
+    >
       {/* Row 1: Why Recommended - Bo góc trên */}
       <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-100 dark:border-blue-800 rounded-t-2xl">
         <div className="flex items-start gap-3">
@@ -142,7 +156,7 @@ const RecommendationCard = ({ recommendation, type = "food" }) => {
                     <HeartOutlined />
                   )
                 }
-                onClick={() => handleFeedback("like")}
+                onClick={(e) => handleFeedback("like", e)}
                 loading={loading}
                 className="hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
               />
@@ -150,7 +164,7 @@ const RecommendationCard = ({ recommendation, type = "food" }) => {
                 type="text"
                 size="small"
                 icon={<InfoCircleOutlined />}
-                onClick={() => handleFeedback("not_interested")}
+                onClick={(e) => handleFeedback("not_interested", e)}
                 loading={loading}
                 className="hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg"
               />
@@ -162,7 +176,10 @@ const RecommendationCard = ({ recommendation, type = "food" }) => {
   );
 
   const renderExerciseCard = () => (
-    <Card className="border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800 hover:shadow-xl transition-all duration-300 group">
+    <Card
+      className="border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800 hover:shadow-xl transition-all duration-300 group cursor-pointer"
+      onClick={handleCardClick}
+    >
       {/* Row 1: Why Recommended - Bo góc trên */}
       <div className="p-4 bg-green-50 dark:bg-green-900/20 border-b border-green-100 dark:border-green-800 rounded-t-2xl">
         <div className="flex items-start gap-3">
@@ -259,7 +276,7 @@ const RecommendationCard = ({ recommendation, type = "food" }) => {
                     <HeartOutlined />
                   )
                 }
-                onClick={() => handleFeedback("like")}
+                onClick={(e) => handleFeedback("like", e)}
                 loading={loading}
                 className="hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
               />
@@ -267,7 +284,7 @@ const RecommendationCard = ({ recommendation, type = "food" }) => {
                 type="text"
                 size="small"
                 icon={<InfoCircleOutlined />}
-                onClick={() => handleFeedback("not_interested")}
+                onClick={(e) => handleFeedback("not_interested", e)}
                 loading={loading}
                 className="hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg"
               />
