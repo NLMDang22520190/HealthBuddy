@@ -16,6 +16,7 @@ import UserProfile from "../pages/User/UserProfile/UserProfile";
 import AllPost from "../pages/User/AllPost/AllPost";
 import PostByKeyword from "../pages/User/PostByKeyword/PostByKeyword";
 import Schedule from "../pages/User/Schedule/Schedule";
+import Messages from "../pages/User/Messages/Messages";
 
 import NewFood from "../pages/User/Add/NewFood/NewFood";
 import NewExercise from "../pages/User/Add/NewExercise/NewExercise";
@@ -41,6 +42,7 @@ const AllUserRoutes = () => {
       <Route path="schedule" element={<Schedule />} />
       <Route path="users" element={<Users />} />
       <Route path="user/:userId" element={<UserProfile />} />
+      <Route path="messages" element={<Messages />} />
 
       {/* Auth */}
       <Route path="auth/login" element={<Login />} />
@@ -64,7 +66,10 @@ const AllUserRoutes = () => {
       <Route path="detail/mealSchedule/:postId" element={<Meal />} />
 
       {/* Schedule Tracking */}
-      <Route path="schedule-tracking/:scheduleId/:scheduleType" element={<ScheduleTrackingDetail />} />
+      <Route
+        path="schedule-tracking/:scheduleId/:scheduleType"
+        element={<ScheduleTrackingDetail />}
+      />
 
       {/* Under Construction */}
 

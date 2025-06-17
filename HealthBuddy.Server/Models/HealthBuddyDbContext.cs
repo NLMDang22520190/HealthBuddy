@@ -60,7 +60,13 @@ public partial class HealthBuddyDbContext : DbContext
 
     public virtual DbSet<WorkoutSchedule> WorkoutSchedules { get; set; }
 
-  
+    public virtual DbSet<Message> Messages { get; set; }
+
+    public virtual DbSet<Conversation> Conversations { get; set; }
+
+    public virtual DbSet<ConversationParticipant> ConversationParticipants { get; set; }
+
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Comment>(entity =>
@@ -469,6 +475,61 @@ public partial class HealthBuddyDbContext : DbContext
                 .HasForeignKey(d => d.UploaderId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__WorkoutSc__Uploa__797309D9");
+        });
+
+        modelBuilder.Entity<Message>(entity =>
+        {
+            entity.HasKey(e => e.MessageId).HasName("PK__Messages__C87C037C");
+
+            entity.Property(e => e.MessageId).HasColumnName("MessageID");
+            entity.Property(e => e.ConversationId).HasColumnName("ConversationID");
+            entity.Property(e => e.SenderId).HasColumnName("SenderID");
+            entity.Property(e => e.Content).HasMaxLength(1000);
+            entity.Property(e => e.SentAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Conversation).WithMany(p => p.Messages)
+                .HasForeignKey(d => d.ConversationId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Messages__ConversationID");
+
+            entity.HasOne(d => d.Sender).WithMany(p => p.Messages)
+                .HasForeignKey(d => d.SenderId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Messages__SenderID");
+        });
+
+        modelBuilder.Entity<Conversation>(entity =>
+        {
+            entity.HasKey(e => e.ConversationId).HasName("PK__Conversations__C87C037D");
+
+            entity.Property(e => e.ConversationId).HasColumnName("ConversationID");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.LastMessageAt).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<ConversationParticipant>(entity =>
+        {
+            entity.HasKey(e => new { e.ConversationId, e.UserId }).HasName("PK__ConversationParticipants");
+
+            entity.Property(e => e.ConversationId).HasColumnName("ConversationID");
+            entity.Property(e => e.UserId).HasColumnName("UserID");
+            entity.Property(e => e.JoinedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Conversation).WithMany(p => p.ConversationParticipants)
+                .HasForeignKey(d => d.ConversationId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__ConversationParticipants__ConversationID");
+
+            entity.HasOne(d => d.User).WithMany(p => p.ConversationParticipants)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__ConversationParticipants__UserID");
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -115,6 +115,52 @@ namespace HealthBuddy.Server.Migrations
                     b.ToTable("Comments");
                 });
 
+            modelBuilder.Entity("HealthBuddy.Server.Models.Domain.Conversation", b =>
+                {
+                    b.Property<int>("ConversationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("ConversationID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ConversationId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("(getdate())");
+
+                    b.Property<DateTime?>("LastMessageAt")
+                        .HasColumnType("datetime");
+
+                    b.HasKey("ConversationId")
+                        .HasName("PK__Conversations__C87C037D");
+
+                    b.ToTable("Conversations");
+                });
+
+            modelBuilder.Entity("HealthBuddy.Server.Models.Domain.ConversationParticipant", b =>
+                {
+                    b.Property<int>("ConversationId")
+                        .HasColumnType("int")
+                        .HasColumnName("ConversationID");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("UserID");
+
+                    b.Property<DateTime>("JoinedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("(getdate())");
+
+                    b.HasKey("ConversationId", "UserId")
+                        .HasName("PK__ConversationParticipants");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ConversationParticipants");
+                });
+
             modelBuilder.Entity("HealthBuddy.Server.Models.Domain.Exercise", b =>
                 {
                     b.Property<int>("ExerciseId")
@@ -446,6 +492,46 @@ namespace HealthBuddy.Server.Migrations
                     b.HasIndex("UploaderId");
 
                     b.ToTable("MealSchedules");
+                });
+
+            modelBuilder.Entity("HealthBuddy.Server.Models.Domain.Message", b =>
+                {
+                    b.Property<int>("MessageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("MessageID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MessageId"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("ConversationId")
+                        .HasColumnType("int")
+                        .HasColumnName("ConversationID");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("SenderId")
+                        .HasColumnType("int")
+                        .HasColumnName("SenderID");
+
+                    b.Property<DateTime>("SentAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("(getdate())");
+
+                    b.HasKey("MessageId")
+                        .HasName("PK__Messages__C87C037C");
+
+                    b.HasIndex("ConversationId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("Messages");
                 });
 
             modelBuilder.Entity("HealthBuddy.Server.Models.Domain.MuscleType", b =>
@@ -986,6 +1072,25 @@ namespace HealthBuddy.Server.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("HealthBuddy.Server.Models.Domain.ConversationParticipant", b =>
+                {
+                    b.HasOne("HealthBuddy.Server.Models.Domain.Conversation", "Conversation")
+                        .WithMany("ConversationParticipants")
+                        .HasForeignKey("ConversationId")
+                        .IsRequired()
+                        .HasConstraintName("FK__ConversationParticipants__ConversationID");
+
+                    b.HasOne("HealthBuddy.Server.Models.Domain.User", "User")
+                        .WithMany("ConversationParticipants")
+                        .HasForeignKey("UserId")
+                        .IsRequired()
+                        .HasConstraintName("FK__ConversationParticipants__UserID");
+
+                    b.Navigation("Conversation");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("HealthBuddy.Server.Models.Domain.Exercise", b =>
                 {
                     b.HasOne("HealthBuddy.Server.Models.Domain.User", "Uploader")
@@ -1047,6 +1152,25 @@ namespace HealthBuddy.Server.Migrations
                         .HasConstraintName("FK__MealSched__Uploa__03F0984C");
 
                     b.Navigation("Uploader");
+                });
+
+            modelBuilder.Entity("HealthBuddy.Server.Models.Domain.Message", b =>
+                {
+                    b.HasOne("HealthBuddy.Server.Models.Domain.Conversation", "Conversation")
+                        .WithMany("Messages")
+                        .HasForeignKey("ConversationId")
+                        .IsRequired()
+                        .HasConstraintName("FK__Messages__ConversationID");
+
+                    b.HasOne("HealthBuddy.Server.Models.Domain.User", "Sender")
+                        .WithMany("Messages")
+                        .HasForeignKey("SenderId")
+                        .IsRequired()
+                        .HasConstraintName("FK__Messages__SenderID");
+
+                    b.Navigation("Conversation");
+
+                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("HealthBuddy.Server.Models.Domain.Recipe", b =>
@@ -1218,6 +1342,13 @@ namespace HealthBuddy.Server.Migrations
                     b.Navigation("Uploader");
                 });
 
+            modelBuilder.Entity("HealthBuddy.Server.Models.Domain.Conversation", b =>
+                {
+                    b.Navigation("ConversationParticipants");
+
+                    b.Navigation("Messages");
+                });
+
             modelBuilder.Entity("HealthBuddy.Server.Models.Domain.Exercise", b =>
                 {
                     b.Navigation("WorkoutDetails");
@@ -1248,6 +1379,8 @@ namespace HealthBuddy.Server.Migrations
                 {
                     b.Navigation("Comments");
 
+                    b.Navigation("ConversationParticipants");
+
                     b.Navigation("Exercises");
 
                     b.Navigation("Foods");
@@ -1255,6 +1388,8 @@ namespace HealthBuddy.Server.Migrations
                     b.Navigation("Likes");
 
                     b.Navigation("MealSchedules");
+
+                    b.Navigation("Messages");
 
                     b.Navigation("Reports");
 
