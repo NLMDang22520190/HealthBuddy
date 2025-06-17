@@ -4,6 +4,7 @@ using HealthBuddy.Server.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthBuddy.Server.Migrations
 {
     [DbContext(typeof(HealthBuddyDbContext))]
-    partial class HealthBuddyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250617151505_AddMessagingSystem")]
+    partial class AddMessagingSystem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

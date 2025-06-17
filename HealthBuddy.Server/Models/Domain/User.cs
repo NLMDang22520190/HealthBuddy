@@ -50,4 +50,8 @@ public partial class User
     public virtual ICollection<UserWorkoutTracking> UserWorkoutTrackings { get; set; } = new List<UserWorkoutTracking>();
 
     public virtual ICollection<WorkoutSchedule> WorkoutSchedules { get; set; } = new List<WorkoutSchedule>();
+
+    public virtual ICollection<Message> Messages { get; set; } = new List<Message>();
+
+    public virtual ICollection<ConversationParticipant> ConversationParticipants { get; set; } = new List<ConversationParticipant>();
 }

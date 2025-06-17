@@ -2,6 +2,7 @@ import React, { useTransition } from "react";
 import {
   Home,
   MessageSquareText,
+  MessageCircle,
   Search,
   UsersRound,
   CalendarFold,
@@ -18,6 +19,12 @@ const LeftSideBar = () => {
           className="has-[:checked]:shadow-lg relative w-full h-16 p-4 ease-in-out duration-300 border-solid border-black/10 has-[:checked]:border group flex flex-row gap-3 items-center justify-center text-primary-light dark:text-primary-dark rounded-xl"
         >
           <Home className="group-hover:scale-125 text-2xl peer-checked/expand:scale-125 ease-in-out duration-300" />
+        </Link>
+        <Link
+          to="/messages"
+          className="has-[:checked]:shadow-lg relative w-full h-16 p-4 ease-in-out duration-300 border-solid border-black/10 has-[:checked]:border group flex flex-row gap-3 items-center justify-center text-primary-light dark:text-primary-dark rounded-xl"
+        >
+          <MessageCircle className="group-hover:scale-125 text-2xl peer-checked/expand:scale-125 ease-in-out duration-300" />
         </Link>
         <Link
           to="/all-post"
