@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Card } from "flowbite-react";
-import { MessageCircle, Users, Plus } from "lucide-react";
+import { MessageCircle, Plus } from "lucide-react";
 import { Button, Typography, message } from "antd";
 import { useSelector, useDispatch } from "react-redux";
 
@@ -129,15 +128,13 @@ const NewMessagesMainBar = () => {
         >
           {/* Chat Area */}
           <div className="flex-1 min-w-0">
-            <Card className="h-full p-0 overflow-hidden">
-              <div className="h-full w-full">
-                <ChatInterface
-                  conversation={currentConversation}
-                  onBack={handleBackToList}
-                  onStartNewConversation={() => setShowUserSearch(true)}
-                />
-              </div>
-            </Card>
+            <div className="h-full bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+              <ChatInterface
+                conversation={currentConversation}
+                onBack={handleBackToList}
+                onStartNewConversation={() => setShowUserSearch(true)}
+              />
+            </div>
           </div>
 
           {/* Conversations Sidebar */}
