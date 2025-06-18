@@ -1,6 +1,6 @@
 import React from "react";
 import LeftSideBar from "../../../components/User/LeftSideBar/LeftSideBar";
-import MessagesMainBar from "../../../components/User/MessagesMainBar/MessagesMainBar";
+import NewMessagesMainBar from "../../../components/User/MessagesMainBar/NewMessagesMainBar";
 
 const Messages = () => {
   return (
@@ -10,7 +10,7 @@ const Messages = () => {
       </div>
 
       <div className="user-page-mainbar-container">
-        <MessagesMainBar />
+        <NewMessagesMainBar />
       </div>
     </div>
   );
