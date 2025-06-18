@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from "react-redux";
 
 import MessageBubble from "./MessageBubble";
 import MessageComposer from "./MessageComposer";
+import DateSeparator from "./DateSeparator";
 import {
   setMessagesLoading,
   setMessages,
@@ -17,6 +18,7 @@ import {
   setHasMoreMessages,
 } from "../../../features/Message/messageSlice";
 import messageAPI from "../../../features/MessageAPI/MessageAPI";
+import { isSameDay } from "date-fns";
 
 const { Title, Text } = Typography;
 
@@ -33,6 +35,32 @@ const ChatInterface = ({ conversation, onBack, onStartNewConversation }) => {
 
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isSending, setIsSending] = useState(false);
+
+  // Group messages by date
+  const groupMessagesByDate = (messages) => {
+    const groups = [];
+    let currentGroup = null;
+
+    messages.forEach((message) => {
+      const messageDate = new Date(message.sentAt);
+      const isNewDay =
+        !currentGroup || !isSameDay(messageDate, new Date(currentGroup.date));
+
+      if (isNewDay) {
+        currentGroup = {
+          date: message.sentAt,
+          messages: [message],
+        };
+        groups.push(currentGroup);
+      } else {
+        currentGroup.messages.push(message);
+      }
+    });
+
+    return groups;
+  };
+
+  const messageGroups = groupMessagesByDate(messages);
 
   // Get other participant
   const otherParticipant = conversation?.participants?.find(
@@ -217,13 +245,24 @@ const ChatInterface = ({ conversation, onBack, onStartNewConversation }) => {
 
             {/* Messages */}
             <AnimatePresence>
-              {messages.map((message, index) => (
-                <MessageBubble
-                  key={message.messageId}
-                  message={message}
-                  currentUserId={currentUserId}
-                  isLast={index === messages.length - 1}
-                />
+              {messageGroups.map((group, groupIndex) => (
+                <div key={`group-${groupIndex}`}>
+                  {/* Date Separator */}
+                  <DateSeparator date={group.date} />
+
+                  {/* Messages in this group */}
+                  {group.messages.map((message, messageIndex) => (
+                    <MessageBubble
+                      key={message.messageId}
+                      message={message}
+                      currentUserId={currentUserId}
+                      isLast={
+                        groupIndex === messageGroups.length - 1 &&
+                        messageIndex === group.messages.length - 1
+                      }
+                    />
+                  ))}
+                </div>
               ))}
             </AnimatePresence>
           </div>
