@@ -40,7 +40,7 @@ namespace HealthBuddy.Server.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, 
+                return StatusCode(StatusCodes.Status500InternalServerError,
                     $"Error getting food recommendations: {ex.Message}");
             }
         }
@@ -66,7 +66,7 @@ namespace HealthBuddy.Server.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, 
+                return StatusCode(StatusCodes.Status500InternalServerError,
                     $"Error getting exercise recommendations: {ex.Message}");
             }
         }
@@ -80,8 +80,8 @@ namespace HealthBuddy.Server.Controllers
         /// <returns>Personalized recommendations with health summary</returns>
         [HttpGet("personalized/{userId}")]
         public async Task<ActionResult<PersonalizedRecommendationDTO>> GetPersonalizedRecommendations(
-            int userId, 
-            [FromQuery] int foodCount = 5, 
+            int userId,
+            [FromQuery] int foodCount = 5,
             [FromQuery] int exerciseCount = 5)
         {
             try
@@ -96,7 +96,7 @@ namespace HealthBuddy.Server.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, 
+                return StatusCode(StatusCodes.Status500InternalServerError,
                     $"Error getting personalized recommendations: {ex.Message}");
             }
         }
@@ -116,7 +116,7 @@ namespace HealthBuddy.Server.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, 
+                return StatusCode(StatusCodes.Status500InternalServerError,
                     $"Error getting health summary: {ex.Message}");
             }
         }
@@ -141,7 +141,7 @@ namespace HealthBuddy.Server.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, 
+                return StatusCode(StatusCodes.Status500InternalServerError,
                     $"Error getting trending foods: {ex.Message}");
             }
         }
@@ -166,7 +166,7 @@ namespace HealthBuddy.Server.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, 
+                return StatusCode(StatusCodes.Status500InternalServerError,
                     $"Error getting trending exercises: {ex.Message}");
             }
         }
@@ -186,13 +186,13 @@ namespace HealthBuddy.Server.Controllers
                     return BadRequest("Invalid user ID or item ID");
                 }
 
-                if (string.IsNullOrEmpty(feedback.ItemType) || 
+                if (string.IsNullOrEmpty(feedback.ItemType) ||
                     !new[] { "food", "exercise" }.Contains(feedback.ItemType.ToLower()))
                 {
                     return BadRequest("Item type must be 'food' or 'exercise'");
                 }
 
-                if (string.IsNullOrEmpty(feedback.FeedbackType) || 
+                if (string.IsNullOrEmpty(feedback.FeedbackType) ||
                     !new[] { "like", "dislike", "not_interested", "tried" }.Contains(feedback.FeedbackType.ToLower()))
                 {
                     return BadRequest("Invalid feedback type");
@@ -212,7 +212,7 @@ namespace HealthBuddy.Server.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, 
+                return StatusCode(StatusCodes.Status500InternalServerError,
                     $"Error recording feedback: {ex.Message}");
             }
         }
@@ -238,9 +238,57 @@ namespace HealthBuddy.Server.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, 
+                return StatusCode(StatusCodes.Status500InternalServerError,
                     $"Error getting similar users: {ex.Message}");
             }
         }
+
+        /// <summary>
+        /// Clear recommendation cache for a specific user
+        /// Use this when user details are updated to ensure fresh recommendations
+        /// </summary>
+        /// <param name="userId">User ID</param>
+        /// <returns>Success status</returns>
+        [HttpPost("clear-cache/{userId}")]
+        public ActionResult ClearUserCache(int userId)
+        {
+            try
+            {
+                if (userId <= 0)
+                {
+                    return BadRequest("Invalid user ID");
+                }
+
+                _recommendationService.ClearUserRecommendationCache(userId);
+                return Ok(new { message = $"Cache cleared successfully for user {userId}" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    $"Error clearing cache: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Clear all recommendation cache (admin only)
+        /// Use sparingly as it affects all users
+        /// </summary>
+        /// <returns>Success status</returns>
+        [HttpPost("clear-cache/all")]
+        public ActionResult ClearAllCache()
+        {
+            try
+            {
+                _recommendationService.ClearAllRecommendationCache();
+                return Ok(new { message = "All recommendation cache cleared successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    $"Error clearing all cache: {ex.Message}");
+            }
+        }
+
+
     }
 }

@@ -3,6 +3,7 @@ using HealthBuddy.Server.Models.Domain;
 using HealthBuddy.Server.Models.DTO.GET;
 using HealthBuddy.Server.Models.DTO.UPDATE;
 using HealthBuddy.Server.Repositories;
+using HealthBuddy.Server.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,6 +20,7 @@ namespace HealthBuddy.Server.Controllers
         private readonly IExerciseRepository _exerciseRepository;
         private readonly IWorkoutScheduleRepository _workoutScheduleRepository;
         private readonly IMealScheduleRepository _mealScheduleRepository;
+        private readonly IRecommendationService _recommendationService;
         private readonly IMapper _mapper;
 
         public UserController(IUserRepository userRepository,
@@ -28,7 +30,8 @@ namespace HealthBuddy.Server.Controllers
         IFoodRepository foodRepository,
         IExerciseRepository exerciseRepository,
         IWorkoutScheduleRepository workoutScheduleRepository,
-        IMealScheduleRepository mealScheduleRepository)
+        IMealScheduleRepository mealScheduleRepository,
+        IRecommendationService recommendationService)
         {
             _userRepository = userRepository;
             _mapper = mapper;
@@ -38,6 +41,7 @@ namespace HealthBuddy.Server.Controllers
             _exerciseRepository = exerciseRepository;
             _workoutScheduleRepository = workoutScheduleRepository;
             _mealScheduleRepository = mealScheduleRepository;
+            _recommendationService = recommendationService;
         }
 
 
@@ -196,6 +200,11 @@ namespace HealthBuddy.Server.Controllers
                 {
                     return BadRequest(new { error = "User detail not found" });
                 }
+
+                // Clear recommendation cache since user details changed
+                // This ensures fresh recommendations with updated allergy/health info
+                _recommendationService.ClearUserRecommendationCache(requestDTO.UserId);
+
                 //return Ok(_mapper.Map<UserDetailDTO>(updateUserDetail));
                 return Ok("User detail updated successfully");
             }
