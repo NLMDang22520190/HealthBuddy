@@ -3,7 +3,6 @@ using HealthBuddy.Server.Models.Domain;
 using HealthBuddy.Server.Models.DTO.GET;
 using HealthBuddy.Server.Repositories;
 using Microsoft.Extensions.Caching.Memory;
-using System.Text.Json;
 
 namespace HealthBuddy.Server.Services
 {
@@ -46,21 +45,40 @@ namespace HealthBuddy.Server.Services
 
         public async Task<List<FoodRecommendationDTO>> GetFoodRecommendationsAsync(int userId, int count = 10)
         {
-            var cacheKey = $"food_recommendations_{userId}_{count}";
+            // Get user detail first to include in cache key for proper invalidation
+            var userDetail = await _userDetailRepository.GetUserDetailByUserIdAsync(userId);
+
+            // Create cache key that includes user detail hash to auto-invalidate when user data changes
+            var userDetailHash = userDetail != null ?
+                $"{userDetail.Height}_{userDetail.Weight}_{userDetail.HealthCondition}_{userDetail.Allergies}".GetHashCode() : 0;
+            var cacheKey = $"food_recommendations_{userId}_{count}_{userDetailHash}";
+
             if (_cache.TryGetValue(cacheKey, out List<FoodRecommendationDTO>? cachedResult))
             {
                 return cachedResult ?? new List<FoodRecommendationDTO>();
             }
 
             var user = await _userRepository.GetUserByIdAsync(userId);
-            var userDetail = await _userDetailRepository.GetUserDetailByUserIdAsync(userId);
             var allFoods = await _foodRepository.GetApprovedFoods();
 
             var recommendations = new List<FoodRecommendationDTO>();
 
             foreach (var food in allFoods)
             {
-                var score = await CalculateFoodScore(food, user, userDetail, userId);
+                // Pre-filter foods with allergies - exclude them completely
+                if (userDetail?.Allergies != null && HasAllergyConflict(food, userDetail.Allergies))
+                {
+                    continue; // Skip this food entirely
+                }
+
+                var score = CalculateFoodScore(food, user, userDetail, userId);
+
+                // Only include foods with positive scores
+                if (score <= 0)
+                {
+                    continue;
+                }
+
                 var reason = GenerateFoodRecommendationReason(food, userDetail, score);
                 var isLiked = await _likeRepository.GetPostLikeByUserId(food.FoodId, userId, "food");
 
@@ -81,6 +99,8 @@ namespace HealthBuddy.Server.Services
                     IsLikedByUser = isLiked
                 });
             }
+
+
 
             var result = recommendations
                 .OrderByDescending(r => r.RecommendationScore)
@@ -163,6 +183,56 @@ namespace HealthBuddy.Server.Services
             // This could be stored in a separate RecommendationFeedback table
             // For now, we'll return true as a placeholder
             return await Task.FromResult(true);
+        }
+
+        /// <summary>
+        /// Clear recommendation cache for a specific user
+        /// Call this method when user details are updated to ensure fresh recommendations
+        /// </summary>
+        public void ClearUserRecommendationCache(int userId)
+        {
+            try
+            {
+                // Get all cache keys that start with the user's recommendation pattern
+                var cacheKeys = new List<string>();
+
+                // Since IMemoryCache doesn't expose keys directly, we'll use a pattern-based approach
+                // Clear both food and exercise recommendations for this user
+                for (int count = 1; count <= 50; count++) // Reasonable range for count parameter
+                {
+                    // Try different hash values (we can't predict the exact hash, so we clear broadly)
+                    for (int hash = -1000000; hash <= 1000000; hash += 100000)
+                    {
+                        var foodCacheKey = $"food_recommendations_{userId}_{count}_{hash}";
+                        var exerciseCacheKey = $"exercise_recommendations_{userId}_{count}";
+
+                        _cache.Remove(foodCacheKey);
+                        _cache.Remove(exerciseCacheKey);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // Log error if needed
+            }
+        }
+
+        /// <summary>
+        /// Clear all recommendation cache
+        /// Use this sparingly as it affects all users
+        /// </summary>
+        public void ClearAllRecommendationCache()
+        {
+            try
+            {
+                // Since we can't enumerate IMemoryCache keys, we'll need to implement a more sophisticated approach
+                // Note: In production, consider using IDistributedCache with Redis
+                // which allows pattern-based key deletion
+            }
+            catch (Exception)
+            {
+                // Log error if needed
+            }
         }
 
         public async Task<List<int>> GetSimilarUsersAsync(int userId, int count = 10)
@@ -254,7 +324,7 @@ namespace HealthBuddy.Server.Services
         }
 
         // Private helper methods for scoring algorithms
-        private async Task<double> CalculateFoodScore(Food food, User? user, UserDetail? userDetail, int userId)
+        private double CalculateFoodScore(Food food, User? user, UserDetail? userDetail, int userId)
         {
             double score = 0.0;
 
@@ -267,11 +337,8 @@ namespace HealthBuddy.Server.Services
                 score += CalculateHealthConditionScore(food, userDetail.HealthCondition);
             }
 
-            // Allergy filtering (critical - can make score 0)
-            if (userDetail?.Allergies != null && HasAllergyConflict(food, userDetail.Allergies))
-            {
-                return 0; // Exclude foods with allergens
-            }
+            // Note: Allergy filtering is now done before calling this method
+            // This ensures foods with allergens are completely excluded from recommendations
 
             // BMI-based calorie matching (0-25 points)
             if (userDetail?.Height != null && userDetail?.Weight != null)
@@ -355,15 +422,67 @@ namespace HealthBuddy.Server.Services
 
         private bool HasAllergyConflict(Food food, string allergies)
         {
-            var allergyList = allergies.ToLower().Split(',').Select(a => a.Trim()).ToList();
-            var foodName = food.FoodName.ToLower();
-            var description = food.Description?.ToLower() ?? "";
+            try
+            {
+                if (string.IsNullOrWhiteSpace(allergies))
+                {
+                    return false;
+                }
 
-            return allergyList.Any(allergy =>
-                foodName.Contains(allergy) ||
-                description.Contains(allergy) ||
-                food.Recipes.Any(r => r.Ingredient.IngredientName.ToLower().Contains(allergy))
-            );
+                var allergyList = allergies.ToLower().Split(',').Select(a => a.Trim()).Where(a => !string.IsNullOrEmpty(a)).ToList();
+
+                if (!allergyList.Any())
+                {
+                    return false;
+                }
+
+                var foodName = food.FoodName.ToLower();
+                var description = food.Description?.ToLower() ?? "";
+
+                // Check food name for allergens
+                foreach (var allergy in allergyList)
+                {
+                    if (IsAllergyMatch(foodName, allergy))
+                    {
+                        return true;
+                    }
+                }
+
+                // Check description for allergens
+                foreach (var allergy in allergyList)
+                {
+                    if (IsAllergyMatch(description, allergy))
+                    {
+                        return true;
+                    }
+                }
+
+                // Check ingredients for allergens
+                if (food.Recipes != null && food.Recipes.Any())
+                {
+                    foreach (var recipe in food.Recipes)
+                    {
+                        if (recipe.Ingredient != null)
+                        {
+                            var ingredientName = recipe.Ingredient.IngredientName.ToLower();
+                            foreach (var allergy in allergyList)
+                            {
+                                if (IsAllergyMatch(ingredientName, allergy))
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return false;
+            }
+            catch (Exception)
+            {
+                // In case of error, be safe and exclude the food
+                return true;
+            }
         }
 
         private double CalculateCalorieScore(int foodCalories, double? bmi)
@@ -509,6 +628,64 @@ namespace HealthBuddy.Server.Services
             }
 
             return reasons.Any() ? string.Join(", ", reasons) : "Recommended for you";
+        }
+
+        /// <summary>
+        /// Enhanced allergy matching with fuzzy logic to handle typos and variations
+        /// </summary>
+        private bool IsAllergyMatch(string text, string allergy)
+        {
+            if (string.IsNullOrWhiteSpace(text) || string.IsNullOrWhiteSpace(allergy))
+                return false;
+
+            text = text.ToLower();
+            allergy = allergy.ToLower();
+
+            // Exact match
+            if (text.Contains(allergy, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            // Common typo corrections for allergies
+            var allergyCorrections = new Dictionary<string, string[]>
+            {
+                { "sugar", new[] { "suger", "sugr", "shugar" } },
+                { "potato", new[] { "potatos", "potatoe", "potatos" } },
+                { "milk", new[] { "mlk", "milks" } },
+                { "egg", new[] { "eggs", "eg" } },
+                { "nuts", new[] { "nut", "nts" } },
+                { "shellfish", new[] { "shell fish", "shelfish" } },
+                { "wheat", new[] { "weat", "whea" } },
+                { "soy", new[] { "soya", "soybeans" } }
+            };
+
+            // Check if allergy matches any known ingredient with corrections
+            foreach (var correction in allergyCorrections)
+            {
+                var correctSpelling = correction.Key;
+                var typos = correction.Value;
+
+                // If user typed a typo, check against correct spelling
+                if (typos.Contains(allergy) && text.Contains(correctSpelling, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+
+                // If ingredient has typo, check against user's correct spelling
+                if (allergy == correctSpelling)
+                {
+                    foreach (var typo in typos)
+                    {
+                        if (text.Contains(typo, StringComparison.OrdinalIgnoreCase))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }

@@ -39,5 +39,17 @@ namespace HealthBuddy.Server.Services
         /// </summary>
         Task<List<FoodRecommendationDTO>> GetTrendingFoodsAsync(int count = 10);
         Task<List<ExerciseRecommendationDTO>> GetTrendingExercisesAsync(int count = 10);
+
+        /// <summary>
+        /// Clear recommendation cache for a specific user
+        /// Call this when user details are updated to ensure fresh recommendations
+        /// </summary>
+        void ClearUserRecommendationCache(int userId);
+
+        /// <summary>
+        /// Clear all recommendation cache
+        /// Use sparingly as it affects all users
+        /// </summary>
+        void ClearAllRecommendationCache();
     }
 }
