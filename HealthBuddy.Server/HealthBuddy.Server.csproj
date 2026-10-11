@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>0286ae1f-6b88-565f-bc65-1b7c379f7ee4</UserSecretsId>
     <SpaRoot>..\healthbuddy.client</SpaRoot>
     <SpaProxyLaunchCommand>npm run dev</SpaProxyLaunchCommand>
     <SpaProxyServerUrl>https://localhost:63716</SpaProxyServerUrl>
